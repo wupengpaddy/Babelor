@@ -16,7 +16,7 @@ import os
 import time
 import pandas as pd
 from sqlalchemy import create_engine
-
+from Message import URL
 # 切换中文字符
 os.environ['NLS_LANG'] = 'SIMPLIFIED CHINESE_CHINA.UTF8'
 
