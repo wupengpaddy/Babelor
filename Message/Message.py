@@ -12,13 +12,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from urllib.parse import urlparse, quote, unquote
+from urllib.parse import urlparse, unquote
 from datetime import datetime
 import json
+
 DatetimeFmt = '%Y-%m-%d %H:%M:%S.%f'
+CODING = 'utf-8'
 
 
-def get_datetime():
+def get_current_datetime():
     return datetime.now().strftime(DatetimeFmt)
 
 
@@ -28,7 +30,10 @@ class URL:
             raise AttributeError
         if not isinstance(args[0], str):
             raise ValueError
-        self.url = urlparse(args[0])
+        if "port" in args[0]:
+            self.url = urlparse(args[0].replace("port", "0"))
+        else:
+            self.url = urlparse(args[0])
         self.scheme = self.url.scheme
         self.username = self.url.username
         self.password = self.url.password
@@ -49,20 +54,25 @@ class URL:
 
 class MSG:
     def __init__(self, org, dst, case: str, activity: str, encrypt: str, data):
-        self.timestamp = get_datetime()
+        self.timestamp = get_current_datetime()
         self.origination = check_url(org)
         self.destination = check_url(dst)
         self.case = case
         self.activity = activity
         self.encryption = encrypt
-        self.data = data
+        if isinstance(data, str):
+            self.data = json.load(data)
+        elif isinstance(data, dict):
+            self.data = data
+        else:
+            raise ValueError
 
-   def __str__(self):
+    def __str__(self):
         return json.dumps({
             "head": {
                 "timestamp": self.timestamp,
                 "origination": self.origination,
-                "destination": self.desti,
+                "destination": self.destination,
                 "case": self.case,
                 "activity": self.activity,
             },
@@ -72,19 +82,11 @@ class MSG:
             }
         }, ensure_ascii=False)
 
+
 def check_url(*args):
-    if  len(args) > 1:
-        raise AttributeError
     if isinstance(args[0], str):
         return URL(args[0])
     elif isinstance(args[0], URL):
         return args[0]
     else:
         raise ValueError
-
-
-
-
-a = URL("scheme://username:password@host:10/path?query#fragment")
-print(a)
-
