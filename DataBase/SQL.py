@@ -16,7 +16,7 @@ import os
 import time
 import pandas as pd
 from sqlalchemy import create_engine
-from Message import URL
+from Message import URL, MSG
 # 切换中文字符
 os.environ['NLS_LANG'] = 'SIMPLIFIED CHINESE_CHINA.UTF8'
 
@@ -25,7 +25,7 @@ class SQL:
     """
     Load Data from Oracle
     """
-    def __init__(self, uri: str, typ: str):
+    def __init__(self, uri: str, sql, typ: str):
         """
         :param sql: SQL脚本
         """
@@ -40,8 +40,7 @@ class SQL:
             "query": "orcl",
             "fragment": "",
         }
-        conn = "oracle+cx_oracle://" + cfg["user"] + ":" + cfg["password"] \
-               + "@" + cfg["host"] + ":" + str(cfg["port"]) + "/" + cfg["service"]
+        conn = "oracle+cx_oracle://username:password@host:port/service"
         self.engine = create_engine(conn)
         self.sql = sql
         self.typ = typ

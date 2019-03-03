@@ -26,14 +26,14 @@ def get_current_datetime():
 
 class URL:
     def __init__(self, *args):
+        """
+        :type args[0]: "scheme[+scheme]://[username[:password]@]hostname[:port][/path][?query][#fragment]"
+        """
         if len(args) > 1:
             raise AttributeError
         if not isinstance(args[0], str):
             raise ValueError
-        if "port" in args[0]:
-            self.url = urlparse(args[0].replace("port", "0"))
-        else:
-            self.url = urlparse(args[0])
+        self.url = urlparse(check_port(args))
         self.scheme = self.url.scheme
         self.username = self.url.username
         self.password = self.url.password
@@ -83,10 +83,30 @@ class MSG:
         }, ensure_ascii=False)
 
 
-def check_url(*args):
+def check_url(args):
     if isinstance(args[0], str):
         return URL(args[0])
     elif isinstance(args[0], URL):
         return args[0]
     else:
         raise ValueError
+
+
+def check_port(args):
+    if "port" in args[0]:
+        if "oracle" in args[0]:
+            port = "1521"
+        elif "mysql" in args[0]:
+            port = "3306"
+        else:
+            port = "0"
+        return args[0].replace("port", port)
+    else:
+        return args[0]
+
+
+if __name__ == '__main__':
+    conn = "oracle+cx_oracle://username:password@host:port/service"
+    b = URL(conn)
+    print(type(b.username))
+    print(b.username)
