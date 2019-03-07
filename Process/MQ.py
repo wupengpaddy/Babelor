@@ -14,23 +14,14 @@
 # limitations under the License.
 import zmq
 import time
-from multiprocessing import Pool, Queue, Manager
-from Tools.Conversion import json2dict, dict2json
-from Message.Message import MSG, URL
+from multiprocessing import Queue
+from Tools.Conversion import json2dict
+from Message.Message import MSG
 
 
 MSG_Q_MAX_DEPTH = 100
 CODING = "utf-8"
 BlockingTime = 0.025
-
-MSG_RESPONSE = {
-    "SUCCESS": {
-        "STAT": True
-    },
-    "FAULT": {
-        "STAT": False
-    }
-}
 
 
 class MessageQueue:

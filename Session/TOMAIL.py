@@ -12,8 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import os
-import pandas as pd
 import smtplib
 from email.header import Header
 from email.mime.text import MIMEText
@@ -21,93 +19,49 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email.headerregistry import Address
 from email import encoders
+from Message.Message import URL
 
 
-def email_send(select_date: str, df: pd.DataFrame):
-    file_path = "data/{0}.xlsx".format(select_date)
-    df.to_excel(file_path, index=False)
-    mail_to = {
-        'name':     '葛元霁',
-        'user':     'geyuanji',
-        'postfix':  'shairport.com'
-    }
-    mail_sub = '航班日报{0}'.format(select_date)
-    mail_content = "航班日报{0}".format(select_date)
-    mail = Mail(mail_to, mail_sub, mail_content, file_path)
-    mail.send()
-    print("APP45-PVG2SAA send {0} data by email successful.".format(select_date))
-    os.remove(file_path)
-
-
-def json_send(select_date: str, df: pd.DataFrame):
-    msg = MessageQueue(select_date, df)
-    msg.send()
-    print("APP45-PVG2SAA send {0} data via json successful.".format(select_date))
-
-
-class Mail:
+class MAIL:
     """
     Mail Model
     """
-    def __init__(self, to: dict, sub: str, content: str, attach_path=None):
-        """
-        :param to: 收件人{'name': str, 'user': str, 'postfix': str}
-        :param sub: 邮件主题
-        :param content: 邮件正文
-        :param attach_path: 邮件附件
-        """
-        # Mail config
-        self.cfg = {
-            "host":     "172.21.98.66",           # SMTP 服务器
-            "port":     10002,                  # 服务端口
-            "user":     "tanghailing",          # 用户名
-            "name":     "唐海铃",               # 发件人
-            "pass":     "65684446Mail",         # 口令
-            "postfix":  "shairport.com"         # 发件箱后缀
-        }
-        # Structure ME/TO
-        self.me = str(Address(Header(self.cfg['name'], 'UTF-8').encode(), self.cfg['user'], self.cfg['postfix']))
-        self.to = str(Address(Header(to['name'], 'UTF-8').encode(), to['user'], to['postfix']))
-        self.msg = self.create_email(sub, content, attach_path)
+    def __init__(self, conn: str):
+        # tomail://user1@strtrek.com#smtp://user2:password@192.168.0.1:10001#tomail://user2@strtrek.com#用户2
+        self.conn = URL(conn)
 
-    # Structure MIME
-    def create_email(self, sub: str, content: str, attach_path=None) -> str:
+    def send(self, mail_msg: dict):
+        sender_user = self.conn.fragment.username               # 寄件人用户名
+        receiver_user = self.conn.username                      # 收件人用户名
+        sender_name = self.conn.fragment.fragment.username      # 寄件人名
+        receiver_name = self.conn.fragment.fragment.fragment    # 收件人名
+        sender_postfix = self.conn.fragment.fragment.hostname   # 寄件人 postfix
+        receiver_postfix = self.conn.hostname                   # 收件人 postfix
+        # Structure MIME
+        me = str(Address(Header(sender_name, 'UTF-8').encode(), sender_user, sender_postfix))
+        to = str(Address(Header(receiver_name, 'UTF-8').encode(), receiver_user, receiver_postfix))
         msg = MIMEMultipart()
-        msg['from'] = self.me                               # 寄件人
-        msg['to'] = self.to                                 # 收件人
-        msg['subject'] = Header(sub, 'UTF-8').encode()      # 主题
+        msg['from'] = me                                                # 寄件人
+        msg['to'] = to                                                  # 收件人
+        msg['subject'] = Header(mail_msg["subject"], 'UTF-8').encode()      # 标题
         msg["Accept-Language"] = "zh-CN"
         msg["Accept-Charset"] = "ISO-8859-1,utf-8"
-        msg.attach(MIMEText(content, 'plain', "utf-8"))     # 正文
-        if attach_path is not None:
-            with open(attach_path, 'rb') as attachment:        # 附件
-                part = MIMEBase('application', 'octet-stream')
-                part.set_payload(attachment.read())
-                encoders.encode_base64(part)
-                part.add_header('Content-Disposition', 'attachment',
-                                filename=Header(attach_path[attach_path.rindex("/") + 1:], 'UTF-8').encode())
-                msg.attach(part)
-        return msg.as_string()
-
-    # noinspection PyBroadException
-    def send(self):
-        # print(self.msg)
-        with smtplib.SMTP_SSL(host=self.cfg["host"], port=self.cfg["port"]) as sess:
-            sess.login(user=self.cfg["user"], password=self.cfg["pass"])
-            sess.sendmail(self.me, self.to, self.msg)
-
-
-def demo():
-    mail_to = {
-        'name':     '葛元霁',
-        'user':     'geyuanji',
-        'postfix':  'strtrek.com'
-    }
-    mail_sub = '航班日报'
-    mail_content = "测试正文"
-    mail = Mail(mail_to, mail_sub, mail_content)
-    mail.send()
-
-
-if __name__ == '__main__':
-    demo()
+        msg.attach(MIMEText(mail_msg["content"], 'plain', "utf-8"))         # 正文
+        attachments = mail_msg["attachments"]                               # 附件
+        if attachments is not None:
+            for attach_path in attachments:
+                with open(attach_path, 'rb') as attachment:
+                    part = MIMEBase('application', 'octet-stream')
+                    part.set_payload(attachment.read())
+                    encoders.encode_base64(part)
+                    part.add_header('Content-Disposition', 'attachment',
+                                    filename=Header(attach_path.split("/")[-1], 'UTF-8').encode())
+                    msg.attach(part)
+        # Send mail
+        hostname = self.conn.fragment.hostname      # 邮件服务主机
+        port = self.conn.fragment.port              # 邮件服务端口
+        username = self.conn.fragment.username      # 邮件服务用户
+        password = self.conn.fragment.password      # 邮件服务密码
+        with smtplib.SMTP_SSL(host=hostname, port=port) as sess:
+            sess.login(user=username, password=password)
+            sess.sendmail(me, to, msg.as_string())

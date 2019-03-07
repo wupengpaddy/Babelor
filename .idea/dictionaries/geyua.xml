@@ -3,8 +3,11 @@
     <words>
       <w>acdm</w>
       <w>orcl</w>
+      <w>pymysql</w>
       <w>shairport</w>
       <w>spia</w>
+      <w>stor</w>
+      <w>tomail</w>
       <w>unparse</w>
     </words>
   </dictionary>

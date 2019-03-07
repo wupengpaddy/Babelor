@@ -24,6 +24,22 @@ def get_current_datetime():
     return datetime.now().strftime(DatetimeFmt)
 
 
+MAIL_MSG = {
+    'subject': '测试邮件主题',
+    'content': '测试邮件正文',
+    'attachments': None
+}
+
+RESPONSE_MSG = {
+    "SUCCESS": {
+        "STAT": True
+    },
+    "FAULT": {
+        "STAT": False
+    }
+}
+
+
 class URL:
     def __init__(self, url: str):
         url = urlparse(url)
@@ -33,7 +49,10 @@ class URL:
         self.hostname = url.hostname
         self.port = url.port
         self.netloc = url.netloc
-        self.path = url.path
+        if "/" in url.path:
+            self.path = url.path[url.path.rindex("/") + 1:]
+        else:
+            self.path = url.path
         self.params = url.params
         self.query = url.query
         try:
@@ -102,21 +121,75 @@ def check_url(*args):
         raise ValueError
 
 
-def demo():
-    # b = urlparse("scheme://username:password@host:10/path;params?query2#fragment")
-    # b = urlunparse(("scheme", "username:password@host:10", "path", "params", "query", "fragment"))
-    b = URL("tomail://zhangpeng@shairport.com#smtp://tanghailing:65684446Mail@172.21.98.66:10001#唐海铃")
-    b.scheme = "orcale"
-    print("URL:", b)
-    print("目标协议:", b.scheme)
-    print("收件人:", b.netloc)
-    print("发送协议:", b.fragment.scheme)
-    print("服务用户:", b.fragment.username)
-    print("服务密码:", b.fragment.password)
-    print("主机地址", b.fragment.hostname)
-    print("主机端口", b.fragment.port)
-    print("邮件表示", b.fragment.fragment)
+def check_sql_url(*args):
+    # conn = "oracle://username:password@hostname/service"
+    # conn = "mysql://username:password@hostname/service"
+    # conn = "oracle://username:password@hostname:1521/service"
+    # conn = "mysql://username:password@hostname:3306/service"
+    url = URL(args[0])
+    port = 0
+    if url.scheme == "oracle":
+        url.scheme = "oracle+cx_oracle"
+        port = 1521
+    if url.scheme == "mysql":
+        url.scheme = "mysql+pymysql"
+        port = 3306
+    if url.port is None:
+        url.port = port
+        url.netloc = "{0}:{1}".format(url.netloc, port)
+    # conn = "oracle+cx_oracle://username:password@hostname:1521/service"
+    # conn = "mysql+pymysql://username:password@hostname:3306/service"
+    return url.get_url(True, False, False, False)
+
+
+def demo_tomail():
+    conn = "{0}#{1}#{2}#{3}".format("tomail://zhangpeng@shairport.com",
+                                    "smtp://tanghailing:65684446Mail@172.21.98.66:10002",
+                                    "tomail://唐海铃@shairport.com",
+                                    "张鹏")
+    url = URL(conn)
+    print("URL:", url)
+    print("收件人:", url.netloc)
+    print("收件人协议:", url.scheme)
+    print("收件人用户名:", url.username)
+    print("收件人名:", url.fragment.fragment.fragment)
+    print("发件人：", "{0}@{1}".format(url.fragment.username, url.fragment.fragment.hostname))
+    print("发件人协议:", url.fragment.fragment.scheme)
+    print("发件人用户名:", url.fragment.username)
+    print("发件人名:", url.fragment.fragment.username)
+    print("服务协议:", url.fragment.scheme)
+    print("服务用户:", url.fragment.username)
+    print("服务密码:", url.fragment.password)
+    print("服务地址", url.fragment.hostname)
+    print("服务端口", url.fragment.port)
+
+
+def demo_sql():
+    conn = "oracle://username:password@hostname:1521/service"
+    url = URL(conn)
+    print("URL:", url)
+    print("服务协议:", url.scheme)
+    print("服务用户:", url.username)
+    print("服务密码:", url.password)
+    print("服务地址", url.hostname)
+    print("服务端口", url.port)
+    print("数据服务", url.path)
+
+
+def demo_ftp():
+    conn = "ftp://username:password@hostname:21/path#PASV"
+    url = URL(conn)
+    print("URL:", url)
+    print("服务协议:", url.scheme)
+    print("服务用户:", url.username)
+    print("服务密码:", url.password)
+    print("服务地址", url.hostname)
+    print("服务端口", url.port)
+    print("服务路径", url.path)
+    print("服务模式", url.fragment)
 
 
 if __name__ == '__main__':
-    demo()
+    # demo_tomail()
+    # demo_sql()
+    demo_ftp()

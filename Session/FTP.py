@@ -17,15 +17,16 @@ from Message.Message import URL
 
 
 class FTP:
-    def __init__(self, conn: str, set_pasv=True):
+    def __init__(self, conn: str):
         self.conn = URL(conn)
-        self.set_pasv = set_pasv
 
-    def send(self, filepath: str):
+    def send(self, attachments):
         ftp = ftplib.FTP()
         ftp.connect(self.conn.hostname, self.conn.port)     # 连接
         ftp.login(self.conn.username, self.conn.password)   # 登录
-        ftp.set_pasv(self.set_pasv)                         # 被动模式
-        with open(filepath, 'rb') as attachment:
-            ftp.storbinary('STOR ' + filepath.split("/")[-1], attachment)  # 上传文件
+        if "PASV" in self.conn.fragment:
+            ftp.set_pasv(True)                              # 被动模式
+        for attach_path in attachments:
+            with open(attach_path, 'rb') as attachment:
+                ftp.storbinary('STOR ' + attach_path.split("/")[-1], attachment)  # 上传文件
         ftp.close()
