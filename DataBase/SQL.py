@@ -13,10 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
-import time
 import pandas as pd
 from sqlalchemy import create_engine
-
+from Message.Message import URL
 # 切换中文字符
 os.environ['NLS_LANG'] = 'SIMPLIFIED CHINESE_CHINA.UTF8'
 
@@ -25,40 +24,35 @@ class SQL:
     """
     Load Data from Oracle
     """
-    def __init__(self, uri: str, typ: str):
+    def __init__(self, conn: str):
         """
-        :param sql: SQL脚本
+        :param conn: SQL连接脚本
         """
+        # conn = "oracle://username:password@hostname:1521/path"
+        # conn = "mysql://username:password@hostname:3306/path"
+        self.engine = create_engine(sql_connection_check(conn))
+        self.request_sql = None
+        self.reply_df = None
 
-        uri = {
-            "scheme": "oracle+cx_oracle",
-            "username": "spia_acdm",
-            "password": "Wonders",
-            "netloc": "10.28.130.13:1521",
-            "hostname": "mail.shairport.com",
-            "port": 1521,
-            "query": "orcl",
-            "fragment": "",
-        }
-        conn = "oracle+cx_oracle://" + cfg["user"] + ":" + cfg["password"] \
-               + "@" + cfg["host"] + ":" + str(cfg["port"]) + "/" + cfg["service"]
-        self.engine = create_engine(conn)
-        self.sql = sql
-        self.typ = typ
-        self.isLoad = False
-        self.df = None
+    def request(self, sql: str):
+        self.request_sql = sql
+        reply_df = pd.read_sql(sql=self.request_sql, con=self.engine)
+        self.reply_df = reply_df.rename(str.upper, axis='columns')
+        return self.reply_df
 
-    def load(self):
-        df = pd.read_sql(sql=self.sql, con=self.engine)
-        self.df = df.rename(str.upper, axis='columns')
-        self.isLoad = True
-        return self.df
 
-    def save(self):
-        temp_path = "data/{0}-{1}.xlsx".format(self.typ, time.strftime('%Y-%m-%d', time.localtime(time.time())))
-        if self.isLoad:
-            df = self.df
-        else:
-            df = self.load()
-        df.to_excel(temp_path)
-        return temp_path
+def sql_connection_check(conn: str):
+    # conn = "oracle+cx_oracle://username:password@hostname:1521/path"
+    # conn = "mysql+pymysql://username:password@hostname:3306/path"
+    conn_url = URL(conn)
+    port = 0
+    if conn_url.scheme == "oracle":
+        conn_url.scheme = "oracle+cx_oracle"
+        port = 1521
+    if conn_url.scheme == "mysql":
+        conn_url.scheme = "mysql+pymysql"
+        port = 3306
+    if conn_url.port is None:
+        conn_url.port = port
+        conn_url.netloc = "{0}:{1}".format(conn_url.netloc, port)
+    return conn_url.get_url(True, False, False, False)

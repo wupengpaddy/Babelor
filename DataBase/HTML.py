@@ -70,7 +70,7 @@ query = {
 
 
 def get_html2dataframe(path: str):
-    session = requests.Session()
+
     url_rec_doc = "&".join([
         'http://newoa.shairport.com/shairport/dep162/swgl_162.nsf/myview?openform',
         'view=vwdocforfenlei',
@@ -100,7 +100,6 @@ def get_html2dataframe(path: str):
         "Content-Length":   "446",
         "Connection":       "Keep-Alive"
     }
-    session.header = header
     data = {
         "%%ModDate": "0000000000000000",
         "reasonType": "0",
@@ -112,6 +111,9 @@ def get_html2dataframe(path: str):
         "Password": "123456",
         "RedirectTo": url_rec_doc.format(20, 1)
     }
+
+    session = requests.Session()
+    session.header = header
     reply = session.post(url_login, data=data, allow_redirects=True)
     total_rows = BeautifulSoup(reply.text, "html.parser").body.table.select('input[name="total"]')[0].attrs["value"]
     reply = session.get(url_rec_doc.format(total_rows, 1))
