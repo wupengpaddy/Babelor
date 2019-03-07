@@ -17,9 +17,10 @@ from datetime import datetime
 from Tools.Conversion import dict2json, json2dict
 
 DatetimeFmt = '%Y-%m-%d %H:%M:%S.%f'
+CODING = 'utf-8'
 
 
-def get_datetime():
+def get_current_datetime():
     return datetime.now().strftime(DatetimeFmt)
 
 
