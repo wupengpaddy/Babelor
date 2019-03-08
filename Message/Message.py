@@ -24,7 +24,7 @@ def get_current_datetime():
     return datetime.now().strftime(DatetimeFmt)
 
 
-MAIL_MSG = {
+MAIL_MSG_BODY = {
     'subject': '测试邮件主题',
     'content': '测试邮件正文',
     'attachments': None
@@ -142,6 +142,17 @@ def check_sql_url(*args):
     return url.get_url(True, False, False, False)
 
 
+def check_ftp_url(*args):
+    # conn = "ftp://username:password@hostname:21/path#PASV"
+    url = URL(args[0])
+    if url.scheme != "ftp":
+        raise ValueError
+    if url.port is None:
+        url.port = 21
+        url.netloc = "{0}:{1}".format(url.netloc, url.port)
+    return url.get_url(True, False, False, True)
+
+
 def demo_tomail():
     conn = "{0}#{1}#{2}#{3}".format("tomail://zhangpeng@shairport.com",
                                     "smtp://tanghailing:65684446Mail@172.21.98.66:10002",
@@ -177,7 +188,7 @@ def demo_sql():
 
 
 def demo_ftp():
-    conn = "ftp://username:password@hostname:21/path#PASV"
+    conn = "ftp://username:password@hostname/path#PASV"
     url = URL(conn)
     print("URL:", url)
     print("服务协议:", url.scheme)

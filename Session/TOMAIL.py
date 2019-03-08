@@ -27,7 +27,7 @@ class MAIL:
     Mail Model
     """
     def __init__(self, conn: str):
-        # tomail://user1@strtrek.com#smtp://user2:password@192.168.0.1:10001#tomail://user2@strtrek.com#用户2
+        # tomail://user1@strtrek.com#smtp://user2:password@192.168.0.1:10001#tomail://用户2@strtrek.com#用户1
         self.conn = URL(conn)
 
     def send(self, mail_msg: dict):
