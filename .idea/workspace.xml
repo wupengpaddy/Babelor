@@ -3,14 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="be54182a-218b-4e8e-9234-62a7d88d12fc" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Message/Message.py" beforeDir="false" afterPath="$PROJECT_DIR$/Message/Message.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README/Babelor-协议.vsdx" beforeDir="false" afterPath="$PROJECT_DIR$/README/Babelor-协议.vsdx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README/Babelor-消息.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/README/Babelor-消息.vsdx" beforeDir="false" afterPath="$PROJECT_DIR$/README/Babelor-消息.vsdx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Session/Conversion.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Session/DataIn.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Session/DataOut.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Session/TOMAIL.py" beforeDir="false" afterPath="$PROJECT_DIR$/Session/TOMAIL.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Process/MQ.py" beforeDir="false" afterPath="$PROJECT_DIR$/Process/MQ.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -23,56 +16,7 @@
     <SUITE FILE_PATH="coverage/Babelor$Message.coverage" NAME="Message Coverage Results" MODIFIED="1552007007682" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Message" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Process/MQ.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="456">
-              <caret line="24" selection-start-line="24" selection-end-line="24" />
-              <folding>
-                <element signature="e#600#610#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Message/Message.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1421">
-              <caret line="191" column="19" lean-forward="true" selection-start-line="191" selection-start-column="19" selection-end-line="191" selection-end-column="19" />
-              <folding>
-                <element signature="e#600#654#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Session/TOMAIL.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="585">
-              <caret line="38" column="77" lean-forward="true" selection-start-line="38" selection-start-column="77" selection-end-line="38" selection-end-column="77" />
-              <folding>
-                <element signature="e#600#614#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Session/FTP.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="589">
-              <caret line="31" column="19" lean-forward="true" selection-start-line="31" selection-start-column="19" selection-end-line="31" selection-end-column="19" />
-              <folding>
-                <element signature="e#600#613#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -99,10 +43,10 @@
         <option value="$PROJECT_DIR$/DataBase/HTML.py" />
         <option value="$PROJECT_DIR$/Session/Conversion.py" />
         <option value="$PROJECT_DIR$/Session/FTP.py" />
-        <option value="$PROJECT_DIR$/Process/MQ.py" />
         <option value="$PROJECT_DIR$/DataBase/SQL.py" />
         <option value="$PROJECT_DIR$/Session/TOMAIL.py" />
         <option value="$PROJECT_DIR$/Message/Message.py" />
+        <option value="$PROJECT_DIR$/Process/MQ.py" />
       </list>
     </option>
   </component>
@@ -118,7 +62,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -129,37 +72,7 @@
             <path>
               <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
               <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-              <item name="DataBase" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-              <item name="Message" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-              <item name="Presentation" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-              <item name="Process" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
               <item name="README" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-              <item name="Session" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-              <item name="Tools" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
@@ -169,6 +82,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -260,7 +174,8 @@
       <workItem from="1550121805712" duration="14277000" />
       <workItem from="1551073821359" duration="72069000" />
       <workItem from="1551956860699" duration="8882000" />
-      <workItem from="1552006137359" duration="1650000" />
+      <workItem from="1552006137359" duration="2335000" />
+      <workItem from="1552273613846" duration="3673000" />
     </task>
     <task id="LOCAL-00001" summary="init">
       <created>1551342044292</created>
@@ -273,18 +188,17 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="96878000" />
+    <option name="totallyTimeSpent" value="101236000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-6" y="-6" width="2263" height="1473" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25804988" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.26031747" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49977323" visible="true" weight="0.328614" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49977323" weight="0.328614" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -342,25 +256,13 @@
       </provider>
     </entry>
     <entry file="file://C:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/site-packages/zmq/__init__.py" />
-    <entry file="file://$PROJECT_DIR$/Session/DataIn.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
+    <entry file="file://$PROJECT_DIR$/Session/DataIn.py" />
     <entry file="file://$PROJECT_DIR$/DataBase/SQL.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="374">
           <caret line="41" selection-start-line="41" selection-end-line="41" />
           <folding>
             <element signature="e#600#609#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Message/Message.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1421">
-          <caret line="191" column="19" lean-forward="true" selection-start-line="191" selection-start-column="19" selection-end-line="191" selection-end-column="19" />
-          <folding>
-            <element signature="e#600#654#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -375,31 +277,33 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Session/Conversion.py">
+    <entry file="file://$PROJECT_DIR$/Session/Conversion.py" />
+    <entry file="file://$PROJECT_DIR$/Session/FTP.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2">
+        <state relative-caret-position="608">
+          <caret line="32" lean-forward="true" selection-start-line="32" selection-end-line="32" />
           <folding>
-            <element signature="e#601#612#0" expanded="true" />
+            <element signature="e#600#613#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Session/TOMAIL.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="585">
-          <caret line="38" column="77" lean-forward="true" selection-start-line="38" selection-start-column="77" selection-end-line="38" selection-end-column="77" />
+        <state relative-caret-position="627">
+          <caret line="38" column="77" selection-start-line="38" selection-start-column="77" selection-end-line="38" selection-end-column="77" />
           <folding>
             <element signature="e#600#614#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Session/FTP.py">
+    <entry file="file://$PROJECT_DIR$/Message/Message.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="589">
-          <caret line="31" column="19" lean-forward="true" selection-start-line="31" selection-start-column="19" selection-end-line="31" selection-end-column="19" />
+        <state relative-caret-position="1691">
+          <caret line="191" column="19" selection-start-line="191" selection-start-column="19" selection-end-line="191" selection-end-column="19" />
           <folding>
-            <element signature="e#600#613#0" expanded="true" />
+            <element signature="e#600#654#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -407,7 +311,7 @@
     <entry file="file://$PROJECT_DIR$/Process/MQ.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="456">
-          <caret line="24" selection-start-line="24" selection-end-line="24" />
+          <caret line="42" column="43" lean-forward="true" selection-start-line="42" selection-start-column="43" selection-end-line="42" selection-end-column="43" />
           <folding>
             <element signature="e#600#610#0" expanded="true" />
           </folding>

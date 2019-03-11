@@ -21,7 +21,7 @@ from Message.Message import MSG
 
 MSG_Q_MAX_DEPTH = 100
 CODING = "utf-8"
-BlockingTime = 0.025
+BlockingTime = 1/1024
 
 
 class MessageQueue:
