@@ -88,6 +88,7 @@ class MSG:
         self.destination = URL(msg["head"]["destination"])
         self.case = msg["head"]["case"]
         self.activity = msg["head"]["activity"]
+        self.treatment = msg["body"]["treatment"]
         self.encryption = msg["body"]["encryption"]
         self.data = msg["body"]["data"]
 
@@ -104,6 +105,7 @@ class MSG:
                 "activity": self.activity,
             },
             "body": {
+                "treatment": self.treatment,
                 "encryption": self.encryption,
                 "data": self.data,
             }

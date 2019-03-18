@@ -14,9 +14,9 @@
 # limitations under the License.
 import zmq
 import time
-from multiprocessing import Queue
+from multiprocessing import Queue, Process
 from Tools.Conversion import json2dict
-from Message.Message import MSG
+from Message.Message import MSG, URL
 
 
 MSG_Q_MAX_DEPTH = 100
@@ -24,57 +24,99 @@ CODING = "utf-8"
 BlockingTime = 1/1024
 
 
+def sender_request(receiver: str, msg: MSG):
+    context = zmq.Context()
+    socket = context.socket(zmq.REQ)
+    socket.connect(str(receiver))
+    socket.send(str(msg).encode(CODING))
+    reply_msg = MSG(socket.recv())
+    return reply_msg
+
+
+def receiver_reply(receiver: str, func, has_next: int):
+    context = zmq.Context()
+    socket = context.socket(zmq.REP)
+    socket.bind(str(receiver))
+    while True:
+        if has_next == 0:
+            return
+        msg = MSG(json2dict(socket.recv().decode(CODING)))
+        reply_msg = func(msg)
+        socket.send(reply_msg).encode(CODING)
+        has_next -= 1
+
+
+def sender_push(receiver: URL, msg_queue: Queue):
+    context = zmq.Context()
+    socket = context.socket(zmq.PUSH)
+    socket.connect(receiver)
+    while True:
+        if msg_queue.empty():
+            time.sleep(BlockingTime)
+        else:
+            msg, has_next = msg_queue.get()
+            if has_next == 0:
+                return
+            message = str(msg)
+            socket.send(message.encode(CODING))
+            has_next -= 1
+        pass
+
+
+def receiver_pull(receiver: URL, msg_queue: Queue, ctrl_queue: Queue):
+    context = zmq.Context()
+    socket = context.socket(zmq.PULL)
+    socket.bind(receiver)
+    has_next = 1
+    while True:
+        if not ctrl_queue.empty():
+            has_next = ctrl_queue.get()
+            if has_next == 0:
+                return
+        if msg_queue.full():
+            time.sleep(BlockingTime)
+        else:
+            message = socket.recv()
+            msg = MSG(json2dict(message.decode(CODING)))
+            msg_queue.put(msg)
+            has_next -= 1
+
+
 class MessageQueue:
     """
     MessageQueue Model
     """
-    def __init__(self, sender=None, receiver=None):
-        self.context = zmq.Context()
-        # self.sender = "tcp://127.0.0.1:10011"
-        self.sender = sender
-        self.receiver = receiver
+    def __init__(self, msg: MSG):
+        self.queue = Queue(MSG_Q_MAX_DEPTH)
+        self.ctrl_queue = Queue(MSG_Q_MAX_DEPTH)
+        self.origination = str(msg.origination)
+        self.destination = str(msg.destination)
+        self.is_init = {
+            "PUSH": False,
+            "PULL": False,
+            "PUB": False,
+            "SUB": False,
+        }
 
-    def sender_request(self, msg: MSG):
-        if self.receiver is None:
-            raise ValueError
-        socket = self.context.socket(zmq.REQ)
-        socket.connect(self.receiver)
-        message = str(msg)
-        socket.send(message.encode(CODING))
-        reply_msg = MSG(socket.recv())
-        return reply_msg
+    def request(self, msg: MSG):
+        return sender_request(self.destination, msg)
 
-    def receiver_reply(self, func):
-        if self.sender is None:
-            raise ValueError
-        socket = self.context.socket(zmq.REP)
-        socket.bind(self.sender)
+    def reply(self, func, has_next=-1):
+        return receiver_reply(self.origination, func, has_next)
+
+    def push(self, msg: MSG, has_next=1):
+        if not self.is_init["PUSH"]:
+            push_process = Process(target=sender_push, args=(self.destination, self.queue))
+            push_process.start()
+        self.queue.put((msg, has_next))
+
+    def pull(self, has_next=-1):
+        if not self.is_init["PULL"]:
+            pull_process = Process(target=receiver_pull, args=(self.origination, self.queue, self.ctrl_queue))
+            pull_process.start()
+        self.ctrl_queue.put((has_next, ))
         while True:
-            message = socket.recv()
-            msg = MSG(json2dict(message.decode(CODING)))
-            reply_msg = func(msg)
-            socket.send(reply_msg).encode(CODING)
-
-    def sender_push(self, msg_q_out: Queue):
-        if self.receiver is None:
-            raise ValueError
-        socket = self.context.socket(zmq.PUSH)
-        socket.connect(self.receiver)
-        while True:
-            if msg_q_out.empty():
+            if self.queue.empty():
                 time.sleep(BlockingTime)
             else:
-                msg = msg_q_out.get()
-                message = str(msg)
-                socket.send(message.encode(CODING))
-            pass
-
-    def receiver_pull(self, msg_q_in: Queue):
-        if self.sender is None:
-            raise ValueError
-        socket = self.context.socket(zmq.PULL)
-        socket.bind(self.sender)
-        while True:
-            message = socket.recv()
-            msg = MSG(json2dict(message.decode(CODING)))
-            msg_q_in.put(msg)
+                return self.queue.get()
