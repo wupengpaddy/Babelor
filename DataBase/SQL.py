@@ -28,14 +28,15 @@ class SQL:
         """
         :param conn: SQL连接脚本
         """
-        # conn = "oracle://username:password@hostname:1521/service"
-        # conn = "mysql://username:password@hostname:3306/service"
+        # conn = "oracle://username:password@hostname:1521/service#table_name"
+        # conn = "mysql://username:password@hostname:3306/service#table_name"
+        self.conn = conn
         self.engine = create_engine(check_sql_url(conn))
-        self.request_sql = None
-        self.reply_df = None
 
-    def request(self, sql: str):
-        self.request_sql = sql
-        reply_df = pd.read_sql(sql=self.request_sql, con=self.engine)
-        self.reply_df = reply_df.rename(str.upper, axis='columns')
-        return self.reply_df
+    def read(self, sql: str):
+        reply_df = pd.read_sql(sql=sql, con=self.engine)
+        return reply_df.rename(str.upper, axis='columns')
+
+    def write(self, df: pd.DataFrame, table_name: str):
+        df.to_sql(table_name, con=self.engine, if_exists='append', index=False, index_label=False)
+        return True
