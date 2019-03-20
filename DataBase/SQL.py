@@ -30,13 +30,14 @@ class SQL:
         """
         # conn = "oracle://username:password@hostname:1521/service#table_name"
         # conn = "mysql://username:password@hostname:3306/service#table_name"
-        self.conn = conn
+        self.conn = URL(conn)
         self.engine = create_engine(check_sql_url(conn))
 
     def read(self, sql: str):
-        reply_df = pd.read_sql(sql=sql, con=self.engine)
-        return reply_df.rename(str.upper, axis='columns')
+        df = pd.read_sql(sql=sql, con=self.engine)
+        return df.rename(str.upper, axis='columns')
 
-    def write(self, df: pd.DataFrame, table_name: str):
+    def write(self, df: pd.DataFrame):
+        table_name = self.conn.fragment
         df.to_sql(table_name, con=self.engine, if_exists='append', index=False, index_label=False)
         return True
