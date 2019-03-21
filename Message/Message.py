@@ -112,6 +112,25 @@ class MSG:
         })
 
 
+EMPTY_URL = URL()
+
+
+EMPTY_MSG = MSG(dict2json({
+            "head": {
+                "timestamp": "",
+                "origination": "",
+                "destination": "",
+                "case": "",
+                "activity": "",
+            },
+            "body": {
+                "treatment": "",
+                "encryption": "",
+                "data": "",
+            }
+        }))
+
+
 def check_url(*args):
     if len(args) > 1:
         raise AttributeError
@@ -156,10 +175,10 @@ def check_ftp_url(*args):
 
 
 def demo_tomail():
-    conn = "{0}#{1}#{2}#{3}".format("tomail://zhangpeng@shairport.com",
-                                    "smtp://tanghailing:65684446Mail@172.21.98.66:10002",
-                                    "tomail://唐海铃@shairport.com",
-                                    "张鹏")
+    conn = "{0}#{1}#{2}#{3}".format("tomail://receiver_mail_username@receive_mail_hostname",
+                                    "smtp://sender_username:sender_password@sender_hostname:10001",
+                                    "tomail://sender_mail_username_2@senderhostname_2",
+                                    "receiver_user")
     url = URL(conn)
     print("URL:", url)
     print("收件人:", url.netloc)
@@ -201,8 +220,3 @@ def demo_ftp():
     print("服务路径", url.path)
     print("服务模式", url.fragment)
 
-
-if __name__ == '__main__':
-    # demo_tomail()
-    # demo_sql()
-    demo_ftp()
