@@ -15,71 +15,86 @@
 import zmq
 import time
 from multiprocessing import Queue, Process
-from Tools.Conversion import json2dict
-from Message.Message import MSG, URL
+from Message.Message import MSG
 
 
-MSG_Q_MAX_DEPTH = 100
+MSG_Q_MAX_DEPTH = 1024
 CODING = "utf-8"
 BlockingTime = 1/1024
 
 
-def sender_request(receiver: str, msg: MSG):
-    context = zmq.Context()
-    socket = context.socket(zmq.REQ)
-    socket.connect(str(receiver))
+def consumer_request(socket: zmq.Socket, msg: MSG):
     socket.send(str(msg).encode(CODING))
     reply_msg = MSG(socket.recv())
     return reply_msg
 
 
-def receiver_reply(receiver: str, func, has_next: int):
-    context = zmq.Context()
-    socket = context.socket(zmq.REP)
-    socket.bind(str(receiver))
+def producer_reply(socket: zmq.Socket, ctrl_queue: Queue, func):
     while True:
-        if has_next == 0:
+        is_break = False                                        # Control Flow
+        if not ctrl_queue.empty():
+            is_break = ctrl_queue.get()
+        if is_break:
             return
-        msg = MSG(json2dict(socket.recv().decode(CODING)))
+        msg = MSG(socket.recv().decode(CODING))                 # Data Flow
         reply_msg = func(msg)
         socket.send(reply_msg).encode(CODING)
-        has_next -= 1
 
 
-def sender_push(receiver: URL, msg_queue: Queue):
-    context = zmq.Context()
-    socket = context.socket(zmq.PUSH)
-    socket.connect(receiver)
+def producer_push(socket: zmq.Socket, ctrl_queue: Queue, msg_queue: Queue):
     while True:
-        if msg_queue.empty():
+        is_break = False                                        # Control Flow
+        if not ctrl_queue.empty():
+            is_break = ctrl_queue.get()
+        if is_break:
+            return
+        if msg_queue.empty():                                   # Data Flow
             time.sleep(BlockingTime)
         else:
-            msg, has_next = msg_queue.get()
-            if has_next == 0:
-                return
-            message = str(msg)
+            message = str(msg_queue.get())
             socket.send(message.encode(CODING))
-            has_next -= 1
-        pass
 
 
-def receiver_pull(receiver: URL, msg_queue: Queue, ctrl_queue: Queue):
-    context = zmq.Context()
-    socket = context.socket(zmq.PULL)
-    socket.bind(receiver)
-    has_next = 1
+def consumer_pull(socket: zmq.Socket, ctrl_queue: Queue, msg_queue: Queue):
     while True:
+        is_break = False                                        # Control Flow
         if not ctrl_queue.empty():
-            has_next = ctrl_queue.get()
-            if has_next == 0:
-                return
-        if msg_queue.full():
+            is_break = ctrl_queue.get()
+        if is_break:
+            return
+        if msg_queue.full():                                    # Data Flow
             time.sleep(BlockingTime)
         else:
             message = socket.recv()
-            msg = MSG(json2dict(message.decode(CODING)))
-            msg_queue.put(msg)
-            has_next -= 1
+            msg_queue.put(MSG(message.decode(CODING)))
+
+
+def producer_publish(socket: zmq.Socket, ctrl_queue: Queue, msg_queue: Queue):
+    while True:
+        is_break = False                                        # Control Flow
+        if not ctrl_queue.empty():
+            is_break = ctrl_queue.get()
+        if is_break:
+            return
+        if msg_queue.empty():                                   # Data Flow
+            time.sleep(BlockingTime)
+        else:
+            message = str(msg_queue.get())
+            socket.send(message.encode(CODING))
+
+
+def consumer_subscribe(socket: zmq.Socket, ctrl_queue: Queue, msg_queue: Queue):
+    while True:
+        is_break = False                                        # Control Flow
+        if not ctrl_queue.empty():
+            is_break = ctrl_queue.get()
+        if is_break:
+            return
+        if msg_queue.full():                                    # Data Flow
+            time.sleep(BlockingTime)
+        else:
+            message = socket.recv()
+            msg_queue.put(MSG(message.decode(CODING)))
 
 
 class MessageQueue:
@@ -87,36 +102,96 @@ class MessageQueue:
     MessageQueue Model
     """
     def __init__(self, msg: MSG):
-        self.queue = Queue(MSG_Q_MAX_DEPTH)
+        self.msg_queue = Queue(MSG_Q_MAX_DEPTH)
         self.ctrl_queue = Queue(MSG_Q_MAX_DEPTH)
         self.origination = str(msg.origination)
         self.destination = str(msg.destination)
-        self.is_init = {
-            "PUSH": False,
-            "PULL": False,
-            "PUB": False,
-            "SUB": False,
+        self.is_not_init = {
+            "REQUEST": True,
+            "REPLY": True,
+            "PUSH": True,
+            "PULL": True,
+            "PUBLISH": True,
+            "SUBSCRIBE": True,
         }
+        self.context = zmq.Context()
+        self.socket = None
 
-    def request(self, msg: MSG):
-        return sender_request(self.destination, msg)
+    def request(self, msg: MSG, is_break=False):
+        if self.is_not_init["REQUEST"]:
+            self.socket = self.context.socket(zmq.REQ)
+            self.socket.connect(str(self.destination))
+            self.is_not_init["REQUEST"] = False
+        if is_break:
+            self.is_not_init["REQUEST"] = True
+        return consumer_request(self.socket, msg)
 
-    def reply(self, func, has_next=-1):
-        return receiver_reply(self.origination, func, has_next)
+    def reply(self, func, is_break=False):
+        if self.is_not_init["REPLY"]:
+            self.socket = self.context.socket(zmq.REP)
+            self.socket.bind(str(self.origination))
+            reply_process = Process(target=producer_reply, args=(self.socket, self.ctrl_queue, func))
+            reply_process.start()
+            self.is_not_init["REPLY"] = False
+        if is_break:
+            self.ctrl_queue.put(is_break)
+            self.is_not_init["REPLY"] = True
 
-    def push(self, msg: MSG, has_next=1):
-        if not self.is_init["PUSH"]:
-            push_process = Process(target=sender_push, args=(self.destination, self.queue))
+    def push(self, msg: MSG, is_break=False):
+        if self.is_not_init["PUSH"]:
+            self.socket = self.context.socket(zmq.PUSH)
+            self.socket.connect(str(self.destination))
+            push_process = Process(target=producer_push, args=(self.socket, self.ctrl_queue, self.msg_queue))
             push_process.start()
-        self.queue.put((msg, has_next))
+            self.is_not_init["PUSH"] = False
+        self.msg_queue.put(msg)
+        if is_break:
+            self.ctrl_queue.put(is_break)
+            self.is_not_init["PUSH"] = True
 
-    def pull(self, has_next=-1):
-        if not self.is_init["PULL"]:
-            pull_process = Process(target=receiver_pull, args=(self.origination, self.queue, self.ctrl_queue))
+    def pull(self, is_break=False):
+        if not self.is_not_init["PULL"]:
+            self.socket = self.context.socket(zmq.PULL)
+            self.socket.bind(str(self.origination))
+            pull_process = Process(target=consumer_pull, args=(self.socket, self.ctrl_queue, self.msg_queue))
             pull_process.start()
-        self.ctrl_queue.put((has_next, ))
+            self.is_not_init["PULL"] = False
+        if is_break:
+            self.ctrl_queue.put(is_break)
+            self.is_not_init["PULL"] = True
+            return MSG
         while True:
-            if self.queue.empty():
+            if self.msg_queue.empty():
                 time.sleep(BlockingTime)
             else:
-                return self.queue.get()
+                return self.msg_queue.get()
+
+    def publish(self, msg: MSG, is_break=False):
+        if not self.is_not_init["PUBLISH"]:
+            self.socket = self.context.socket(zmq.PUB)
+            self.socket.bind(str(self.origination))
+            publish_process = Process(target=producer_publish, args=(self.socket, self.ctrl_queue, self.msg_queue))
+            publish_process.start()
+            self.is_not_init["PUBLISH"] = False
+        self.msg_queue.put(msg)
+        if is_break:
+            self.ctrl_queue.put(is_break)
+            self.is_not_init["PUBLISH"] = True
+
+    def subscribe(self, is_break=False):
+        if not self.is_not_init["SUBSCRIBE"]:
+            self.socket = self.context.socket(zmq.SUB)
+            self.socket.connect(str(self.destination))
+            self.socket.setsockopt(zmq.SUBSCRIBE, '')
+            subscribe_process = Process(target=consumer_subscribe, args=(self.socket, self.ctrl_queue, self.msg_queue))
+            subscribe_process.start()
+            self.is_not_init["SUBSCRIBE"] = False
+        if is_break:
+            self.ctrl_queue.put(is_break)
+            self.is_not_init["SUBSCRIBE"] = True
+            return MSG
+        while True:
+            if self.msg_queue.empty():
+                time.sleep(BlockingTime)
+            else:
+                return self.msg_queue.get()

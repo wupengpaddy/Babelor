@@ -30,7 +30,10 @@ class SQL:
         """
         # conn = "oracle://username:password@hostname:1521/service#table_name"
         # conn = "mysql://username:password@hostname:3306/service#table_name"
-        self.conn = URL(conn)
+        if isinstance(conn, URL):
+            self.conn = conn
+        else:
+            self.conn = URL(conn)
         self.engine = create_engine(check_sql_url(conn))
 
     def read(self, sql: str):
