@@ -20,7 +20,7 @@ DatetimeFmt = '%Y-%m-%d %H:%M:%S.%f'
 CODING = 'utf-8'
 
 
-def get_current_datetime():
+def current_datetime():
     return datetime.now().strftime(DatetimeFmt)
 
 
@@ -80,6 +80,9 @@ class URL:
         return urlunparse((self.scheme, self.netloc, path, params, query, fragment))
 
 
+EMPTY_URL = URL("scheme://username:password@hostname:10001/path;params?query#fragment")
+
+
 class MSG:
     def __init__(self, json: str):
         msg = json2dict(json)
@@ -88,8 +91,14 @@ class MSG:
         self.destination = URL(msg["head"]["destination"])
         self.case = msg["head"]["case"]
         self.activity = msg["head"]["activity"]
-        self.treatment = msg["body"]["treatment"]
-        self.encryption = msg["body"]["encryption"]
+        if msg["body"]["treatment"] is None:
+            self.treatment = None
+        else:
+            self.treatment = URL(msg["body"]["treatment"])
+        if msg["body"]["encryption"] is None:
+            self.encryption = None
+        else:
+            self.encryption = URL(msg["body"]["encryption"])
         self.data = msg["body"]["data"]
 
     def __str__(self):
@@ -111,24 +120,37 @@ class MSG:
             }
         })
 
+    def swap(self):
+        origination = self.origination
+        self.timestamp = current_datetime()
+        self.origination = self.destination
+        self.destination = origination
+        return self
 
-EMPTY_URL = URL()
+    def forward(self, destination: URL):
+        self.origination = self.destination
+        self.destination = destination
+        return self
+
+    def renew(self):
+        self.timestamp = current_datetime()
+        return self
 
 
 EMPTY_MSG = MSG(dict2json({
-            "head": {
-                "timestamp": "",
-                "origination": "",
-                "destination": "",
-                "case": "",
-                "activity": "",
-            },
-            "body": {
-                "treatment": "",
-                "encryption": "",
-                "data": "",
-            }
-        }))
+    "head": {
+        "timestamp": current_datetime(),
+        "origination": EMPTY_URL,
+        "destination": EMPTY_URL,
+        "case": None,
+        "activity": None,
+    },
+    "body": {
+        "treatment": None,
+        "encryption": None,
+        "data": None,
+    }
+}))
 
 
 def check_url(*args):
@@ -164,7 +186,7 @@ def check_sql_url(*args):
 
 
 def check_ftp_url(*args):
-    # conn = "ftp://username:password@hostname:21/path#PASV"
+    # conn = "ftp://username:password@hostname:10001/path#PASV"
     url = URL(args[0])
     if url.scheme != "ftp":
         raise ValueError
@@ -220,3 +242,6 @@ def demo_ftp():
     print("服务路径", url.path)
     print("服务模式", url.fragment)
 
+
+if __name__ == '__main__':
+    print(EMPTY_URL)

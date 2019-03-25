@@ -34,7 +34,7 @@ class SQL:
             self.conn = conn
         else:
             self.conn = URL(conn)
-        self.engine = create_engine(check_sql_url(conn))
+        self.engine = create_engine(check_sql_url(str(conn)))
 
     def read(self, sql: str):
         df = pd.read_sql(sql=sql, con=self.engine)
