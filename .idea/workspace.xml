@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/Message/Message.py" line="127" />
+    <bookmark url="file://$PROJECT_DIR$/Message/Message.py" line="112" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="be54182a-218b-4e8e-9234-62a7d88d12fc" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/Message/Message.py" beforeDir="false" afterPath="$PROJECT_DIR$/Message/Message.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Process/MQ.py" beforeDir="false" afterPath="$PROJECT_DIR$/Process/MQ.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Tools/Conversion.py" beforeDir="false" afterPath="$PROJECT_DIR$/Tools/Conversion.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -19,7 +16,7 @@
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/Babelor$main.coverage" NAME="main Coverage Results" MODIFIED="1553578860778" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Babelor$SQL.coverage" NAME="SQL Coverage Results" MODIFIED="1551943937494" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/DataBase" />
-    <SUITE FILE_PATH="coverage/Babelor$Message.coverage" NAME="Message Coverage Results" MODIFIED="1553734950545" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Message" />
+    <SUITE FILE_PATH="coverage/Babelor$Message.coverage" NAME="Message Coverage Results" MODIFIED="1553755396610" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Message" />
   </component>
   <component name="FileEditorManager">
     <leaf>
@@ -47,7 +44,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Process/MQ.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3265">
+            <state relative-caret-position="529">
               <caret line="197" column="37" lean-forward="true" selection-start-line="197" selection-start-column="37" selection-end-line="197" selection-end-column="37" />
               <folding>
                 <element signature="e#600#610#0" expanded="true" />
@@ -59,8 +56,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Message/Message.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="434">
-              <caret line="38" column="27" selection-start-line="38" selection-start-column="27" selection-end-line="38" selection-end-column="27" />
+            <state relative-caret-position="4614">
+              <caret line="287" lean-forward="true" selection-start-line="287" selection-end-line="287" />
               <folding>
                 <element signature="e#600#654#0" expanded="true" />
               </folding>
@@ -309,7 +306,7 @@
       <workItem from="1552532444445" duration="1228000" />
       <workItem from="1552873946223" duration="13161000" />
       <workItem from="1552961406079" duration="19965000" />
-      <workItem from="1553491688533" duration="26052000" />
+      <workItem from="1553491688533" duration="34847000" />
     </task>
     <task id="LOCAL-00001" summary="init">
       <created>1551342044292</created>
@@ -322,10 +319,11 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="161642000" />
+    <option name="totallyTimeSpent" value="170437000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-6" y="-6" width="2263" height="1473" extended-state="7" />
+    <frame x="-6" y="-6" width="2263" height="1473" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.26938775" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -370,7 +368,6 @@
     <entry file="file://C:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/urllib/parse.py" />
     <entry file="file://C:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/site-packages/toolz/functoolz.py" />
     <entry file="file://C:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/pkgs/odo-0.5.1-py36h7560279_0/Lib/site-packages/odo/backends/sql.py" />
-    <entry file="file://$USER_HOME$/.PyCharm2018.3/system/python_stubs/-96592820/builtins.py" />
     <entry file="file://$PROJECT_DIR$/DataBase/HTML.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="475">
@@ -467,7 +464,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Process/MQ.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3265">
+        <state relative-caret-position="529">
           <caret line="197" column="37" lean-forward="true" selection-start-line="197" selection-start-column="37" selection-end-line="197" selection-end-column="37" />
           <folding>
             <element signature="e#600#610#0" expanded="true" />
@@ -475,10 +472,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$USER_HOME$/.PyCharm2018.3/system/python_stubs/-96592820/builtins.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-278">
+          <caret line="2545" column="6" selection-start-line="2545" selection-start-column="6" selection-end-line="2545" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Message/Message.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="434">
-          <caret line="38" column="27" selection-start-line="38" selection-start-column="27" selection-end-line="38" selection-end-column="27" />
+        <state relative-caret-position="4614">
+          <caret line="287" lean-forward="true" selection-start-line="287" selection-end-line="287" />
           <folding>
             <element signature="e#600#654#0" expanded="true" />
           </folding>

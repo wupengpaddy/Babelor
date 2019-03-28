@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from urllib.parse import urlparse, unquote, urlunparse
+from urllib.parse import urlparse, unquote, urlunparse, quote
 from Tools.Conversion import dict2json, json2dict
 from datetime import datetime
 import re
@@ -26,21 +26,9 @@ def current_datetime():
 
 
 class URL:
-    def __new__(cls, *args, **kwargs):
-        cls.scheme = None
-        cls.username = None
-        cls.password = None
-        cls.hostname = None
-        cls.port = None
-        cls.netloc = None
-        cls.path = None
-        cls.params = None
-        cls.query = None
-        cls.fragment = None
-
     def __init__(self, url: str):
         # scheme://username:password@hostname:port/path;params?query#fragment
-        url = urlparse(re.sub(r':port[^@]', "", url))
+        url = urlparse(re.sub(r':port', "", url))
         self.scheme = url.scheme
         self.username = url.username
         self.password = url.password
@@ -61,19 +49,20 @@ class URL:
     __repr__ = __str__
 
     def __setattr__(self, key, value):
-        self.__dict__[key] = value                                  # source update
-        if key in ["port", "hostname", "username", "password"]:     # relative update
-            if self.password is None:
-                if self.username is None:
+        self.__dict__[key] = value  # source update
+        keys = ["port", "hostname", "username", "password"]
+        if (key in keys) and (len([False for k in keys if k not in self.__dict__.keys()]) == 0):    # relative update
+            if self.__dict__["password"] is None:
+                if self.__dict__["username"] is None:
                     user_info = None
                 else:
                     user_info = self.username
             else:
-                user_info = "{0}:{1}".format(self.username, self.password)
-            if self.port is None:
-                net_info = self.hostname
+                user_info = "{0}:{1}".format(self.__dict__["username"], self.__dict__["password"])
+            if self.__dict__["port"] is None:
+                net_info = self.__dict__["hostname"]
             else:
-                net_info = "{0}:{1}".format(self.hostname, self.port)
+                net_info = "{0}:{1}".format(self.__dict__["hostname"], self.__dict__["port"])
             if user_info is None:
                 self.__dict__["netloc"] = net_info
             else:
@@ -89,29 +78,22 @@ class URL:
             query = self.query
         if allow_fragment:
             if isinstance(self.fragment, URL):
-                fragment = self.fragment.to_string()
+                fragment = quote(self.fragment.to_string())
             else:
-                fragment = self.fragment
+                fragment = quote(self.fragment)
+        if self.scheme == "scheme" and self.port is None:
+            self.netloc = self.netloc + ":port"
         return urlunparse((self.scheme, self.netloc, path, params, query, fragment))
 
 
 EMPTY_URL = URL("scheme://username:password@hostname:port/path;params?query#fragment")
 
 
-def check_url(*args):
-    if len(args) > 1:
-        raise AttributeError
-    if isinstance(args[0], str):
-        return URL(args[0])
-    elif isinstance(args[0], URL):
-        return args[0]
-    else:
-        raise ValueError
-
-
-def null_value_check(msg_value, msg_value_type=str):
+def null_value_check(msg_value: object, msg_value_type: classmethod = str) -> object:
     if msg_value is None:
         return None
+    elif isinstance(msg_value, msg_value_type):
+        return msg_value
     else:
         return msg_value_type(msg_value)
 
@@ -119,7 +101,10 @@ def null_value_check(msg_value, msg_value_type=str):
 class MSG:
     def __init__(self, json: str):
         msg = json2dict(json)
-        self.timestamp = null_value_check(msg["head"]["timestamp"])
+        if msg["head"]["timestamp"] is None:
+            self.timestamp = current_datetime()
+        else:
+            self.timestamp = msg["head"]["timestamp"]
         self.origination = null_value_check(msg["head"]["origination"], URL)
         self.destination = null_value_check(msg["head"]["destination"], URL)
         self.case = null_value_check(msg["head"]["case"])
@@ -132,6 +117,13 @@ class MSG:
         return self.to_string()
 
     __repr__ = __str__
+
+    def __setattr__(self, key, value):
+        self.__dict__[key] = value  # source update
+        keys = ["timestamp", "origination", "destination", "case", "activity", "treatment", "encryption", "data"]
+        if len(self.__dict__.keys()) == len(keys):  # force update datetime
+            if key != "timestamp":
+                self.__dict__["timestamp"] = current_datetime()
 
     def to_string(self):
         return dict2json({
@@ -174,22 +166,20 @@ class MSG:
         return self
 
 
-EMPTY_MSG = MSG('''
-{
+EMPTY_MSG = MSG(dict2json({
     "head": {
-        "timestamp": null,
-        "origination": null,
-        "destination": null,
-        "case": null,
-        "activity": null
+        "timestamp": current_datetime(),
+        "origination": None,
+        "destination": None,
+        "case": None,
+        "activity": None
     },
     "body": {
-        "treatment": null,
-        "encryption": null,
-        "data": null
+        "treatment": None,
+        "encryption": None,
+        "data": None
     }
-}
-''')
+}))
 
 
 def check_sql_url(url: URL, has_table=False):
@@ -237,7 +227,7 @@ def check_success_reply(*args):
     else:
         raise ValueError("未知的数据类型")
     if isinstance(msg.data, dict):
-        if msg.data.haskey("SUCCESS"):
+        if "SUCCESS" in msg.data.keys():
             return msg.data["SUCCESS"]
         else:
             return False
@@ -293,8 +283,5 @@ def demo_ftp():
 
 
 if __name__ == '__main__':
-    # string = "oracle://username:password@hostname:port/service"
-    # txt = re.sub(r':port\[\^@\]', "", string)
-    ur = EMPTY_URL
-    ur.port = 100
-    print(ur)
+    m = EMPTY_URL
+    print(m)
