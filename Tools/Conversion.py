@@ -20,15 +20,15 @@ ROOT_TAG = 'root'
 CODING = 'utf-8'
 
 
-def dict2json(dt: dict):
+def dict2json(dt: dict) -> str:
     return json.dumps(dt, skipkeys=False, ensure_ascii=False)
 
 
-def json2dict(js: str):
+def json2dict(js: str) -> dict:
     return json.loads(js)
 
 
-def etree2dict(root: ElementTree.Element):
+def etree2dict(root: ElementTree.Element) -> dict:
     dt = {}
     lt = []
     ini_tag = None
@@ -56,20 +56,20 @@ def etree2dict(root: ElementTree.Element):
     return dt
 
 
-def xml2json(xml: str):
+def xml2json(xml: str) -> str:
     return dict2json(etree2dict(ElementTree.fromstring(xml.strip())))
 
 
-def xml2dict(xml: str):
+def xml2dict(xml: str) -> dict:
     return etree2dict(ElementTree.fromstring(xml.strip()))
 
 
-def dict2etree(dt: dict, tag=ROOT_TAG, parent=None):
+def dict2etree(dt: dict, tag=ROOT_TAG, parent=None) -> ElementTree.Element:
     if tag == ROOT_TAG:
         root = ElementTree.Element(tag)
     else:
         root = ElementTree.SubElement(parent, tag)
-    for key in dt:
+    for key in dt.keys():
         if isinstance(dt[key], list):
             for lt_child in dt[key]:
                 if isinstance(lt_child, dict):
@@ -77,14 +77,18 @@ def dict2etree(dt: dict, tag=ROOT_TAG, parent=None):
                 else:
                     child = ElementTree.SubElement(root, key)
                     child.text = lt_child
+        elif isinstance(dt[key], dict):
+            dict2etree(dt[key], key, root)
         else:
-            root.attrib[key] = dt[key]
+            child = ElementTree.SubElement(root, key)
+            child.text = dt[key]
     return root
 
 
-def json2xml(js: str):
+def json2xml(js: str) -> str:
     return ElementTree.tostring(dict2etree(json2dict(js)), encoding=CODING).decode(CODING)
 
 
-def dict2xml(dt: dict):
+def dict2xml(dt: dict) -> str:
     return ElementTree.tostring(dict2etree(dt), encoding=CODING).decode(CODING)
+

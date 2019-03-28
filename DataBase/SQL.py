@@ -24,7 +24,7 @@ class SQL:
     """
     Load Data from Oracle
     """
-    def __init__(self, conn: str):
+    def __init__(self, conn: object):
         """
         :param conn: SQL连接脚本
         """
@@ -32,15 +32,19 @@ class SQL:
         # conn = "mysql://username:password@hostname:3306/service#table_name"
         if isinstance(conn, URL):
             self.conn = conn
-        else:
+        elif isinstance(conn, str):
             self.conn = URL(conn)
-        self.engine = create_engine(check_sql_url(str(conn)))
+        else:
+            raise AttributeError("输入的参数错误")
+        self.engine = create_engine(check_sql_url(self.conn, has_table=False))
 
     def read(self, sql: str):
         df = pd.read_sql(sql=sql, con=self.engine)
         return df.rename(str.upper, axis='columns')
 
     def write(self, df: pd.DataFrame):
+        if self.conn.fragment is None:
+            raise ValueError("未定义写入表名")
         table_name = self.conn.fragment
-        df.to_sql(table_name, con=self.engine, if_exists='append', index=False, index_label=False)
+        df.to_sql(table_name, con=self.engine, if_exists='replace', index=False, index_label=False)
         return True

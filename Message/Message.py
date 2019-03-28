@@ -13,15 +13,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from urllib.parse import urlparse, unquote, urlunparse, quote
-from Tools.Conversion import dict2json, json2dict
+from Tools.Conversion import dict2json, json2dict, dict2xml, xml2dict
 from datetime import datetime
 import re
 
 DatetimeFmt = '%Y-%m-%d %H:%M:%S.%f'
 CODING = 'utf-8'
+MSG_TYPE = 'json'           # "xml"
 
 
-def current_datetime():
+def current_datetime() -> str:
     return datetime.now().strftime(DatetimeFmt)
 
 
@@ -68,7 +69,7 @@ class URL:
             else:
                 self.__dict__["netloc"] = "{0}@{1}".format(user_info, net_info)
 
-    def to_string(self, allow_path=True, allow_params=True, allow_query=True, allow_fragment=True):
+    def to_string(self, allow_path=True, allow_params=True, allow_query=True, allow_fragment=True) -> str:
         path, params, query, fragment = "", "", "", ""
         if allow_path:
             path = self.path
@@ -99,8 +100,27 @@ def null_value_check(msg_value: object, msg_value_type: classmethod = str) -> ob
 
 
 class MSG:
-    def __init__(self, json: str):
-        msg = json2dict(json)
+    def __init__(self, msg: object):
+        if isinstance(msg, str):
+            if MSG_TYPE is "json":
+                msg = json2dict(msg)
+            elif MSG_TYPE is "xml":
+                msg = xml2dict(msg)
+            else:
+                raise NotImplementedError("仅支持 xml 和 json 类消息")
+        if isinstance(msg, dict):
+            keys = ["head", "body",
+                    "timestamp", "origination", "destination", "case", "activity", "treatment", "encryption", "data"]
+            if len([False for k in keys if k not in msg.keys()]) > 0:
+                raise ValueError("传入的变量参数错误")
+            else:
+                if isinstance(msg["head"], dict) and isinstance(msg["body"], dict):
+                    ks = len([True for k in keys if k in msg["head"].keys()]) +\
+                         len([True for k in keys if k in msg["body"].keys()])
+                    if not (ks == len(keys) - 2):
+                        raise ValueError("传入的变量参数错误")
+                else:
+                    raise ValueError("传入的变量参数错误")
         if msg["head"]["timestamp"] is None:
             self.timestamp = current_datetime()
         else:
@@ -125,8 +145,8 @@ class MSG:
             if key != "timestamp":
                 self.__dict__["timestamp"] = current_datetime()
 
-    def to_string(self):
-        return dict2json({
+    def to_dict(self):
+        return {
             "head": {
                 "timestamp": self.timestamp,
                 "origination": self.origination,
@@ -139,7 +159,21 @@ class MSG:
                 "encryption": self.encryption,
                 "data": self.data,
             }
-        })
+        }
+
+    def to_string(self):
+        if MSG_TYPE is "json":
+            return self.to_json()
+        elif MSG_TYPE is "xml":
+            return self.to_xml()
+        else:
+            raise NotImplementedError("仅支持 xml 和 json 类消息")
+
+    def to_json(self):
+        return dict2json(self.to_dict())
+
+    def to_xml(self):
+        return dict2xml(self.to_dict())
 
     def swap(self):
         origination = self.origination
@@ -182,7 +216,7 @@ EMPTY_MSG = MSG(dict2json({
 }))
 
 
-def check_sql_url(url: URL, has_table=False):
+def check_sql_url(url: URL, has_table=False) -> str:
     # conn = "oracle://username:password@hostname/service#table"
     # conn = "mysql://username:password@hostname/service#table"
     # conn = "oracle://username:password@hostname:port/service#table"
@@ -205,7 +239,7 @@ def check_sql_url(url: URL, has_table=False):
         return url.to_string(True, False, False, False)
 
 
-def check_ftp_url(*args):
+def check_ftp_url(*args) -> str:
     # conn = "ftp://username:password@hostname:10001/path#PASV"
     url = URL(args[0])
     if url.scheme != "ftp":
@@ -216,7 +250,7 @@ def check_ftp_url(*args):
     return url.to_string(True, False, False, True)
 
 
-def check_success_reply(*args):
+def check_success_reply(*args) -> bool:
     # Function Input Check
     if len(args) > 1:
         raise AttributeError("输入参数过多")
@@ -238,7 +272,7 @@ def check_success_reply(*args):
 def demo_tomail():
     conn = "{0}#{1}#{2}#{3}".format("tomail://receiver_mail_username@receive_mail_hostname",
                                     "smtp://sender_username:sender_password@sender_hostname:port",
-                                    "tomail://sender_mail_username_2@senderhostname_2",
+                                    "frommail://sender_mail_username_2@senderhostname_2",
                                     "receiver_user")
     url = URL(conn)
     print("URL:", url)
@@ -283,5 +317,6 @@ def demo_ftp():
 
 
 if __name__ == '__main__':
-    m = EMPTY_URL
-    print(m)
+    m = EMPTY_MSG
+    print(m.to_xml())
+    print(m.to_json())

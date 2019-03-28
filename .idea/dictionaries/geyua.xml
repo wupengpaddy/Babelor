@@ -2,9 +2,11 @@
   <dictionary name="geyua">
     <words>
       <w>acdm</w>
+      <w>frommail</w>
       <w>orcl</w>
       <w>pymysql</w>
       <w>shairport</w>
+      <w>smtp</w>
       <w>spia</w>
       <w>stor</w>
       <w>tomail</w>
