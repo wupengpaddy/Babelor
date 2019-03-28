@@ -27,22 +27,25 @@ def current_datetime() -> str:
 
 
 class URL:
-    def __init__(self, url: str):
+    def __init__(self, url=None):
         # scheme://username:password@hostname:port/path;params?query#fragment
-        url = urlparse(re.sub(r':port', "", url))
-        self.scheme = url.scheme
-        self.username = url.username
-        self.password = url.password
-        self.hostname = url.hostname
-        self.port = url.port
-        self.netloc = url.netloc
-        self.path = re.sub(r'/$', "", url.path)
-        self.params = url.params
-        self.query = url.query
-        try:
-            self.fragment = URL(unquote(url.fragment))
-        except RecursionError:
-            self.fragment = url.fragment
+        if isinstance(url, str):
+            if re.search(r"://", url) is None:
+                raise ValueError
+            self.from_string(url)
+        elif url is None:
+            self.scheme = "scheme"
+            self.username = "username"
+            self.password = "password"
+            self.hostname = "hostname"
+            self.port = "port"
+            self.netloc = "{0}:{1}@{2}:{3}".format(self.username, self.password, self.hostname, self.port)
+            self.path = "path"
+            self.params = "params"
+            self.query = "query"
+            self.fragment = "fragment"
+        else:
+            raise AttributeError
 
     def __str__(self):
         return self.to_string()
@@ -82,9 +85,32 @@ class URL:
                 fragment = quote(self.fragment.to_string())
             else:
                 fragment = quote(self.fragment)
-        if self.scheme == "scheme" and self.port is None:
-            self.netloc = self.netloc + ":port"
         return urlunparse((self.scheme, self.netloc, path, params, query, fragment))
+
+    def from_string(self, url: str):
+        pattern = re.compile(r":[A-Za-z_-]+[$/]")
+        if pattern.search(url) is None:    # urlparse not apply a string
+            port_pattern = None
+            url = urlparse(url)
+        else:
+            port_pattern = pattern.findall(url)[0]
+            url = urlparse(pattern.sub("/", url))
+        self.scheme = url.scheme
+        self.username = url.username
+        self.password = url.password
+        self.hostname = url.hostname
+        if port_pattern is None:
+            self.port = url.port
+        else:
+            self.port = re.sub(r'^:', "", re.sub(r'/$', "", port_pattern))
+        self.netloc = "{0}:{1}@{2}:{3}".format(self.username, self.password, self.hostname, self.port)
+        self.path = re.sub(r'/$', "", url.path)
+        self.params = url.params
+        self.query = url.query
+        try:
+            self.fragment = URL(unquote(url.fragment))
+        except ValueError:
+            self.fragment = url.fragment
 
 
 EMPTY_URL = URL("scheme://username:password@hostname:port/path;params?query#fragment")
@@ -100,38 +126,26 @@ def null_value_check(msg_value: object, msg_value_type: classmethod = str) -> ob
 
 
 class MSG:
-    def __init__(self, msg: object):
+    def __init__(self, msg=None):
         if isinstance(msg, str):
             if MSG_TYPE is "json":
-                msg = json2dict(msg)
+                self.from_json(msg)
             elif MSG_TYPE is "xml":
-                msg = xml2dict(msg)
+                self.from_xml(msg)
             else:
                 raise NotImplementedError("仅支持 xml 和 json 类消息")
-        if isinstance(msg, dict):
-            keys = ["head", "body",
-                    "timestamp", "origination", "destination", "case", "activity", "treatment", "encryption", "data"]
-            if len([False for k in keys if k not in msg.keys()]) > 0:
-                raise ValueError("传入的变量参数错误")
-            else:
-                if isinstance(msg["head"], dict) and isinstance(msg["body"], dict):
-                    ks = len([True for k in keys if k in msg["head"].keys()]) +\
-                         len([True for k in keys if k in msg["body"].keys()])
-                    if not (ks == len(keys) - 2):
-                        raise ValueError("传入的变量参数错误")
-                else:
-                    raise ValueError("传入的变量参数错误")
-        if msg["head"]["timestamp"] is None:
+        elif isinstance(msg, dict):
+            self.from_dict(msg)
+        elif msg is None:
             self.timestamp = current_datetime()
-        else:
-            self.timestamp = msg["head"]["timestamp"]
-        self.origination = null_value_check(msg["head"]["origination"], URL)
-        self.destination = null_value_check(msg["head"]["destination"], URL)
-        self.case = null_value_check(msg["head"]["case"])
-        self.activity = null_value_check(msg["head"]["activity"])
-        self.treatment = null_value_check(msg["body"]["treatment"], URL)
-        self.encryption = null_value_check(msg["body"]["encryption"], URL)
-        self.data = null_value_check(msg["body"]["data"])
+            self.timestamp = None
+            self.origination = None
+            self.destination = None
+            self.case = None
+            self.activity = None
+            self.treatment = None
+            self.encryption = None
+            self.data = None
 
     def __str__(self):
         return self.to_string()
@@ -175,6 +189,40 @@ class MSG:
     def to_xml(self):
         return dict2xml(self.to_dict())
 
+    def from_dict(self, msg: dict):
+        if not isinstance(msg, dict):
+            raise AttributeError("参数类型错误")
+        keys = ["head", "body"].extend(self.__dict__.keys())
+        if len([False for k in msg.keys() if k not in keys]) > 0:
+            raise ValueError("传入的变量参数错误")
+        else:
+            if isinstance(msg["head"], dict) and isinstance(msg["body"], dict):
+                ks = len([True for k in msg["head"].keys() if k in keys]) +\
+                     len([True for k in msg["body"].keys() if k in keys])
+                if ks == (len(self.__dict__.keys()) - 2):
+                    pass
+                else:
+                    raise ValueError("传入的变量参数错误")
+            else:
+                raise ValueError("传入的变量参数错误")
+        if msg["head"]["timestamp"] is None:
+            self.timestamp = current_datetime()
+        else:
+            self.timestamp = msg["head"]["timestamp"]
+        self.origination = null_value_check(msg["head"]["origination"], URL)
+        self.destination = null_value_check(msg["head"]["destination"], URL)
+        self.case = null_value_check(msg["head"]["case"])
+        self.activity = null_value_check(msg["head"]["activity"])
+        self.treatment = null_value_check(msg["body"]["treatment"], URL)
+        self.encryption = null_value_check(msg["body"]["encryption"], URL)
+        self.data = null_value_check(msg["body"]["data"])
+
+    def from_json(self, msg: str):
+        self.from_dict(json2dict(msg))
+
+    def from_xml(self, msg: str):
+        self.from_dict(xml2dict(msg))
+
     def swap(self):
         origination = self.origination
         self.origination = self.destination
@@ -198,22 +246,6 @@ class MSG:
         self.encryption = None
         self.data = {"SUCCESS": state}
         return self
-
-
-EMPTY_MSG = MSG(dict2json({
-    "head": {
-        "timestamp": current_datetime(),
-        "origination": None,
-        "destination": None,
-        "case": None,
-        "activity": None
-    },
-    "body": {
-        "treatment": None,
-        "encryption": None,
-        "data": None
-    }
-}))
 
 
 def check_sql_url(url: URL, has_table=False) -> str:
@@ -250,7 +282,7 @@ def check_ftp_url(*args) -> str:
     return url.to_string(True, False, False, True)
 
 
-def check_success_reply(*args) -> bool:
+def check_success_reply_msg(*args) -> bool:
     # Function Input Check
     if len(args) > 1:
         raise AttributeError("输入参数过多")
@@ -317,6 +349,6 @@ def demo_ftp():
 
 
 if __name__ == '__main__':
-    m = EMPTY_MSG
-    print(m.to_xml())
-    print(m.to_json())
+    u = EMPTY_URL
+    print(u)
+
