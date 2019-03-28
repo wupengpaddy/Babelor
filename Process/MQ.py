@@ -15,8 +15,7 @@
 import zmq
 import time
 from multiprocessing import Queue, Process
-from Message.Message import MSG
-
+from Message.Message import MSG, URL
 
 MSG_Q_MAX_DEPTH = 1024
 CODING = "utf-8"
@@ -104,8 +103,8 @@ class MessageQueue:
     def __init__(self, msg: MSG):
         self.msg_queue = Queue(MSG_Q_MAX_DEPTH)
         self.ctrl_queue = Queue(MSG_Q_MAX_DEPTH)
-        self.origination = str(msg.origination)
-        self.destination = str(msg.destination)
+        self.origination = msg.origination
+        self.destination = msg.destination
         self.is_not_init = {
             "REQUEST": True,
             "REPLY": True,
@@ -118,18 +117,22 @@ class MessageQueue:
         self.socket = None
 
     def request(self, msg: MSG, is_break=False):
+        if not isinstance(self.destination, URL):
+            raise ValueError("Invalid destination path.")
         if self.is_not_init["REQUEST"]:
             self.socket = self.context.socket(zmq.REQ)
-            self.socket.connect(str(self.destination))
+            self.socket.connect(self.destination.to_string(False, False, False, False))
             self.is_not_init["REQUEST"] = False
         if is_break:
             self.is_not_init["REQUEST"] = True
         return consumer_request(self.socket, msg)
 
     def reply(self, func, is_break=False):
+        if not isinstance(self.origination, URL):
+            raise ValueError("Invalid origination path.")
         if self.is_not_init["REPLY"]:
             self.socket = self.context.socket(zmq.REP)
-            self.socket.bind(str(self.origination))
+            self.socket.bind(self.origination.to_string(False, False, False, False))
             reply_process = Process(target=producer_reply, args=(self.socket, self.ctrl_queue, func))
             reply_process.start()
             self.is_not_init["REPLY"] = False
@@ -138,9 +141,11 @@ class MessageQueue:
             self.is_not_init["REPLY"] = True
 
     def push(self, msg: MSG, is_break=False):
+        if not isinstance(self.destination, URL):
+            raise ValueError("Invalid destination path.")
         if self.is_not_init["PUSH"]:
             self.socket = self.context.socket(zmq.PUSH)
-            self.socket.connect(str(self.destination))
+            self.socket.connect(self.destination.to_string(False, False, False, False))
             push_process = Process(target=producer_push, args=(self.socket, self.ctrl_queue, self.msg_queue))
             push_process.start()
             self.is_not_init["PUSH"] = False
@@ -150,9 +155,11 @@ class MessageQueue:
             self.is_not_init["PUSH"] = True
 
     def pull(self, is_break=False):
+        if not isinstance(self.origination, URL):
+            raise ValueError("Invalid origination path.")
         if not self.is_not_init["PULL"]:
             self.socket = self.context.socket(zmq.PULL)
-            self.socket.bind(str(self.origination))
+            self.socket.bind(self.origination.to_string(False, False, False, False))
             pull_process = Process(target=consumer_pull, args=(self.socket, self.ctrl_queue, self.msg_queue))
             pull_process.start()
             self.is_not_init["PULL"] = False
@@ -167,9 +174,11 @@ class MessageQueue:
                 return self.msg_queue.get()
 
     def publish(self, msg: MSG, is_break=False):
+        if not isinstance(self.origination, URL):
+            raise ValueError("Invalid origination path.")
         if not self.is_not_init["PUBLISH"]:
             self.socket = self.context.socket(zmq.PUB)
-            self.socket.bind(str(self.origination))
+            self.socket.bind(self.origination.to_string(False, False, False, False))
             publish_process = Process(target=producer_publish, args=(self.socket, self.ctrl_queue, self.msg_queue))
             publish_process.start()
             self.is_not_init["PUBLISH"] = False
@@ -179,9 +188,11 @@ class MessageQueue:
             self.is_not_init["PUBLISH"] = True
 
     def subscribe(self, is_break=False):
+        if not isinstance(self.destination, URL):
+            raise ValueError("Invalid destination path.")
         if not self.is_not_init["SUBSCRIBE"]:
             self.socket = self.context.socket(zmq.SUB)
-            self.socket.connect(str(self.destination))
+            self.socket.connect(self.destination.to_string(False, False, False, False))
             self.socket.setsockopt(zmq.SUBSCRIBE, '')
             subscribe_process = Process(target=consumer_subscribe, args=(self.socket, self.ctrl_queue, self.msg_queue))
             subscribe_process.start()

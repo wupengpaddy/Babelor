@@ -21,7 +21,7 @@ CODING = 'utf-8'
 
 
 def dict2json(dt: dict):
-    return json.dumps(dt, ensure_ascii=False)
+    return json.dumps(dt, skipkeys=False, ensure_ascii=False)
 
 
 def json2dict(js: str):
