@@ -108,7 +108,7 @@ def get_html2dataframe(path: str):
         "%%Surrogate_locale": "1",
         "locale": "zh-cn",
         "Username": "gfceshi",
-        "Password": "123456",
+        "Password": "password",
         "RedirectTo": url_rec_doc.format(20, 1)
     }
 

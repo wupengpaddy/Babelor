@@ -30,10 +30,8 @@ class URL:
     def __init__(self, url=None):
         # scheme://username:password@hostname:port/path;params?query#fragment
         if isinstance(url, str):
-            if re.search(r"://", url) is None:
-                raise ValueError
             self.from_string(url)
-        elif url is None:
+        if url is None:
             self.scheme = "scheme"
             self.username = "username"
             self.password = "password"
@@ -44,8 +42,6 @@ class URL:
             self.params = "params"
             self.query = "query"
             self.fragment = "fragment"
-        else:
-            raise AttributeError
 
     def __str__(self):
         return self.to_string()
@@ -54,8 +50,12 @@ class URL:
 
     def __setattr__(self, key, value):
         self.__dict__[key] = value  # source update
+        if key in ["port", "hostname", "username", "password"]:
+            self.netloc_relative_set(key)
+        
+    def netloc_relative_set(self, key):
         keys = ["port", "hostname", "username", "password"]
-        if (key in keys) and (len([False for k in keys if k not in self.__dict__.keys()]) == 0):    # relative update
+        if (key in keys) and (len([False for k in keys if k not in self.__dict__.keys()]) == 0):  # relative update
             if self.__dict__["password"] is None:
                 if self.__dict__["username"] is None:
                     user_info = None
@@ -88,13 +88,18 @@ class URL:
         return urlunparse((self.scheme, self.netloc, path, params, query, fragment))
 
     def from_string(self, url: str):
-        pattern = re.compile(r":[A-Za-z_-]+[$/]")
+        pattern = re.compile(r":[A-Za-z_-]+[$/#]")
+        port_pattern = None
         if pattern.search(url) is None:    # urlparse not apply a string
-            port_pattern = None
             url = urlparse(url)
         else:
             port_pattern = pattern.findall(url)[0]
-            url = urlparse(pattern.sub("/", url))
+            if re.search(r"#$", port_pattern) is not None:
+                url = urlparse(pattern.sub("#", url))
+            elif re.search(r"/$", port_pattern) is not None:
+                url = urlparse(pattern.sub("/", url))
+            else:
+                url = urlparse(pattern.sub("", url))
         self.scheme = url.scheme
         self.username = url.username
         self.password = url.password
@@ -103,17 +108,15 @@ class URL:
             self.port = url.port
         else:
             self.port = re.sub(r'^:', "", re.sub(r'/$', "", port_pattern))
-        self.netloc = "{0}:{1}@{2}:{3}".format(self.username, self.password, self.hostname, self.port)
-        self.path = re.sub(r'/$', "", url.path)
+        # self.netloc is update by relative key
+        self.path = re.sub(r'^/', "", re.sub(r'/$', "", url.path))
         self.params = url.params
         self.query = url.query
-        try:
-            self.fragment = URL(unquote(url.fragment))
-        except ValueError:
-            self.fragment = url.fragment
-
-
-EMPTY_URL = URL("scheme://username:password@hostname:port/path;params?query#fragment")
+        if url.fragment is not None:
+            try:
+                self.fragment = URL(unquote(url.fragment))
+            except RecursionError:
+                self.fragment = url.fragment
 
 
 def null_value_check(msg_value: object, msg_value_type: classmethod = str) -> object:
@@ -302,20 +305,20 @@ def check_success_reply_msg(*args) -> bool:
 
 
 def demo_tomail():
-    conn = "{0}#{1}#{2}#{3}".format("tomail://receiver_mail_username@receive_mail_hostname",
-                                    "smtp://sender_username:sender_password@sender_hostname:port",
-                                    "frommail://sender_mail_username_2@senderhostname_2",
-                                    "receiver_user")
+    conn = "{0}#{1}#{2}".format("tomail://receiver_mail_username@receive_mail_hostname/收件人",
+                                "smtp://sender_username:sender_password@sender_hostname:port",
+                                "tomail://sender_mail_username@sender_mail_hostname/寄件人")
     url = URL(conn)
+    url.params = "123"
     print("URL:", url)
-    print("收件人:", url.netloc)
+    print("收件人邮箱:", url.netloc)
     print("收件人协议:", url.scheme)
     print("收件人用户名:", url.username)
-    print("收件人名:", url.fragment.fragment.fragment)
-    print("发件人：", "{0}@{1}".format(url.fragment.username, url.fragment.fragment.hostname))
+    print("收件人名:", url.path)
+    print("发件人邮箱：", url.fragment.fragment.netloc)
     print("发件人协议:", url.fragment.fragment.scheme)
     print("发件人用户名:", url.fragment.username)
-    print("发件人名:", url.fragment.fragment.username)
+    print("发件人名:", url.fragment.fragment.path)
     print("服务协议:", url.fragment.scheme)
     print("服务用户:", url.fragment.username)
     print("服务密码:", url.fragment.password)
@@ -349,6 +352,5 @@ def demo_ftp():
 
 
 if __name__ == '__main__':
-    u = EMPTY_URL
-    print(u)
+    demo_tomail()
 
