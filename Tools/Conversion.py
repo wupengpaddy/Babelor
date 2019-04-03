@@ -93,6 +93,16 @@ def dict2xml(dt: dict) -> str:
     return ElementTree.tostring(dict2etree(dt), encoding=CODING).decode(CODING)
 
 
+def one_value_out_of_list(func):
+    def inner(*args, **kwargs):
+        ret = func(*args, **kwargs)
+        if isinstance(ret, list):
+            if len(ret) == 1:
+                return ret[0]
+        return ret
+    return inner
+
+
 def extract_multi_values_from_keys(dt, *args):
     depth = len(args)
     if depth < 1:
@@ -120,21 +130,23 @@ def remove_duplicated_value(lt: list):
     return dt
 
 
+@one_value_out_of_list
 def extract_value_from_key(dt, *args):
     depth = len(args)
     if depth < 1:
         return dt
-    if isinstance(dt, dict):
-        if args[0] in dt.keys():
-            return extract_value_from_key(dt[args[0]], *args[1:])
-        else:
-            return None
-    elif isinstance(dt, list):
-        if len(dt) == 0:
-            return None
-        if len(dt) == 1:
-            return extract_value_from_key(dt[0], *args)
-        if len(dt) > 1:
-            return extract_multi_values_from_keys(dt, *args)
     else:
-        return dt
+        if isinstance(dt, dict):
+            if args[0] in dt.keys():
+                return extract_value_from_key(dt[args[0]], *args[1:])
+            else:
+                return None
+        elif isinstance(dt, list):
+            if len(dt) == 0:
+                return None
+            if len(dt) == 1:
+                return extract_value_from_key(dt[0], *args)
+            if len(dt) > 1:
+                return extract_multi_values_from_keys(dt, *args)
+        else:
+            return dt
