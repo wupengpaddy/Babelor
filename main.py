@@ -14,7 +14,7 @@
 # limitations under the License.
 import re
 from Process.MQ import MessageQueue
-from Message.Message import EMPTY_MSG, URL, check_success_reply
+from Message.Message import URL, MSG
 from DataBase.SQL import SQL
 
 BlockingTime = 0.025                # 堵塞时间

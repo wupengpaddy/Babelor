@@ -92,3 +92,33 @@ def json2xml(js: str) -> str:
 def dict2xml(dt: dict) -> str:
     return ElementTree.tostring(dict2etree(dt), encoding=CODING).decode(CODING)
 
+
+def extract_multi_values_from_key(dt: list, key: str):
+    if isinstance(dt, list):
+        string = []
+        for i in range(len(dt)):
+            if isinstance(dt[i-1][key], list):
+                string.append(dt[i-1][key][0])
+            else:
+                string.append(str(dt[i-1][key]))
+        return ",".join(string)
+    else:
+        if dt is None:
+            return None
+        elif isinstance(dt, dict):
+            return extract_value_from_key(dt, (key,))
+        else:
+            raise NotImplementedError("不支持" + str(dt))
+
+
+def extract_value_from_key(dt, *args):
+    depth = len(args)
+    if isinstance(dt, dict):
+        return extract_value_from_key(dt[args[0]], args[1:])
+    elif isinstance(dt, list):
+        if isinstance(dt[0], dict) and depth >= 1:
+            return extract_value_from_key(dt[0][args[0]], args[1:])
+        else:
+            return dt[0]
+    else:
+        raise NotImplementedError("未实现深度:{0}类型{1}的功能".format(depth, type(dt)))
