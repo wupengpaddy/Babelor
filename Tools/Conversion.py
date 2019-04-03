@@ -93,32 +93,48 @@ def dict2xml(dt: dict) -> str:
     return ElementTree.tostring(dict2etree(dt), encoding=CODING).decode(CODING)
 
 
-def extract_multi_values_from_key(dt: list, key: str):
+def extract_multi_values_from_keys(dt, *args):
+    depth = len(args)
+    if depth < 1:
+        return dt
     if isinstance(dt, list):
-        string = []
-        for i in range(len(dt)):
-            if isinstance(dt[i-1][key], list):
-                string.append(dt[i-1][key][0])
-            else:
-                string.append(str(dt[i-1][key]))
-        return ",".join(string)
+        lt = []
+        for d in dt:
+            rt = extract_value_from_key(d, *args)
+            # print("RETURN:{0} DATA:{1} ARGS:{2}".format(rt, d, *args))
+            if rt not in lt:
+                if isinstance(rt, list):
+                    lt.extend(rt)
+                else:
+                    lt.append(rt)
+        return remove_duplicated_value(lt)
     else:
-        if dt is None:
-            return None
-        elif isinstance(dt, dict):
-            return extract_value_from_key(dt, (key,))
-        else:
-            raise NotImplementedError("不支持" + str(dt))
+        return extract_value_from_key(dt, *args)
+
+
+def remove_duplicated_value(lt: list):
+    dt = []
+    for l in lt:
+        if (l not in dt) and (l is not None):
+            dt.append(l)
+    return dt
 
 
 def extract_value_from_key(dt, *args):
     depth = len(args)
+    if depth < 1:
+        return dt
     if isinstance(dt, dict):
-        return extract_value_from_key(dt[args[0]], args[1:])
-    elif isinstance(dt, list):
-        if isinstance(dt[0], dict) and depth >= 1:
-            return extract_value_from_key(dt[0][args[0]], args[1:])
+        if args[0] in dt.keys():
+            return extract_value_from_key(dt[args[0]], *args[1:])
         else:
-            return dt[0]
+            return None
+    elif isinstance(dt, list):
+        if len(dt) == 0:
+            return None
+        if len(dt) == 1:
+            return extract_value_from_key(dt[0], *args)
+        if len(dt) > 1:
+            return extract_multi_values_from_keys(dt, *args)
     else:
-        raise NotImplementedError("未实现深度:{0}类型{1}的功能".format(depth, type(dt)))
+        return dt
