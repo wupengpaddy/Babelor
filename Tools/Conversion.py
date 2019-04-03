@@ -18,6 +18,7 @@ from xml.etree import ElementTree
 
 ROOT_TAG = 'root'
 CODING = 'utf-8'
+IS_STR_VALUE = True
 
 
 def dict2json(dt: dict) -> str:
@@ -93,16 +94,6 @@ def dict2xml(dt: dict) -> str:
     return ElementTree.tostring(dict2etree(dt), encoding=CODING).decode(CODING)
 
 
-def one_value_out_of_list(func):
-    def inner(*args, **kwargs):
-        ret = func(*args, **kwargs)
-        if isinstance(ret, list):
-            if len(ret) == 1:
-                return ret[0]
-        return ret
-    return inner
-
-
 def extract_multi_values_from_keys(dt, *args):
     depth = len(args)
     if depth < 1:
@@ -130,7 +121,6 @@ def remove_duplicated_value(lt: list):
     return dt
 
 
-@one_value_out_of_list
 def extract_value_from_key(dt, *args):
     depth = len(args)
     if depth < 1:
@@ -138,15 +128,34 @@ def extract_value_from_key(dt, *args):
     else:
         if isinstance(dt, dict):
             if args[0] in dt.keys():
-                return extract_value_from_key(dt[args[0]], *args[1:])
-            else:
-                return None
-        elif isinstance(dt, list):
+                rt = extract_value_from_key(dt[args[0]], *args[1:])
+                return rt
+        if isinstance(dt, list):
             if len(dt) == 0:
                 return None
             if len(dt) == 1:
-                return extract_value_from_key(dt[0], *args)
+                if isinstance(dt[0], dict) or isinstance(dt[0], list):
+                    return extract_value_from_key(dt[0], *args)
+                else:
+                    return dt[0]
             if len(dt) > 1:
                 return extract_multi_values_from_keys(dt, *args)
-        else:
-            return dt
+
+
+def extract_from_key(*args, **kwargs):
+    rt = extract_value_from_key(*args, **kwargs)
+    if IS_STR_VALUE:
+        if isinstance(rt, list):
+            if len(rt) == 0:
+                return "None"
+            if len(rt) == 1:
+                return str(rt[0])
+            return ",".join(rt)
+        return str(rt)
+    else:
+        if isinstance(rt, list):
+            if len(rt) == 0:
+                return None
+            if len(rt) == 1:
+                return rt[0]
+        return rt
