@@ -16,10 +16,11 @@ import zmq
 import time
 from multiprocessing import Queue, Process
 from Message.Message import MSG, URL
+from CONFIG.config import GLOBAL_CFG
 
-MSG_Q_MAX_DEPTH = 1024
-CODING = "utf-8"
-BlockingTime = 1/1024
+MSG_Q_MAX_DEPTH = GLOBAL_CFG["MSG_Q_MAX_DEPTH"]
+CODING = GLOBAL_CFG["CODING"]
+BlockingTime = GLOBAL_CFG["MSG_Q_BlockingTime"]
 
 
 def consumer_request(socket: zmq.Socket, msg: MSG):

@@ -18,55 +18,73 @@ from pyftpdlib.authorizers import DummyAuthorizer
 from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.servers import FTPServer
 from Message.Message import URL
+from CONFIG.config import GLOBAL_CFG
+
+BANNER = GLOBAL_CFG["FTP_BANNER"]
+PASV_PORT = GLOBAL_CFG["FTP_PASV_PORTS"]
+MAX_CONS = GLOBAL_CFG["FTP_MAX_CONS"]
+MAX_CONS_PER_IP = GLOBAL_CFG["FTP_MAX_CONS_PER_IP"]
 
 
 class FTP:
-    def __init__(self, conn: str):
-        self.conn = URL(conn)
+    def __init__(self, conn: URL):
+        if isinstance(conn, str):
+            self.conn = URL(conn)
+        elif isinstance(conn, URL):
+            self.conn = conn
+        else:
+            raise NotImplementedError
+        self.buf_size = 1024
 
     def send(self, attachments):
-        ftp = ftplib.FTP()
-        ftp.connect(self.conn.hostname, self.conn.port)     # 连接
-        ftp.login(self.conn.username, self.conn.password)   # 登录
-        if "PASV" in self.conn.fragment:
-            ftp.set_pasv(True)                              # 被动模式
+        ftp = self.ftp_client()
         for attach_path in attachments:
             with open(attach_path, 'rb') as attachment:
-                ftp.storbinary('STOR ' + attach_path.split("/")[-1], attachment)  # 上传文件
+                ftp.storbinary('STOR ' + attach_path.split("/")[-1], attachment, self.buf_size)  # 上传文件
         ftp.close()
 
-    def receive(self):
-        pass
+    def receive(self, attachments):
+        ftp = self.ftp_client()
+        for attach_path in attachments:
+            with open(attach_path, 'rb') as attachment:
+                ftp.retrbinary('RETR ' + attach_path.split("/")[-1], attachment, self.buf_size)
+        ftp.close()
+
+    def ftp_client(self):
+        ftp = ftplib.FTP()
+        ftp.connect(self.conn.hostname, self.conn.port)      # 连接
+        ftp.login(self.conn.username, self.conn.password)    # 登录
+        if "PASV" in self.conn.fragment:                     # 被动模式
+            ftp.set_pasv(True)
+        return ftp
 
 
-def ftp_server():
-    # Instantiate a dummy authorizer for managing 'virtual' users
-    authorizer = DummyAuthorizer()
+class FTPD:
+    def __init__(self, conn: URL):
+        if isinstance(conn, str):
+            self.conn = URL(conn)
+        elif isinstance(conn, URL):
+            self.conn = conn
+        else:
+            raise NotImplementedError
 
-    # Define a new user having full r/w permissions
-    authorizer.add_user('user', 'password', '/home/user', perm='elradfmwM')
-    # Define a read-only anonymous user
-    # authorizer.add_anonymous(os.getcwd())
+    def ftp_server(self):
+        authorizer = DummyAuthorizer()
+        authorizer.add_user(self.conn.username, self.conn.password, self.conn.path, perm='elradfmwM')
+        handler = FTPHandler
+        handler.authorizer = authorizer
+        handler.banner = BANNER
+        if "*" in self.conn.hostname:
+            address = ('', int(self.conn.port))
+        else:
+            handler.masquerade_address = self.conn.hostname
+            address = (self.conn.hostname, int(self.conn.port))
+        if "PASV" in self.conn.fragment:  # 被动模式
+            handler.passive_ports = range(PASV_PORT["START"], PASV_PORT["END"])
+        server = FTPServer(address, handler)
+        # set a limit for connections
+        server.max_cons = MAX_CONS
+        server.max_cons_per_ip = MAX_CONS_PER_IP
 
-    # Instantiate FTP handler class
-    handler = FTPHandler
-    handler.authorizer = authorizer
-
-    # Define a customized banner (string returned when client connects)
-    handler.banner = "Welcome to Shanghai Pudong International Airport Information Exchange Platform."
-
-    # Specify a masquerade address and the range of ports to use for
-    # passive connections.  De-comment in case you're behind a NAT.
-    # handler.masquerade_address = '151.25.42.11'
-    handler.passive_ports = range(10000, 10010)
-
-    # Instantiate FTP server class and listen on 0.0.0.0:2121
-    address = ('', 2121)
-    server = FTPServer(address, handler)
-
-    # set a limit for connections
-    server.max_cons = 20
-    server.max_cons_per_ip = 5
-
-    # start ftp server
-    server.serve_forever()
+        # start ftp server
+        server.serve_forever()

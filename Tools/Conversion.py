@@ -15,10 +15,11 @@
 
 import json
 from xml.etree import ElementTree
+from CONFIG.config import GLOBAL_CFG
 
-ROOT_TAG = 'root'
-CODING = 'utf-8'
-IS_STR_VALUE = True
+ROOT_TAG = GLOBAL_CFG["ROOT_TAG"]
+CODING = GLOBAL_CFG["CODING"]
+IS_STR_VALUE = GLOBAL_CFG["IS_STR_VALUE"]
 
 
 def dict2json(dt: dict) -> str:

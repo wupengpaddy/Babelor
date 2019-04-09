@@ -15,11 +15,14 @@
 from urllib.parse import urlparse, unquote, urlunparse, quote
 from Tools.Conversion import dict2json, json2dict, dict2xml, xml2dict
 from datetime import datetime
+from CONFIG.config import GLOBAL_CFG
+import base64
 import re
 
-DatetimeFmt = '%Y-%m-%d %H:%M:%S.%f'
-CODING = 'utf-8'
-MSG_TYPE = 'json'           # "xml"
+DatetimeFmt = GLOBAL_CFG["DatetimeFormat"]
+PortFmt = GLOBAL_CFG["PortFormat"]
+CODING = GLOBAL_CFG["CODING"]
+MSG_TYPE = GLOBAL_CFG["MSG_TYPE"]
 
 
 def current_datetime() -> str:
@@ -37,7 +40,7 @@ class URL:
             self.password = "password"
             self.hostname = "hostname"
             self.port = "port"
-            self.netloc = "{0}:{1}@{2}:{3}".format(self.username, self.password, self.hostname, self.port)
+            self.compose_netloc()
             self.path = "path"
             self.params = "params"
             self.query = "query"
@@ -49,28 +52,52 @@ class URL:
     __repr__ = __str__
 
     def __setattr__(self, key, value):
-        self.__dict__[key] = value  # source update
-        if key in ["port", "hostname", "username", "password"]:
-            self.netloc_relative_set(key)
-        
-    def netloc_relative_set(self, key):
-        keys = ["port", "hostname", "username", "password"]
-        if (key in keys) and (len([False for k in keys if k not in self.__dict__.keys()]) == 0):  # relative update
-            if self.__dict__["password"] is None:
-                if self.__dict__["username"] is None:
-                    user_info = None
-                else:
-                    user_info = self.username
+        self.__dict__[key] = value      # source update
+        keys = ["port", "hostname", "username", "password"]     # relative update
+        if (key in keys) and (len([False for k in keys if k not in self.__dict__.keys()]) == 0):
+            self.compose_netloc()
+        if key in ["netloc"]:
+            self.decompose_netloc()
+
+    def decompose_netloc(self):
+        netloc = self.__dict__["netloc"]
+        if not isinstance(netloc, str):
+            raise ValueError("netloc 错误赋值")
+        if "@" in netloc:
+            auth, location = netloc.split("@")
+        else:
+            auth = None
+            location = netloc
+        if auth is None:
+            self.__dict__["username"] = None
+            self.__dict__["password"] = None
+        else:
+            if ":" in auth:
+                self.__dict__["username"], self.__dict__["password"] = auth.split(":")
             else:
-                user_info = "{0}:{1}".format(self.__dict__["username"], self.__dict__["password"])
-            if self.__dict__["port"] is None:
-                net_info = self.__dict__["hostname"]
+                self.__dict__["username"] = auth
+                self.__dict__["password"] = None
+        if ":" in location:
+            self.__dict__["hostname"], self.__dict__["port"] = location.split(":")
+        else:
+            self.__dict__["hostname"] = location
+
+    def compose_netloc(self):
+        if self.__dict__["password"] is None:
+            if self.__dict__["username"] is None:
+                auth = None
             else:
-                net_info = "{0}:{1}".format(self.__dict__["hostname"], self.__dict__["port"])
-            if user_info is None:
-                self.__dict__["netloc"] = net_info
-            else:
-                self.__dict__["netloc"] = "{0}@{1}".format(user_info, net_info)
+                auth = self.username
+        else:
+            auth = "{0}:{1}".format(self.__dict__["username"], self.__dict__["password"])
+        if self.__dict__["port"] is None:
+            location = self.__dict__["hostname"]
+        else:
+            location = "{0}:{1}".format(self.__dict__["hostname"], self.__dict__["port"])
+        if auth is None:
+            self.__dict__["netloc"] = location
+        else:
+            self.__dict__["netloc"] = "{0}@{1}".format(auth, location)
 
     def to_string(self, allow_path=True, allow_params=True, allow_query=True, allow_fragment=True) -> str:
         path, params, query, fragment = "", "", "", ""
@@ -88,7 +115,7 @@ class URL:
         return urlunparse((self.scheme, self.netloc, path, params, query, fragment))
 
     def from_string(self, url: str):
-        pattern = re.compile(r":[A-Za-z_-]+[$/#]")
+        pattern = re.compile(r":port[$//#]")
         port_pattern = None
         if pattern.search(url) is None:    # urlparse not apply a string
             url = urlparse(url)
@@ -96,7 +123,7 @@ class URL:
             port_pattern = pattern.findall(url)[0]
             if re.search(r"#$", port_pattern) is not None:
                 url = urlparse(pattern.sub("#", url))
-            elif re.search(r"/$", port_pattern) is not None:
+            elif re.search(r"//$", port_pattern) is not None:
                 url = urlparse(pattern.sub("/", url))
             else:
                 url = urlparse(pattern.sub("", url))
@@ -117,6 +144,25 @@ class URL:
                 self.fragment = URL(unquote(url.fragment))
             except RecursionError:
                 self.fragment = url.fragment
+
+    def check(self):
+        # "mysql://username:password@hostname/service#table"
+        if self.scheme in ["mysql"]:
+            # "mysql+pymysql://username:password@hostname:3306/service#table"
+            self.scheme = "mysql+pymysql"
+            default_port = "3306"
+        # "oracle://username:password@hostname:port/service#table"
+        elif self.scheme in ["oracle"]:
+            # "oracle+cx_oracle://username:password@hostname:1521/service#table"
+            self.scheme = "oracle+cx_oracle"
+            default_port = "1521"
+        # "ftp://username:password@hostname:21/path#PASV"
+        elif self.scheme in ["ftp", "ftpd"]:
+            default_port = "21"
+        else:
+            default_port = self.port
+        if not re.match(PortFmt, self.port):
+            self.port = default_port
 
 
 def null_value_check(msg_value: object, msg_value_type: classmethod = str) -> object:
@@ -252,10 +298,8 @@ class MSG:
 
 
 def check_sql_url(url: URL, has_table=False) -> str:
-    # conn = "oracle://username:password@hostname/service#table"
-    # conn = "mysql://username:password@hostname/service#table"
-    # conn = "oracle://username:password@hostname:port/service#table"
-    # conn = "mysql://username:password@hostname:port/service#table"
+    # "oracle://username:password@hostname/service#table"
+    # "mysql://username:password@hostname:port/service#table"
     port = 0
     if url.scheme == "oracle":
         url.scheme = "oracle+cx_oracle"
@@ -339,7 +383,7 @@ def demo_sql():
 
 
 def demo_ftp():
-    conn = "ftp://username:password@hostname/path#PASV"
+    conn = "ftp://username:password@*:21/path#PASV"
     url = URL(conn)
     print("URL:", url)
     print("服务协议:", url.scheme)
@@ -352,5 +396,5 @@ def demo_ftp():
 
 
 if __name__ == '__main__':
-    demo_tomail()
+    demo_ftp()
 

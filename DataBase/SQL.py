@@ -16,15 +16,14 @@ import os
 import pandas as pd
 from sqlalchemy import create_engine
 from Message.Message import URL, check_sql_url
+from CONFIG.config import GLOBAL_CFG
+
 # 切换中文字符
-os.environ['NLS_LANG'] = 'SIMPLIFIED CHINESE_CHINA.UTF8'
+os.environ['NLS_LANG'] = GLOBAL_CFG["NLS_LANG"]
 
 
 class SQL:
-    """
-    Load Data from Oracle
-    """
-    def __init__(self, conn: object):
+    def __init__(self, conn):
         """
         :param conn: SQL连接脚本
         """
