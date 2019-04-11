@@ -120,6 +120,9 @@ class MessageQueue:
     def request(self, msg: MSG, is_break=False):
         if not isinstance(self.destination, URL):
             raise ValueError("Invalid destination path.")
+        if self.destination.scheme not in ["tcp"]:
+            raise ValueError("Invalid destination scheme.")
+
         if self.is_not_init["REQUEST"]:
             self.socket = self.context.socket(zmq.REQ)
             self.socket.connect(self.destination.to_string(False, False, False, False))

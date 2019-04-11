@@ -30,21 +30,21 @@ def current_datetime() -> str:
 
 
 class URL:
+    # scheme://username:password@hostname:port/path;params?query#fragment
+    scheme = "scheme"
+    username = "username"
+    password = "password"
+    hostname = "hostname"
+    port = "port"
+    netloc = "{0}:{1}@{2}:{3}".format(username, password, hostname, port)
+    path = "path"
+    params = "params"
+    query = "query"
+    fragment = "fragment"
+
     def __init__(self, url=None):
-        # scheme://username:password@hostname:port/path;params?query#fragment
         if isinstance(url, str):
             self.from_string(url)
-        if url is None:
-            self.scheme = "scheme"
-            self.username = "username"
-            self.password = "password"
-            self.hostname = "hostname"
-            self.port = "port"
-            self.compose_netloc()
-            self.path = "path"
-            self.params = "params"
-            self.query = "query"
-            self.fragment = "fragment"
 
     def __str__(self):
         return self.to_string()
@@ -58,6 +58,9 @@ class URL:
             self.compose_netloc()
         if key in ["netloc"]:
             self.decompose_netloc()
+
+    def __getattr__(self, item):
+        return self.__dict__[item]
 
     def decompose_netloc(self):
         netloc = self.__dict__["netloc"]
@@ -114,67 +117,157 @@ class URL:
                 fragment = quote(self.fragment)
         return urlunparse((self.scheme, self.netloc, path, params, query, fragment))
 
-    def from_string(self, url: str):
-        pattern = re.compile(r":port[$//#]")
-        port_pattern = None
-        if pattern.search(url) is None:    # urlparse not apply a string
-            url = urlparse(url)
-        else:
-            port_pattern = pattern.findall(url)[0]
-            if re.search(r"#$", port_pattern) is not None:
-                url = urlparse(pattern.sub("#", url))
-            elif re.search(r"//$", port_pattern) is not None:
-                url = urlparse(pattern.sub("/", url))
-            else:
-                url = urlparse(pattern.sub("", url))
+    def from_string(self, url_string: str):
+        default_port = None
+        if re.search(r":port#", url_string) is not None:
+            url_string = re.sub(r":port#", "#", url_string)
+            default_port = "port"
+        if re.search(r":port/", url_string) is not None:
+            url_string = re.sub(r":port/", "/", url_string)
+            default_port = "port"
+        if re.search(r":port$", url_string) is not None:
+            url_string = re.sub(r":port$", "", url_string)
+            default_port = "port"
+        url = urlparse(url_string)
         self.scheme = url.scheme
         self.username = url.username
         self.password = url.password
         self.hostname = url.hostname
-        if port_pattern is None:
+        if default_port is None:
             self.port = url.port
         else:
-            self.port = re.sub(r'^:', "", re.sub(r'/$', "", port_pattern))
-        # self.netloc is update by relative key
+            self.port = default_port
         self.path = re.sub(r'^/', "", re.sub(r'/$', "", url.path))
         self.params = url.params
         self.query = url.query
-        if url.fragment is not None:
+        if url.fragment == "":
+            self.fragment = ""
+        elif re.search("://", unquote(url.fragment)) is not None:
             try:
                 self.fragment = URL(unquote(url.fragment))
             except RecursionError:
                 self.fragment = url.fragment
+        else:
+            self.fragment = url.fragment
 
+    @property
     def check(self):
-        # "mysql://username:password@hostname/service#table"
+        # "mysql://username:password@hostname:port/service#table"
+        default_port = None
         if self.scheme in ["mysql"]:
             # "mysql+pymysql://username:password@hostname:3306/service#table"
             self.scheme = "mysql+pymysql"
-            default_port = "3306"
+            default_port = 3306
         # "oracle://username:password@hostname:port/service#table"
-        elif self.scheme in ["oracle"]:
+        if self.scheme in ["oracle"]:
             # "oracle+cx_oracle://username:password@hostname:1521/service#table"
             self.scheme = "oracle+cx_oracle"
-            default_port = "1521"
-        # "ftp://username:password@hostname:21/path#PASV"
-        elif self.scheme in ["ftp", "ftpd"]:
-            default_port = "21"
+            default_port = 1521
+        # "ftp://username:password@hostname:port/path#PASV"
+        if self.scheme in ["ftp", "ftpd"]:
+            # "ftp://username:password@hostname:21/path#PASV"
+            default_port = 21
+        # "smtp://username:password@hostname:port"
+        if self.scheme in ["smtp"]:
+            # "smtp://username:password@hostname:port"
+            default_port = 25
+        # "pop3://username:password@hostname:port"
+        if self.scheme in ["pop3"]:
+            # "pop3://username:password@hostname:port"
+            default_port = 110
+        # "http://username:password@hostname:port"
+        if self.scheme in ["http"]:
+            # "http://username:password@hostname:port"
+            default_port = 80
+        if re.match(PortFmt, str(self.port)) is None:
+            if default_port is not None:
+                self.port = default_port
+            else:
+                self.port = None
+        return self
+
+    def init(self, scheme=None):
+        if scheme in ["ftp"]:
+            self.__init__("ftp://username:password@hostname:port/path#PASV")
+        if scheme in ["mysql"]:
+            self.__init__("mysql://username:password@hostname:port/service")
+        if scheme in ["oracle"]:
+            self.__init__("oracle://username:password@hostname:port/service")
+        if scheme in ["tomail+smtp"]:
+            smtp_conn = "{0}#{1}".format("smtp://sender_username:sender_password@sender_hostname:port",
+                                         quote("tomail://sender_mail_username@sender_mail_hostname/sender"))
+            self.__init__("{0}#{1}".format("tomail://receiver_mail_username@receive_mail_hostname/receiver",
+                                           quote(smtp_conn)))
+        if scheme in ["tcp"]:
+            self.__init__("tcp://hostname:port")
+        return self
+
+
+class CASE:
+    def __init__(self, case=None):
+        self.origination = URL()
+        self.destination = URL()
+        if isinstance(case, str):
+            self.from_string(case)
+
+    def __str__(self):
+        return self.to_string()
+
+    __repr__ = __str__
+
+    def to_string(self):
+        return "{0}#{1}".format(quote(str(self.origination)), quote(str(self.destination)))
+
+    def from_string(self, case: str):
+        case = case.split("#")
+        if len(case) == 2:
+            self.origination = URL(unquote(case[0]))
+            self.destination = URL(unquote(case[1]))
         else:
-            default_port = self.port
-        if not re.match(PortFmt, self.port):
-            self.port = default_port
+            raise ValueError("地址格式错误")
 
 
-def null_value_check(msg_value: object, msg_value_type: classmethod = str) -> object:
-    if msg_value is None:
+class DATA:
+    def __init__(self, case=None):
+        self.coding = CODING
+        self.format = None
+        self.path = None
+        self.stream = None
+        if isinstance(case, str):
+            self.from_string(case)
+
+    def from_string(self, case: str):
+        case = case.split("#")
+        if len(case) == 2:
+            self.origination = URL(unquote(case[0]))
+            self.destination = URL(unquote(case[1]))
+        else:
+            raise ValueError("地址格式错误")
+
+
+def null_keep(item: object, item_type: classmethod = str) -> object:
+    if item is None:
         return None
-    elif isinstance(msg_value, msg_value_type):
-        return msg_value
+    elif isinstance(item, item_type):
+        return item
     else:
-        return msg_value_type(msg_value)
+        return item_type(item)
 
 
 class MSG:
+    timestamp = current_datetime()
+    origination = URL()
+    destination = URL()
+    case = CASE()
+    activity = None
+    treatment = None
+    encryption = None
+    data = {
+        "": None,
+        "path": None,
+        "stream": None,
+    }
+
     def __init__(self, msg=None):
         if isinstance(msg, str):
             if MSG_TYPE is "json":
@@ -183,18 +276,8 @@ class MSG:
                 self.from_xml(msg)
             else:
                 raise NotImplementedError("仅支持 xml 和 json 类消息")
-        elif isinstance(msg, dict):
+        if isinstance(msg, dict):
             self.from_dict(msg)
-        elif msg is None:
-            self.timestamp = current_datetime()
-            self.timestamp = None
-            self.origination = None
-            self.destination = None
-            self.case = None
-            self.activity = None
-            self.treatment = None
-            self.encryption = None
-            self.data = None
 
     def __str__(self):
         return self.to_string()
@@ -203,10 +286,8 @@ class MSG:
 
     def __setattr__(self, key, value):
         self.__dict__[key] = value  # source update
-        keys = ["timestamp", "origination", "destination", "case", "activity", "treatment", "encryption", "data"]
-        if len(self.__dict__.keys()) == len(keys):  # force update datetime
-            if key != "timestamp":
-                self.__dict__["timestamp"] = current_datetime()
+        if key != "timestamp":
+            self.__dict__["timestamp"] = current_datetime()
 
     def to_dict(self):
         return {
@@ -224,6 +305,22 @@ class MSG:
             }
         }
 
+    def to_serialize(self):
+        return {
+            "head": {
+                "timestamp": null_keep(self.timestamp),
+                "origination": null_keep(self.origination),
+                "destination": null_keep(self.destination),
+                "case": null_keep(self.case),
+                "activity": null_keep(self.activity),
+            },
+            "body": {
+                "treatment": null_keep(self.treatment),
+                "encryption": null_keep(self.encryption),
+                "data": null_keep(self.data),
+            }
+        }
+
     def to_string(self):
         if MSG_TYPE is "json":
             return self.to_json()
@@ -233,10 +330,10 @@ class MSG:
             raise NotImplementedError("仅支持 xml 和 json 类消息")
 
     def to_json(self):
-        return dict2json(self.to_dict())
+        return dict2json(self.to_serialize())
 
     def to_xml(self):
-        return dict2xml(self.to_dict())
+        return dict2xml(self.to_serialize())
 
     def from_dict(self, msg: dict):
         if not isinstance(msg, dict):
@@ -258,13 +355,14 @@ class MSG:
             self.timestamp = current_datetime()
         else:
             self.timestamp = msg["head"]["timestamp"]
-        self.origination = null_value_check(msg["head"]["origination"], URL)
-        self.destination = null_value_check(msg["head"]["destination"], URL)
-        self.case = null_value_check(msg["head"]["case"])
-        self.activity = null_value_check(msg["head"]["activity"])
-        self.treatment = null_value_check(msg["body"]["treatment"], URL)
-        self.encryption = null_value_check(msg["body"]["encryption"], URL)
-        self.data = null_value_check(msg["body"]["data"])
+        self.origination = null_keep(msg["head"]["origination"], URL)
+        self.destination = null_keep(msg["head"]["destination"], URL)
+        self.case = null_keep(msg["head"]["case"], CASE)
+        self.activity = null_keep(msg["head"]["activity"])
+        self.treatment = null_keep(msg["body"]["treatment"], URL)
+        self.encryption = null_keep(msg["body"]["encryption"])
+        self.data = null_keep(msg["body"]["data"])
+        self.data_check()
 
     def from_json(self, msg: str):
         self.from_dict(json2dict(msg))
@@ -283,50 +381,25 @@ class MSG:
         self.destination = destination
         return self
 
-    def renew(self):
-        self.timestamp = current_datetime()
-        self.data = None
+    def heartbeat(self, state=None):
+        # state is None: set to msg.heartbeat.request
+        # state is bool: set to msg.heartbeat.reply
+        if state is None:
+            self.treatment = None
+            self.encryption = None
+            self.data = {"SUCCESS": None}
+        else:
+            self.swap()
+            self.treatment = None
+            self.encryption = None
+            self.activity = "heartbeat"
+            self.data = {"SUCCESS": state}
         return self
 
-    def success_reply(self, state: bool):
-        self.renew()
-        self.swap()
-        self.treatment = None
-        self.encryption = None
-        self.data = {"SUCCESS": state}
+    def data_check(self):
+        if self.encryption in ["base64"]:
+            self.data = base64.b64decode(self.__dict__["data"])
         return self
-
-
-def check_sql_url(url: URL, has_table=False) -> str:
-    # "oracle://username:password@hostname/service#table"
-    # "mysql://username:password@hostname:port/service#table"
-    port = 0
-    if url.scheme == "oracle":
-        url.scheme = "oracle+cx_oracle"
-        port = 1521
-    if url.scheme == "mysql":
-        url.scheme = "mysql+pymysql"
-        port = 3306
-    if url.port is None:
-        url.port = port
-        url.netloc = "{0}:{1}".format(url.netloc, port)
-    # conn = "oracle+cx_oracle://username:password@hostname:1521/service#table"
-    # conn = "mysql+pymysql://username:password@hostname:3306/service#table"
-    if has_table:
-        return url.to_string(True, False, False, True)
-    else:
-        return url.to_string(True, False, False, False)
-
-
-def check_ftp_url(*args) -> str:
-    # conn = "ftp://username:password@hostname:10001/path#PASV"
-    url = URL(args[0])
-    if url.scheme != "ftp":
-        raise ValueError
-    if url.port is None:
-        url.port = 21
-        url.netloc = "{0}:{1}".format(url.netloc, url.port)
-    return url.to_string(True, False, False, True)
 
 
 def check_success_reply_msg(*args) -> bool:
@@ -349,18 +422,13 @@ def check_success_reply_msg(*args) -> bool:
 
 
 def demo_tomail():
-    conn = "{0}#{1}#{2}".format("tomail://receiver_mail_username@receive_mail_hostname/收件人",
-                                "smtp://sender_username:sender_password@sender_hostname:port",
-                                "tomail://sender_mail_username@sender_mail_hostname/寄件人")
-    url = URL(conn)
-    url.params = "123"
+    url = URL()
+    url.init("tomail+smtp")
     print("URL:", url)
     print("收件人邮箱:", url.netloc)
-    print("收件人协议:", url.scheme)
     print("收件人用户名:", url.username)
     print("收件人名:", url.path)
     print("发件人邮箱：", url.fragment.fragment.netloc)
-    print("发件人协议:", url.fragment.fragment.scheme)
     print("发件人用户名:", url.fragment.username)
     print("发件人名:", url.fragment.fragment.path)
     print("服务协议:", url.fragment.scheme)
@@ -370,10 +438,24 @@ def demo_tomail():
     print("服务端口", url.fragment.port)
 
 
-def demo_sql():
-    conn = "oracle://username:password@hostname:port/service"
-    url = URL(conn)
-    print("URL:", url)
+def demo_mysql():
+    url = URL()
+    url.init("mysql")
+    # url.check()
+    print("\nURL:", url)
+    print("服务协议:", url.scheme)
+    print("服务用户:", url.username)
+    print("服务密码:", url.password)
+    print("服务地址", url.hostname)
+    print("服务端口", url.port)
+    print("数据服务", url.path)
+
+
+def demo_oracle():
+    url = URL()
+    url.init("oracle")
+    # url.check()
+    print("\nURL:", url)
     print("服务协议:", url.scheme)
     print("服务用户:", url.username)
     print("服务密码:", url.password)
@@ -383,9 +465,9 @@ def demo_sql():
 
 
 def demo_ftp():
-    conn = "ftp://username:password@*:21/path#PASV"
-    url = URL(conn)
-    print("URL:", url)
+    url = URL()
+    url.init("ftp")
+    print("\nURL:", url)
     print("服务协议:", url.scheme)
     print("服务用户:", url.username)
     print("服务密码:", url.password)
@@ -395,6 +477,18 @@ def demo_ftp():
     print("服务模式", url.fragment)
 
 
-if __name__ == '__main__':
-    demo_ftp()
+def demo_msg_mysql2ftp():
+    msg = MSG()
+    ftp_url = URL()
+    mysql_url = URL()
+    msg.origination = mysql_url.init("mysql")
+    msg.destination = ftp_url.init("ftp")
+    msg.activity = "init"
+    print(msg)
 
+
+if __name__ == '__main__':
+    # demo_tomail()
+    # demo_ftp()
+    # demo_mysql()
+    demo_msg_mysql2ftp()

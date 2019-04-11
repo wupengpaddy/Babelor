@@ -15,7 +15,7 @@
 import os
 import pandas as pd
 from sqlalchemy import create_engine
-from Message.Message import URL, check_sql_url
+from Message.Message import URL, MSG
 from CONFIG.config import GLOBAL_CFG
 
 # 切换中文字符
@@ -27,23 +27,25 @@ class SQL:
         """
         :param conn: SQL连接脚本
         """
-        # conn = "oracle://username:password@hostname:1521/service#table_name"
-        # conn = "mysql://username:password@hostname:3306/service#table_name"
+        # conn = "oracle://username:password@hostname:1521/service#table"
+        # conn = "mysql://username:password@hostname:3306/service#table"
         if isinstance(conn, URL):
-            self.conn = conn
+            self.me = conn
         elif isinstance(conn, str):
-            self.conn = URL(conn)
+            self.me = URL(conn)
         else:
             raise AttributeError("输入的参数错误")
-        self.engine = create_engine(check_sql_url(self.conn, has_table=False))
+        self.engine = create_engine(self.me.check.to_string(allow_fragment=False))
 
-    def read(self, sql: str):
+    def read(self, msg: MSG):
+        sql = msg.data
         df = pd.read_sql(sql=sql, con=self.engine)
-        return df.rename(str.upper, axis='columns')
+        df = df.rename(str.upper, axis='columns')
+        return df.to_json()
 
     def write(self, df: pd.DataFrame):
-        if self.conn.fragment is None:
+        if self.me.fragment is None:
             raise ValueError("未定义写入表名")
-        table_name = self.conn.fragment
+        table_name = self.me.fragment
         df.to_sql(table_name, con=self.engine, if_exists='replace', index=False, index_label=False)
         return True

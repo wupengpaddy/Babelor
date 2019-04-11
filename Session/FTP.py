@@ -12,12 +12,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import os
 import ftplib
 from pyftpdlib.authorizers import DummyAuthorizer
 from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.servers import FTPServer
-from Message.Message import URL
+from Message.Message import URL, MSG
 from CONFIG.config import GLOBAL_CFG
 
 BANNER = GLOBAL_CFG["FTP_BANNER"]
@@ -36,14 +35,14 @@ class FTP:
             raise NotImplementedError
         self.buf_size = 1024
 
-    def send(self, attachments):
+    def send(self, msg: MSG):
         ftp = self.ftp_client()
         for attach_path in attachments:
             with open(attach_path, 'rb') as attachment:
                 ftp.storbinary('STOR ' + attach_path.split("/")[-1], attachment, self.buf_size)  # 上传文件
         ftp.close()
 
-    def receive(self, attachments):
+    def receive(self):
         ftp = self.ftp_client()
         for attach_path in attachments:
             with open(attach_path, 'rb') as attachment:
@@ -82,9 +81,6 @@ class FTPD:
         if "PASV" in self.conn.fragment:  # 被动模式
             handler.passive_ports = range(PASV_PORT["START"], PASV_PORT["END"])
         server = FTPServer(address, handler)
-        # set a limit for connections
         server.max_cons = MAX_CONS
         server.max_cons_per_ip = MAX_CONS_PER_IP
-
-        # start ftp server
         server.serve_forever()
