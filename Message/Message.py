@@ -419,7 +419,7 @@ class MSG:
         self.destination = destination
         return self
 
-    def check(self):
+    def add_datum(self, ):
         if self.coding in ["base64"]:
             self.stream = base64.b64decode(self.__dict__["stream"])
 
