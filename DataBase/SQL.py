@@ -38,7 +38,7 @@ class SQL:
         self.engine = create_engine(self.me.check.to_string(allow_fragment=False))
 
     def read(self, msg: MSG):
-        sql = msg.data
+        sql = msg.stream
         df = pd.read_sql(sql=sql, con=self.engine)
         df = df.rename(str.upper, axis='columns')
         return df.to_json()

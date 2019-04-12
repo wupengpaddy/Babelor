@@ -17,6 +17,7 @@ from Tools.Conversion import dict2json, json2dict, dict2xml, xml2dict
 from datetime import datetime
 from CONFIG.config import GLOBAL_CFG
 import base64
+import time
 import re
 
 DatetimeFmt = GLOBAL_CFG["DatetimeFormat"]
@@ -30,19 +31,18 @@ def current_datetime() -> str:
 
 
 class URL:
-    # scheme://username:password@hostname:port/path;params?query#fragment
-    scheme = "scheme"
-    username = "username"
-    password = "password"
-    hostname = "hostname"
-    port = "port"
-    netloc = "{0}:{1}@{2}:{3}".format(username, password, hostname, port)
-    path = "path"
-    params = "params"
-    query = "query"
-    fragment = "fragment"
-
     def __init__(self, url=None):
+        # scheme://username:password@hostname:port/path;params?query#fragment
+        self.scheme = "scheme"
+        self.username = "username"
+        self.password = "password"
+        self.hostname = "hostname"
+        self.port = "port"
+        self.netloc = "{0}:{1}@{2}:{3}".format(self.username, self.password, self.hostname, self.port)
+        self.path = "path"
+        self.params = "params"
+        self.query = "query"
+        self.fragment = "fragment"
         if isinstance(url, str):
             self.from_string(url)
 
@@ -51,18 +51,25 @@ class URL:
 
     __repr__ = __str__
 
+    def __eq__(self, other):
+        if isinstance(other, URL):
+            pass
+        else:
+            raise ValueError
+
     def __setattr__(self, key, value):
         self.__dict__[key] = value      # source update
         keys = ["port", "hostname", "username", "password"]     # relative update
-        if (key in keys) and (len([False for k in keys if k not in self.__dict__.keys()]) == 0):
-            self.compose_netloc()
+        is_keys_init = len([False for k in keys if k not in list(self.__dict__.keys())]) == 0
+        if (key in keys) and is_keys_init:
+            self._compose_netloc()
         if key in ["netloc"]:
-            self.decompose_netloc()
+            self._decompose_netloc()
 
     def __getattr__(self, item):
         return self.__dict__[item]
 
-    def decompose_netloc(self):
+    def _decompose_netloc(self):
         netloc = self.__dict__["netloc"]
         if not isinstance(netloc, str):
             raise ValueError("netloc 错误赋值")
@@ -85,12 +92,12 @@ class URL:
         else:
             self.__dict__["hostname"] = location
 
-    def compose_netloc(self):
+    def _compose_netloc(self):
         if self.__dict__["password"] is None:
             if self.__dict__["username"] is None:
                 auth = None
             else:
-                auth = self.username
+                auth = self.__dict__["username"]
         else:
             auth = "{0}:{1}".format(self.__dict__["username"], self.__dict__["password"])
         if self.__dict__["port"] is None:
@@ -117,16 +124,17 @@ class URL:
                 fragment = quote(self.fragment)
         return urlunparse((self.scheme, self.netloc, path, params, query, fragment))
 
-    def from_string(self, url_string: str):
+    def from_string(self, string: str):
         default_port = None
-        if re.search(r":port#", url_string) is not None:
-            url_string = re.sub(r":port#", "#", url_string)
+        url_string = string
+        if re.search(r":port#", string) is not None:
+            url_string = re.sub(r":port#", "#", string)
             default_port = "port"
-        if re.search(r":port/", url_string) is not None:
-            url_string = re.sub(r":port/", "/", url_string)
+        if re.search(r":port/", string) is not None:
+            url_string = re.sub(r":port/", "/", string)
             default_port = "port"
-        if re.search(r":port$", url_string) is not None:
-            url_string = re.sub(r":port$", "", url_string)
+        if re.search(r":port$", string) is not None:
+            url_string = re.sub(r":port$", "", string)
             default_port = "port"
         url = urlparse(url_string)
         self.scheme = url.scheme
@@ -179,6 +187,10 @@ class URL:
         if self.scheme in ["http"]:
             # "http://username:password@hostname:port"
             default_port = 80
+        # "file://username:password@hostname:port/path"
+        if self.scheme in ["file"]:
+            # "file://username:password@hostname/path"
+            default_port = None
         if re.match(PortFmt, str(self.port)) is None:
             if default_port is not None:
                 self.port = default_port
@@ -200,6 +212,10 @@ class URL:
                                            quote(smtp_conn)))
         if scheme in ["tcp"]:
             self.__init__("tcp://hostname:port")
+        if scheme in ["http"]:
+            self.__init__("http://username:password@hostname:port")
+        if scheme in ["file"]:
+            self.__init__("file://username:password@hostname/path")
         return self
 
 
@@ -227,24 +243,6 @@ class CASE:
             raise ValueError("地址格式错误")
 
 
-class DATA:
-    def __init__(self, case=None):
-        self.coding = CODING
-        self.format = None
-        self.path = None
-        self.stream = None
-        if isinstance(case, str):
-            self.from_string(case)
-
-    def from_string(self, case: str):
-        case = case.split("#")
-        if len(case) == 2:
-            self.origination = URL(unquote(case[0]))
-            self.destination = URL(unquote(case[1]))
-        else:
-            raise ValueError("地址格式错误")
-
-
 def null_keep(item: object, item_type: classmethod = str) -> object:
     if item is None:
         return None
@@ -255,20 +253,19 @@ def null_keep(item: object, item_type: classmethod = str) -> object:
 
 
 class MSG:
-    timestamp = current_datetime()
-    origination = URL()
-    destination = URL()
-    case = CASE()
-    activity = None
-    treatment = None
-    encryption = None
-    data = {
-        "": None,
-        "path": None,
-        "stream": None,
-    }
-
     def __init__(self, msg=None):
+        self.timestamp = current_datetime()     # 时间戳
+        self.origination = None                 # 来源节点
+        self.destination = None                 # 目标节点
+        self.case = None                        # 案例
+        self.activity = None                    # 事件
+        self.treatment = None                   # 计算节点
+        self.encryption = None                  # 加/解密节点
+        self.nums = 0                           # 文件数量
+        self.coding = None                      # 编码
+        self.format = None                      # 格式
+        self.stream = None                      # 流
+        self.path = None                        # 路径
         if isinstance(msg, str):
             if MSG_TYPE is "json":
                 self.from_json(msg)
@@ -285,24 +282,38 @@ class MSG:
     __repr__ = __str__
 
     def __setattr__(self, key, value):
-        self.__dict__[key] = value  # source update
-        if key != "timestamp":
+        self.__dict__[key] = value
+        keys = ["coding", "format", "path", "stream"]
+        is_keys_init = len([False for k in keys if k not in list(self.__dict__.keys())]) == 0
+        if key in ["nums"]:
+            if value == 0 and is_keys_init:
+                for k in keys:
+                    self.__dict__[k] = None
+        if key in keys and is_keys_init:
+            if isinstance(value, list) and self.__dict__["nums"] == 1:
+                self.__dict__[key] = value[0]
+            # print([False for k in keys if self.__dict__[k] is None])
+        if key not in ["timestamp"]:
             self.__dict__["timestamp"] = current_datetime()
 
     def to_dict(self):
         return {
             "head": {
-                "timestamp": self.timestamp,
-                "origination": self.origination,
-                "destination": self.destination,
+                "timestamp": self.timestamp,        # 时间戳
+                "origination": self.origination,    # 来源    -   节点
+                "destination": self.destination,    # 目标    -   节点
+                "treatment": self.treatment,        # 计算    -   节点
+                "encryption": self.encryption,      # 加/解密  -  节点
                 "case": self.case,
                 "activity": self.activity,
             },
             "body": {
-                "treatment": self.treatment,
-                "encryption": self.encryption,
-                "data": self.data,
-            }
+                "nums": self.nums,
+                "coding": self.coding,
+                "format": self.format,
+                "path": self.path,
+                "stream": self.stream,
+            },
         }
 
     def to_serialize(self):
@@ -311,14 +322,18 @@ class MSG:
                 "timestamp": null_keep(self.timestamp),
                 "origination": null_keep(self.origination),
                 "destination": null_keep(self.destination),
+                "treatment": null_keep(self.treatment),
+                "encryption": null_keep(self.encryption),
                 "case": null_keep(self.case),
                 "activity": null_keep(self.activity),
             },
             "body": {
-                "treatment": null_keep(self.treatment),
-                "encryption": null_keep(self.encryption),
-                "data": null_keep(self.data),
-            }
+                "nums": self.nums,
+                "coding": self.coding,
+                "format": self.format,
+                "path": self.path,
+                "stream": self.stream,
+            },
         }
 
     def to_string(self):
@@ -336,33 +351,56 @@ class MSG:
         return dict2xml(self.to_serialize())
 
     def from_dict(self, msg: dict):
+        def _value_check(key: str, item: dict, datum_type: classmethod = str):
+            if key in item.keys():
+                self.__dict__[key] = null_keep(item[key], datum_type)
+            else:
+                self.__dict__[key] = None
+
         if not isinstance(msg, dict):
             raise AttributeError("参数类型错误")
-        keys = ["head", "body"].extend(self.__dict__.keys())
-        if len([False for k in msg.keys() if k not in keys]) > 0:
-            raise ValueError("传入的变量参数错误")
+        if "head" in msg.keys():
+            # set timestamp from msg
+            _value_check("timestamp", msg["head"])
+            if self.__dict__["timestamp"] is None:
+                self.__dict__["timestamp"] = current_datetime()
+            # set origination from msg
+            _value_check("origination", msg["head"], URL)
+            # set destination from msg
+            _value_check("destination", msg["head"], URL)
+            # set treatment from msg
+            _value_check("treatment", msg["head"], URL)
+            # set encryption from msg
+            _value_check("encryption", msg["head"], URL)
+            # set case from msg
+            _value_check("case", msg["head"], CASE)
+            # set activity from msg
+            _value_check("activity", msg["head"])
         else:
-            if isinstance(msg["head"], dict) and isinstance(msg["body"], dict):
-                ks = len([True for k in msg["head"].keys() if k in keys]) +\
-                     len([True for k in msg["body"].keys() if k in keys])
-                if ks == (len(self.__dict__.keys()) - 2):
-                    pass
-                else:
-                    raise ValueError("传入的变量参数错误")
-            else:
-                raise ValueError("传入的变量参数错误")
-        if msg["head"]["timestamp"] is None:
-            self.timestamp = current_datetime()
+            self.__dict__["timestamp"] = current_datetime()
+            self.__dict__["origination"] = None
+            self.__dict__["destination"] = None
+            self.__dict__["treatment"] = None
+            self.__dict__["encryption"] = None
+            self.__dict__["case"] = None
+            self.__dict__["activity"] = None
+        if "body" in msg.keys():
+            # set nums from msg
+            _value_check("nums", msg["body"], int)
+            # set coding from msg
+            self.__dict__["coding"] = msg["body"]["coding"]
+            # set path from msg
+            self.__dict__["path"] = msg["body"]["path"]
+            # set format from msg
+            self.__dict__["format"] = msg["body"]["format"]
+            # set stream from msg
+            self.__dict__["stream"] = msg["body"]["stream"]
         else:
-            self.timestamp = msg["head"]["timestamp"]
-        self.origination = null_keep(msg["head"]["origination"], URL)
-        self.destination = null_keep(msg["head"]["destination"], URL)
-        self.case = null_keep(msg["head"]["case"], CASE)
-        self.activity = null_keep(msg["head"]["activity"])
-        self.treatment = null_keep(msg["body"]["treatment"], URL)
-        self.encryption = null_keep(msg["body"]["encryption"])
-        self.data = null_keep(msg["body"]["data"])
-        self.data_check()
+            self.__dict__["nums"] = 0
+            self.__dict__["coding"] = None
+            self.__dict__["path"] = None
+            self.__dict__["format"] = None
+            self.__dict__["stream"] = None
 
     def from_json(self, msg: str):
         self.from_dict(json2dict(msg))
@@ -381,25 +419,9 @@ class MSG:
         self.destination = destination
         return self
 
-    def heartbeat(self, state=None):
-        # state is None: set to msg.heartbeat.request
-        # state is bool: set to msg.heartbeat.reply
-        if state is None:
-            self.treatment = None
-            self.encryption = None
-            self.data = {"SUCCESS": None}
-        else:
-            self.swap()
-            self.treatment = None
-            self.encryption = None
-            self.activity = "heartbeat"
-            self.data = {"SUCCESS": state}
-        return self
-
-    def data_check(self):
-        if self.encryption in ["base64"]:
-            self.data = base64.b64decode(self.__dict__["data"])
-        return self
+    def check(self):
+        if self.coding in ["base64"]:
+            self.stream = base64.b64decode(self.__dict__["stream"])
 
 
 def check_success_reply_msg(*args) -> bool:
@@ -439,9 +461,8 @@ def demo_tomail():
 
 
 def demo_mysql():
-    url = URL()
-    url.init("mysql")
-    # url.check()
+    url = URL().init("mysql")
+    url.check
     print("\nURL:", url)
     print("服务协议:", url.scheme)
     print("服务用户:", url.username)
@@ -452,8 +473,7 @@ def demo_mysql():
 
 
 def demo_oracle():
-    url = URL()
-    url.init("oracle")
+    url = URL().init("oracle")
     # url.check()
     print("\nURL:", url)
     print("服务协议:", url.scheme)
@@ -465,8 +485,7 @@ def demo_oracle():
 
 
 def demo_ftp():
-    url = URL()
-    url.init("ftp")
+    url = URL().init("ftp")
     print("\nURL:", url)
     print("服务协议:", url.scheme)
     print("服务用户:", url.username)
@@ -477,18 +496,33 @@ def demo_ftp():
     print("服务模式", url.fragment)
 
 
+def demo_tcp():
+    url = URL().init("tcp")
+    print("\nURL:", url)
+    print("服务协议:", url.scheme)
+    print("服务地址", url.hostname)
+    print("服务端口", url.port)
+
+
 def demo_msg_mysql2ftp():
     msg = MSG()
-    ftp_url = URL()
-    mysql_url = URL()
-    msg.origination = mysql_url.init("mysql")
-    msg.destination = ftp_url.init("ftp")
+    msg.origination = URL().init("mysql").check
+    msg.destination = URL().init("ftp").check
+    msg.treatment = URL().init("tcp")
     msg.activity = "init"
     print(msg)
+    msg_string = str(msg)
+    new_msg = MSG(msg_string)
+    time.sleep(1/100)
+    print(new_msg)
+    time.sleep(1 / 100)
+    new_msg.nums = 1
+    print(new_msg)
 
 
 if __name__ == '__main__':
     # demo_tomail()
     # demo_ftp()
     # demo_mysql()
+    # demo_tcp()
     demo_msg_mysql2ftp()
