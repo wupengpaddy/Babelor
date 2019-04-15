@@ -13,12 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from urllib.parse import urlparse, unquote, urlunparse, quote
-from Tools.Conversion import dict2json, json2dict, dict2xml, xml2dict
 from datetime import datetime
-from CONFIG.config import GLOBAL_CFG
 import base64
 import time
 import re
+import io
+
+from Tools.Conversion import dict2json, json2dict, dict2xml, xml2dict
+from CONFIG.config import GLOBAL_CFG
+
 
 DatetimeFmt = GLOBAL_CFG["DatetimeFormat"]
 PortFmt = GLOBAL_CFG["PortFormat"]
@@ -263,7 +266,7 @@ class MSG:
         self.encryption = None                  # 加/解密节点
         self.nums = 0                           # 文件数量
         self.coding = None                      # 编码
-        self.format = None                      # 格式
+        self.dtype = None                      # 格式
         self.stream = None                      # 流
         self.path = None                        # 路径
         if isinstance(msg, str):
@@ -283,7 +286,7 @@ class MSG:
 
     def __setattr__(self, key, value):
         self.__dict__[key] = value
-        keys = ["coding", "format", "path", "stream"]
+        keys = ["coding", "dtype", "path", "stream"]
         is_keys_init = len([False for k in keys if k not in list(self.__dict__.keys())]) == 0
         if key in ["nums"]:
             if value == 0 and is_keys_init:
@@ -310,7 +313,7 @@ class MSG:
             "body": {
                 "nums": self.nums,
                 "coding": self.coding,
-                "format": self.format,
+                "dtype": self.dtype,
                 "path": self.path,
                 "stream": self.stream,
             },
@@ -330,7 +333,7 @@ class MSG:
             "body": {
                 "nums": self.nums,
                 "coding": self.coding,
-                "format": self.format,
+                "dtype": self.dtype,
                 "path": self.path,
                 "stream": self.stream,
             },
@@ -391,15 +394,15 @@ class MSG:
             self.__dict__["coding"] = msg["body"]["coding"]
             # set path from msg
             self.__dict__["path"] = msg["body"]["path"]
-            # set format from msg
-            self.__dict__["format"] = msg["body"]["format"]
+            # set dtype from msg
+            self.__dict__["dtype"] = msg["body"]["dtype"]
             # set stream from msg
             self.__dict__["stream"] = msg["body"]["stream"]
         else:
             self.__dict__["nums"] = 0
             self.__dict__["coding"] = None
             self.__dict__["path"] = None
-            self.__dict__["format"] = None
+            self.__dict__["dtype"] = None
             self.__dict__["stream"] = None
 
     def from_json(self, msg: str):
@@ -419,9 +422,63 @@ class MSG:
         self.destination = destination
         return self
 
-    def add_datum(self, ):
-        if self.coding in ["base64"]:
-            self.stream = base64.b64decode(self.__dict__["stream"])
+    def add_datum(self, datum, path=None, dtype=None):
+        stream, coding = datum_to_stream(datum)
+        path = null_keep(path)
+        dtype = null_keep(dtype)
+        if self.__dict__["nums"] == 0:
+            self.__dict__["stream"] = stream
+            self.__dict__["coding"] = coding
+            self.__dict__["path"] = path
+            self.__dict__["dtype"] = dtype
+        if self.__dict__["nums"] == 1:
+            self.__dict__["stream"] = [self.__dict__["stream"], stream]
+            self.__dict__["coding"] = [self.__dict__["coding"], coding]
+            self.__dict__["path"] = [self.__dict__["path"], path]
+            self.__dict__["dtype"] = [self.__dict__["dtype"], dtype]
+        if self.__dict__["nums"] > 1:
+            self.__dict__["stream"] = self.__dict__["stream"] + [stream]
+            self.__dict__["coding"] = self.__dict__["coding"] + [coding]
+            self.__dict__["path"] = self.__dict__["path"] + [path]
+            self.__dict__["dtype"] = self.__dict__["dtype"] + [dtype]
+        self.__dict__["nums"] = self.__dict__["nums"] + 1
+
+    def read_datum(self, num: int):
+        if self.__dict__["nums"] == 0:
+            return None
+        elif num > self.__dict__["nums"]:
+            return None
+        elif self.__dict__["nums"] == 1:
+            return stream_to_datum(self.__dict__["stream"], self.__dict__["coding"])
+        else:
+            return stream_to_datum(self.__dict__["stream"][num - 1], self.__dict__["coding"][num - 1])
+
+
+def datum_to_stream(datum=None):
+    if datum is None:
+        return None, None, None
+    elif isinstance(datum, str):
+        return datum, CODING, "str"
+    elif isinstance(datum, bytes):
+        return datum.decode(CODING), CODING, "bytes"
+    else:
+        return base64.b64encode(datum).decode(CODING), CODING, "base64"
+
+
+def stream_to_datum(stream, coding=None, dtype=None):
+    if stream is None and coding is None and dtype is None:
+        return None
+    if stream is None or coding is None or dtype is None:
+        raise ValueError
+    if isinstance(stream, str):
+        if dtype in ["base64"]:
+            return base64.b64decode(stream.encode(coding))
+        elif dtype in ["bytes"]:            
+            return stream.encode(coding)
+        elif dtype in ["str"]:
+            return stream
+        else:
+            raise NotImplementedError
 
 
 def check_success_reply_msg(*args) -> bool:
@@ -509,15 +566,33 @@ def demo_msg_mysql2ftp():
     msg.origination = URL().init("mysql").check
     msg.destination = URL().init("ftp").check
     msg.treatment = URL().init("tcp")
+    case = CASE()
+    case.origination = msg.origination
+    case.destination = msg.destination
     msg.activity = "init"
-    print(msg)
+    msg.case = case
+    msg.add_datum("This is a test string", path=URL().init("file"))
+    msg.add_datum("中文UTF编码测试", path=URL().init("file"))
+    path = "..\README\Babelor-设计.png"
+    f = open(path, "rb")
+    bf = f.read()
+    b64_f = base64.b64encode(bf).decode("ascii")
+    print(type(b64_f), b64_f)
+    url = URL().init("file")
+    url.path = path
+    msg.add_datum(b64_f, url)
+    # print(type(msg.read_datum(3)), msg.read_datum(3))
     msg_string = str(msg)
+    # print(msg_string)
     new_msg = MSG(msg_string)
-    time.sleep(1/100)
-    print(new_msg)
-    time.sleep(1 / 100)
-    new_msg.nums = 1
-    print(new_msg)
+    # print(new_msg)
+    nb64_f = new_msg.read_datum(3)
+    print(type(nb64_f), nb64_f)
+    new_path = "..\README\Babelor-设计-new.png"
+    nf = open(new_path, "wb")
+    nb64_nf = base64.b64decode(nb64_f.encode("ascii"))
+    nf.write(nb64_nf)
+    # print()
 
 
 if __name__ == '__main__':
