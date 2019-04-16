@@ -35,6 +35,7 @@ GLOBAL_CFG = {
         "START": 10000,
         "END": 10009,
     },
+    "FTP_BUFFER_SIZE": 1024,
     "FTP_MAX_CONS": 10,
     "FTP_MAX_CONS_PER_IP": 5,
 }

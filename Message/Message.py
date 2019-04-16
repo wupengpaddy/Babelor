@@ -162,15 +162,15 @@ class URL:
 
     @property
     def check(self):
-        # "mysql://username:password@hostname:port/service#table"
+        # "mysql://username:password@hostname:port/service"
         default_port = None
         if self.scheme in ["mysql"]:
-            # "mysql+pymysql://username:password@hostname:3306/service#table"
+            # "mysql+pymysql://username:password@hostname:3306/service"
             self.scheme = "mysql+pymysql"
             default_port = 3306
-        # "oracle://username:password@hostname:port/service#table"
+        # "oracle://username:password@hostname:port/service"
         if self.scheme in ["oracle"]:
-            # "oracle+cx_oracle://username:password@hostname:1521/service#table"
+            # "oracle+cx_oracle://username:password@hostname:1521/service"
             self.scheme = "oracle+cx_oracle"
             default_port = 1521
         # "ftp://username:password@hostname:port/path#PASV"
@@ -198,6 +198,8 @@ class URL:
                 self.port = default_port
             else:
                 self.port = None
+        if isinstance(self.fragment, URL):
+            self.fragment = self.fragment.check
         return self
 
     def init(self, scheme=None):
@@ -209,8 +211,8 @@ class URL:
             self.__init__("oracle://username:password@hostname:port/service")
         if scheme in ["tomail+smtp"]:
             smtp_conn = "{0}#{1}".format("smtp://sender_username:sender_password@sender_hostname:port",
-                                         quote("tomail://sender_mail_username@sender_mail_hostname/sender"))
-            self.__init__("{0}#{1}".format("tomail://receiver_mail_username@receive_mail_hostname/receiver",
+                                         quote("tomail://sender_mail_username@sender_mail_postfix/发件人"))
+            self.__init__("{0}#{1}".format("tomail://receiver_mail_username@receive_mail_postfix/收件人",
                                            quote(smtp_conn)))
         if scheme in ["tcp"]:
             self.__init__("tcp://hostname:port")
@@ -520,8 +522,8 @@ def check_success_reply_msg(*args) -> bool:
 
 
 def demo_tomail():
-    url = URL()
-    url.init("tomail+smtp")
+    url = URL().init("tomail+smtp")
+    url = url.check
     print("URL:", url)
     print("收件人邮箱:", url.netloc)
     print("收件人用户名:", url.username)
@@ -538,7 +540,7 @@ def demo_tomail():
 
 def demo_mysql():
     url = URL().init("mysql")
-    url.check
+    url = url.check
     print("\nURL:", url)
     print("服务协议:", url.scheme)
     print("服务用户:", url.username)
@@ -550,7 +552,7 @@ def demo_mysql():
 
 def demo_oracle():
     url = URL().init("oracle")
-    # url.check()
+    url = url.check
     print("\nURL:", url)
     print("服务协议:", url.scheme)
     print("服务用户:", url.username)
@@ -562,6 +564,7 @@ def demo_oracle():
 
 def demo_ftp():
     url = URL().init("ftp")
+    url = url.check
     print("\nURL:", url)
     print("服务协议:", url.scheme)
     print("服务用户:", url.username)
@@ -574,6 +577,7 @@ def demo_ftp():
 
 def demo_tcp():
     url = URL().init("tcp")
+    url = url.check
     print("\nURL:", url)
     print("服务协议:", url.scheme)
     print("服务地址", url.hostname)
@@ -609,8 +613,8 @@ def demo_msg_mysql2ftp():
 
 
 if __name__ == '__main__':
-    # demo_tomail()
-    # demo_ftp()
-    # demo_mysql()
-    # demo_tcp()
-    demo_msg_mysql2ftp()
+    demo_tomail()
+    demo_ftp()
+    demo_mysql()
+    demo_tcp()
+    # demo_msg_mysql2ftp()

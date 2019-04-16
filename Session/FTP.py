@@ -20,37 +20,38 @@ from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.servers import FTPServer
 # 内部依赖
 from Message.Message import URL, MSG
-from CONFIG.config import GLOBAL_CFG
+from CONFIG import GLOBAL_CFG
 # 全局参数
 BANNER = GLOBAL_CFG["FTP_BANNER"]
 PASV_PORT = GLOBAL_CFG["FTP_PASV_PORTS"]
 MAX_CONS = GLOBAL_CFG["FTP_MAX_CONS"]
 MAX_CONS_PER_IP = GLOBAL_CFG["FTP_MAX_CONS_PER_IP"]
+BUFFER_SIZE = GLOBAL_CFG['FTP_BUFFER_SIZE']
 
 
 class FTP:
     def __init__(self, conn: URL):
         if isinstance(conn, str):
             self.conn = URL(conn)
-        elif isinstance(conn, URL):
-            self.conn = conn
-        else:
-            raise NotImplementedError
-        self.buf_size = 1024
+        self.conn = self.__dict__["conn"].check
 
     def write(self, msg: MSG):
         ftp = self.ftp_client()
-        for attach_path in attachments:
-            with open(attach_path, 'rb') as attachment:
-                ftp.storbinary('STOR ' + attach_path.split("/")[-1], attachment, self.buf_size)  # 上传文件
+        for i in range(0, msg.nums, 1):
+            attachment = msg.read_datum(i)
+            ftp.storbinary('STOR ' + attachment["path"].split("/")[-1], attachment["stream"], BUFFER_SIZE)  # 上传文件
         ftp.close()
 
     def read(self, msg: MSG):
+        new_msg = msg
+        new_msg.nums = 0
         ftp = self.ftp_client()
-        for attach_path in attachments:
-            with open(attach_path, 'rb') as attachment:
-                ftp.retrbinary('RETR ' + attach_path.split("/")[-1], attachment, self.buf_size)
+        for i in range(0, msg.nums, 1):
+            attachment = msg.read_datum(i)
+            ftp.retrbinary('RETR ' + attachment.split("/")[-1], attachment["stream"], BUFFER_SIZE)  # 下载文件
+            new_msg.add_datum(attachment["stream"], attachment['path'])
         ftp.close()
+        return new_msg
 
     def ftp_client(self):
         ftp = ftplib.FTP()
@@ -65,10 +66,7 @@ class FTPD:
     def __init__(self, conn: URL):
         if isinstance(conn, str):
             self.conn = URL(conn)
-        elif isinstance(conn, URL):
-            self.conn = conn
-        else:
-            raise NotImplementedError
+        self.conn = self.__dict__["conn"].check
 
     def ftp_server(self):
         authorizer = DummyAuthorizer()

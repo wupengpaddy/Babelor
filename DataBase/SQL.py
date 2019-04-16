@@ -26,18 +26,12 @@ os.environ['NLS_LANG'] = GLOBAL_CFG["NLS_LANG"]     # 切换中文字符
 
 class SQL:
     def __init__(self, conn: URL):
-        """
-        :param conn: SQL连接
-        """
-        # conn = "oracle://username:password@hostname:1521/service#table"
-        # conn = "mysql://username:password@hostname:3306/service#table"
-        if isinstance(conn, URL):
-            self.conn = conn.check
-        elif isinstance(conn, str):
-            self.conn = URL(conn).check
-        else:
-            raise AttributeError("输入的参数{0}错误".format(str(conn)))
-        self.engine = create_engine(self.conn.to_string(allow_fragment=False))
+        # conn = "oracle://username:password@hostname:1521/service"
+        # conn = "mysql://username:password@hostname:3306/service"
+        if isinstance(conn, str):
+            self.conn = URL(conn)
+        self.conn = self.__dict__["conn"].check
+        self.engine = create_engine(self.conn.to_string())
 
     def read(self, msg: MSG):
         new_msg = msg
