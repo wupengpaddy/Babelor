@@ -12,6 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# 外部依赖
 import smtplib
 from email.header import Header
 from email.mime.text import MIMEText
@@ -19,18 +20,21 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email.headerregistry import Address
 from email import encoders
-from Message.Message import URL
+# 内部依赖
+from Message import URL, MSG
 
 
-class MAIL:
+class TOMAIL:
     """
     Mail Model
     """
     def __init__(self, conn: str):
-        # tomail://user1@strtrek.com#smtp://user2:password@192.168.0.1:10001#tomail://用户2@strtrek.com#用户1
+        # "tomail://receiver_mail_username@receive_mail_hostname/receiver"
+        # "smtp://sender_username:sender_password@sender_hostname:port"
+        # "tomail://sender_mail_username@sender_mail_hostname/sender"
         self.conn = URL(conn)
 
-    def send(self, mail_msg: dict):
+    def send(self, msg: MSG):
         sender_user = self.conn.fragment.username               # 寄件人用户名
         receiver_user = self.conn.username                      # 收件人用户名
         sender_name = self.conn.fragment.fragment.username      # 寄件人名
@@ -47,6 +51,7 @@ class MAIL:
         msg["Accept-Language"] = "zh-CN"
         msg["Accept-Charset"] = "ISO-8859-1,utf-8"
         msg.attach(MIMEText(mail_msg["content"], 'plain', "utf-8"))         # 正文
+
         attachments = mail_msg["attachments"]                               # 附件
         if attachments is not None:
             for attach_path in attachments:
@@ -65,3 +70,6 @@ class MAIL:
         with smtplib.SMTP_SSL(host=hostname, port=port) as sess:
             sess.login(user=username, password=password)
             sess.sendmail(me, to, msg.as_string())
+
+    def read(self, msg: MSG):
+        pass

@@ -12,17 +12,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+# 外部依赖
 from urllib.parse import urlparse, unquote, urlunparse, quote
 from datetime import datetime
 import base64
-import time
 import re
-import io
-
-from Tools.Conversion import dict2json, json2dict, dict2xml, xml2dict
-from CONFIG.config import GLOBAL_CFG
-
-
+# 内部依赖
+from Tools import dict2json, json2dict, dict2xml, xml2dict
+from CONFIG import GLOBAL_CFG
+# 全局参数
 DatetimeFmt = GLOBAL_CFG["DatetimeFormat"]
 PortFmt = GLOBAL_CFG["PortFormat"]
 CODING = GLOBAL_CFG["CODING"]
@@ -226,6 +225,7 @@ class CASE:
     def __init__(self, case=None):
         self.origination = URL()
         self.destination = URL()
+        self.timestamp = current_datetime()
         if isinstance(case, str):
             self.from_string(case)
 
@@ -235,13 +235,14 @@ class CASE:
     __repr__ = __str__
 
     def to_string(self):
-        return "{0}#{1}".format(quote(str(self.origination)), quote(str(self.destination)))
+        return "{0}#{1}#{2}".format(quote(str(self.origination)), quote(str(self.destination)), quote(self.timestamp))
 
     def from_string(self, case: str):
         case = case.split("#")
-        if len(case) == 2:
+        if len(case) == 3:
             self.origination = URL(unquote(case[0]))
             self.destination = URL(unquote(case[1]))
+            self.timestamp = unquote((case[2]))
         else:
             raise ValueError("地址格式错误")
 
@@ -422,10 +423,9 @@ class MSG:
         self.destination = destination
         return self
 
-    def add_datum(self, datum, path=None, dtype=None):
-        stream, coding = datum_to_stream(datum)
+    def add_datum(self, datum, path=None):
+        stream, coding, dtype = datum_to_stream(datum)
         path = null_keep(path)
-        dtype = null_keep(dtype)
         if self.__dict__["nums"] == 0:
             self.__dict__["stream"] = stream
             self.__dict__["coding"] = coding
@@ -445,13 +445,36 @@ class MSG:
 
     def read_datum(self, num: int):
         if self.__dict__["nums"] == 0:
-            return None
+            return {"stream": None, "path": None}
         elif num > self.__dict__["nums"]:
-            return None
+            return {"stream": None, "path": None}
         elif self.__dict__["nums"] == 1:
-            return stream_to_datum(self.__dict__["stream"], self.__dict__["coding"])
+            return {
+                "stream": stream_to_datum(self.__dict__["stream"], self.__dict__["coding"], self.__dict__["dtype"]),
+                "path": self.__dict__["path"],
+            }
         else:
-            return stream_to_datum(self.__dict__["stream"][num - 1], self.__dict__["coding"][num - 1])
+            return {
+                "stream": stream_to_datum(self.__dict__["stream"][num - 1], self.__dict__["coding"][num - 1],
+                                          self.__dict__["dtype"][num - 1]),
+                "path": self.__dict__["path"][num - 1],
+            }
+
+    def delete_datum(self, num: int):
+        if self.__dict__["nums"] == 0:
+            pass
+        elif self.__dict__["nums"] == 1:
+            self.nums = 0
+        else:
+            del self.__dict__["stream"][num]
+            del self.__dict__["coding"][num]
+            del self.__dict__["path"][num]
+            del self.__dict__["dtype"][num]
+            self.nums = self.__dict__["nums"] - 1   # Out of list by __setattr__
+            self.stream = self.__dict__["stream"]
+            self.coding = self.__dict__["coding"]
+            self.path = self.__dict__["path"]
+            self.dtype = self.__dict__["dtype"]
 
 
 def datum_to_stream(datum=None):
@@ -459,8 +482,6 @@ def datum_to_stream(datum=None):
         return None, None, None
     elif isinstance(datum, str):
         return datum, CODING, "str"
-    elif isinstance(datum, bytes):
-        return datum.decode(CODING), CODING, "bytes"
     else:
         return base64.b64encode(datum).decode(CODING), CODING, "base64"
 
@@ -473,12 +494,10 @@ def stream_to_datum(stream, coding=None, dtype=None):
     if isinstance(stream, str):
         if dtype in ["base64"]:
             return base64.b64decode(stream.encode(coding))
-        elif dtype in ["bytes"]:            
-            return stream.encode(coding)
         elif dtype in ["str"]:
             return stream
         else:
-            raise NotImplementedError
+            raise NotImplementedError("不支持此类型{0}".format(dtype))
 
 
 def check_success_reply_msg(*args) -> bool:
@@ -572,27 +591,21 @@ def demo_msg_mysql2ftp():
     msg.activity = "init"
     msg.case = case
     msg.add_datum("This is a test string", path=URL().init("file"))
-    msg.add_datum("中文UTF编码测试", path=URL().init("file"))
+    msg.add_datum("中文UTF-8编码测试", path=URL().init("file"))
     path = "..\README\Babelor-设计.png"
-    f = open(path, "rb")
-    bf = f.read()
-    b64_f = base64.b64encode(bf).decode("ascii")
-    print(type(b64_f), b64_f)
-    url = URL().init("file")
-    url.path = path
-    msg.add_datum(b64_f, url)
-    # print(type(msg.read_datum(3)), msg.read_datum(3))
+    with open(path, "rb") as f:
+        bytes_f = f.read()
+        url = URL().init("file")
+        url.path = path
+        msg.add_datum(bytes_f, url)
+
     msg_string = str(msg)
-    # print(msg_string)
+
     new_msg = MSG(msg_string)
-    # print(new_msg)
-    nb64_f = new_msg.read_datum(3)
-    print(type(nb64_f), nb64_f)
+    new_bytes_f = new_msg.read_datum(3)["stream"]
     new_path = "..\README\Babelor-设计-new.png"
-    nf = open(new_path, "wb")
-    nb64_nf = base64.b64decode(nb64_f.encode("ascii"))
-    nf.write(nb64_nf)
-    # print()
+    with open(new_path, "wb") as f:
+        f.write(new_bytes_f)
 
 
 if __name__ == '__main__':

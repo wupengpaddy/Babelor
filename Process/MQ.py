@@ -12,12 +12,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+# 外部依赖
 import zmq
 import time
 from multiprocessing import Queue, Process
+# 内部依赖
 from Message.Message import MSG, URL
 from CONFIG.config import GLOBAL_CFG
-
+# 全局参数
 MSG_Q_MAX_DEPTH = GLOBAL_CFG["MSG_Q_MAX_DEPTH"]
 CODING = GLOBAL_CFG["CODING"]
 BlockingTime = GLOBAL_CFG["MSG_Q_BlockingTime"]
@@ -119,10 +122,10 @@ class MessageQueue:
 
     def request(self, msg: MSG, is_break=False):
         if not isinstance(self.destination, URL):
-            raise ValueError("Invalid destination path.")
+            raise ValueError("Invalid destination path{0} or type:{1}.".format(self.destination,
+                                                                               type(self.destination)))
         if self.destination.scheme not in ["tcp"]:
-            raise ValueError("Invalid destination scheme.")
-
+            raise ValueError("Invalid destination scheme{0}.".format(self.destination.scheme))
         if self.is_not_init["REQUEST"]:
             self.socket = self.context.socket(zmq.REQ)
             self.socket.connect(self.destination.to_string(False, False, False, False))
@@ -133,7 +136,8 @@ class MessageQueue:
 
     def reply(self, func, is_break=False):
         if not isinstance(self.origination, URL):
-            raise ValueError("Invalid origination path.")
+            raise ValueError("Invalid origination path{0} or type:{1}.".format(self.origination,
+                                                                               type(self.origination)))
         if self.is_not_init["REPLY"]:
             self.socket = self.context.socket(zmq.REP)
             self.socket.bind(self.origination.to_string(False, False, False, False))
@@ -146,7 +150,8 @@ class MessageQueue:
 
     def push(self, msg: MSG, is_break=False):
         if not isinstance(self.destination, URL):
-            raise ValueError("Invalid destination path.")
+            raise ValueError("Invalid destination path {0} or type:{1}.".format(self.destination,
+                                                                                type(self.destination)))
         if self.is_not_init["PUSH"]:
             self.socket = self.context.socket(zmq.PUSH)
             self.socket.connect(self.destination.to_string(False, False, False, False))
@@ -160,7 +165,8 @@ class MessageQueue:
 
     def pull(self, is_break=False):
         if not isinstance(self.origination, URL):
-            raise ValueError("Invalid origination path.")
+            raise ValueError("Invalid origination path{0} or type:{1}.".format(self.origination,
+                                                                               type(self.origination)))
         if not self.is_not_init["PULL"]:
             self.socket = self.context.socket(zmq.PULL)
             self.socket.bind(self.origination.to_string(False, False, False, False))
@@ -179,7 +185,8 @@ class MessageQueue:
 
     def publish(self, msg: MSG, is_break=False):
         if not isinstance(self.origination, URL):
-            raise ValueError("Invalid origination path.")
+            raise ValueError("Invalid origination path{0} or type:{1}.".format(self.origination,
+                                                                               type(self.origination)))
         if not self.is_not_init["PUBLISH"]:
             self.socket = self.context.socket(zmq.PUB)
             self.socket.bind(self.origination.to_string(False, False, False, False))
@@ -193,7 +200,8 @@ class MessageQueue:
 
     def subscribe(self, is_break=False):
         if not isinstance(self.destination, URL):
-            raise ValueError("Invalid destination path.")
+            raise ValueError("Invalid destination path{0} or type:{1}.".format(self.destination,
+                                                                               type(self.destination)))
         if not self.is_not_init["SUBSCRIBE"]:
             self.socket = self.context.socket(zmq.SUB)
             self.socket.connect(self.destination.to_string(False, False, False, False))

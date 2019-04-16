@@ -12,13 +12,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+# 外部依赖
 import ftplib
 from pyftpdlib.authorizers import DummyAuthorizer
 from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.servers import FTPServer
+# 内部依赖
 from Message.Message import URL, MSG
 from CONFIG.config import GLOBAL_CFG
-
+# 全局参数
 BANNER = GLOBAL_CFG["FTP_BANNER"]
 PASV_PORT = GLOBAL_CFG["FTP_PASV_PORTS"]
 MAX_CONS = GLOBAL_CFG["FTP_MAX_CONS"]
@@ -35,14 +38,14 @@ class FTP:
             raise NotImplementedError
         self.buf_size = 1024
 
-    def send(self, msg: MSG):
+    def write(self, msg: MSG):
         ftp = self.ftp_client()
         for attach_path in attachments:
             with open(attach_path, 'rb') as attachment:
                 ftp.storbinary('STOR ' + attach_path.split("/")[-1], attachment, self.buf_size)  # 上传文件
         ftp.close()
 
-    def receive(self):
+    def read(self, msg: MSG):
         ftp = self.ftp_client()
         for attach_path in attachments:
             with open(attach_path, 'rb') as attachment:

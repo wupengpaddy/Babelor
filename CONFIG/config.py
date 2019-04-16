@@ -12,10 +12,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import re
 
 GLOBAL_CFG = {
     # 数据格式 及 编码
+    "DateFormat": '%Y-%m-%d',
     "DatetimeFormat": "%Y-%m-%d %H:%M:%S.%f",
     "IPv4_Format": r"(?=(\b|\D))(((\d{1,2})|(1\d{1,2})|(2[0-4]\d)|(25[0-5]))\.){3}((\d{1,2})|(1\d{1,2})|(2[0-4]\d)|(25[0-5]))(?=(\b|\D))",
     "IPv6_Format": r"^([\\da-fA-F]{1,4}:){7}([\\da-fA-F]{1,4})$",
@@ -38,9 +38,3 @@ GLOBAL_CFG = {
     "FTP_MAX_CONS": 10,
     "FTP_MAX_CONS_PER_IP": 5,
 }
-
-
-if __name__ == '__main__':
-    netloc = "user:password@hostname:port"
-    auth, loca = netloc.split("@")
-    print(auth, loca)
