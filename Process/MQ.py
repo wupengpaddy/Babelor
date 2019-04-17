@@ -104,11 +104,16 @@ class MessageQueue:
     """
     MessageQueue Model
     """
-    def __init__(self, msg: MSG):
+    def __init__(self, conn: URL):
+        if isinstance(conn, str):
+            self.conn = URL(conn)
+        else:
+            self.conn = conn
+        if self.conn.scheme not in ["tcp"]:
+            raise ValueError("Invalid destination scheme{0}.".format(self.conn.scheme))
+        self.conn = self.__dict__["conn"].check
         self.msg_queue = Queue(MSG_Q_MAX_DEPTH)
         self.ctrl_queue = Queue(MSG_Q_MAX_DEPTH)
-        self.origination = msg.origination
-        self.destination = msg.destination
         self.is_not_init = {
             "REQUEST": True,
             "REPLY": True,
@@ -121,40 +126,30 @@ class MessageQueue:
         self.socket = None
 
     def request(self, msg: MSG, is_break=False):
-        if not isinstance(self.destination, URL):
-            raise ValueError("Invalid destination path{0} or type:{1}.".format(self.destination,
-                                                                               type(self.destination)))
-        if self.destination.scheme not in ["tcp"]:
-            raise ValueError("Invalid destination scheme{0}.".format(self.destination.scheme))
         if self.is_not_init["REQUEST"]:
             self.socket = self.context.socket(zmq.REQ)
-            self.socket.connect(self.destination.to_string(False, False, False, False))
+            self.socket.connect(self.conn.to_string(False, False, False, False))
             self.is_not_init["REQUEST"] = False
         if is_break:
             self.is_not_init["REQUEST"] = True
         return consumer_request(self.socket, msg)
 
     def reply(self, func, is_break=False):
-        if not isinstance(self.origination, URL):
-            raise ValueError("Invalid origination path{0} or type:{1}.".format(self.origination,
-                                                                               type(self.origination)))
         if self.is_not_init["REPLY"]:
             self.socket = self.context.socket(zmq.REP)
-            self.socket.bind(self.origination.to_string(False, False, False, False))
+            self.socket.bind(self.conn.to_string(False, False, False, False))
             reply_process = Process(target=producer_reply, args=(self.socket, self.ctrl_queue, func))
             reply_process.start()
             self.is_not_init["REPLY"] = False
         if is_break:
             self.ctrl_queue.put(is_break)
             self.is_not_init["REPLY"] = True
+            return None
 
-    def push(self, msg: MSG, is_break=False):
-        if not isinstance(self.destination, URL):
-            raise ValueError("Invalid destination path {0} or type:{1}.".format(self.destination,
-                                                                                type(self.destination)))
+    def push(self, msg: MSG = None, is_break=False):
         if self.is_not_init["PUSH"]:
             self.socket = self.context.socket(zmq.PUSH)
-            self.socket.connect(self.destination.to_string(False, False, False, False))
+            self.socket.connect(self.conn.to_string(False, False, False, False))
             push_process = Process(target=producer_push, args=(self.socket, self.ctrl_queue, self.msg_queue))
             push_process.start()
             self.is_not_init["PUSH"] = False
@@ -164,19 +159,16 @@ class MessageQueue:
             self.is_not_init["PUSH"] = True
 
     def pull(self, is_break=False):
-        if not isinstance(self.origination, URL):
-            raise ValueError("Invalid origination path{0} or type:{1}.".format(self.origination,
-                                                                               type(self.origination)))
         if not self.is_not_init["PULL"]:
             self.socket = self.context.socket(zmq.PULL)
-            self.socket.bind(self.origination.to_string(False, False, False, False))
+            self.socket.bind(self.conn.to_string(False, False, False, False))
             pull_process = Process(target=consumer_pull, args=(self.socket, self.ctrl_queue, self.msg_queue))
             pull_process.start()
             self.is_not_init["PULL"] = False
         if is_break:
             self.ctrl_queue.put(is_break)
             self.is_not_init["PULL"] = True
-            return MSG
+            return None
         while True:
             if self.msg_queue.empty():
                 time.sleep(BlockingTime)
@@ -184,12 +176,9 @@ class MessageQueue:
                 return self.msg_queue.get()
 
     def publish(self, msg: MSG, is_break=False):
-        if not isinstance(self.origination, URL):
-            raise ValueError("Invalid origination path{0} or type:{1}.".format(self.origination,
-                                                                               type(self.origination)))
         if not self.is_not_init["PUBLISH"]:
             self.socket = self.context.socket(zmq.PUB)
-            self.socket.bind(self.origination.to_string(False, False, False, False))
+            self.socket.bind(self.conn.to_string(False, False, False, False))
             publish_process = Process(target=producer_publish, args=(self.socket, self.ctrl_queue, self.msg_queue))
             publish_process.start()
             self.is_not_init["PUBLISH"] = False
@@ -197,14 +186,12 @@ class MessageQueue:
         if is_break:
             self.ctrl_queue.put(is_break)
             self.is_not_init["PUBLISH"] = True
+            return None
 
     def subscribe(self, is_break=False):
-        if not isinstance(self.destination, URL):
-            raise ValueError("Invalid destination path{0} or type:{1}.".format(self.destination,
-                                                                               type(self.destination)))
         if not self.is_not_init["SUBSCRIBE"]:
             self.socket = self.context.socket(zmq.SUB)
-            self.socket.connect(self.destination.to_string(False, False, False, False))
+            self.socket.connect(self.conn.to_string(False, False, False, False))
             self.socket.setsockopt(zmq.SUBSCRIBE, '')
             subscribe_process = Process(target=consumer_subscribe, args=(self.socket, self.ctrl_queue, self.msg_queue))
             subscribe_process.start()
@@ -212,7 +199,7 @@ class MessageQueue:
         if is_break:
             self.ctrl_queue.put(is_break)
             self.is_not_init["SUBSCRIBE"] = True
-            return MSG
+            return None
         while True:
             if self.msg_queue.empty():
                 time.sleep(BlockingTime)

@@ -2,18 +2,30 @@
   <dictionary name="geyua">
     <words>
       <w>acdm</w>
+      <w>adep</w>
+      <w>ades</w>
+      <w>afds</w>
+      <w>aibt</w>
+      <w>aobt</w>
       <w>dtype</w>
+      <w>flno</w>
       <w>frommail</w>
       <w>ftpd</w>
+      <w>iata</w>
+      <w>icao</w>
       <w>orcl</w>
       <w>pymysql</w>
+      <w>regne</w>
       <w>retr</w>
       <w>shairport</w>
       <w>smtp</w>
       <w>spia</w>
+      <w>stoa</w>
+      <w>stod</w>
       <w>stor</w>
       <w>tomail</w>
       <w>unparse</w>
+      <w>xlsx</w>
     </words>
   </dictionary>
 </component>

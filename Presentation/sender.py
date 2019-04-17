@@ -19,8 +19,11 @@ from Process import MessageQueue
 
 class SENDER:
     def __init__(self, conn: URL):
-        # conn = "oracle://username:password@hostname:1521/service"
+        # conn = "tcp://*:port"
         if isinstance(conn, str):
             self.conn = URL(conn)
         self.conn = self.__dict__["conn"].check
+        self.mq = MessageQueue(conn)
+        self.mq.pull()
 
+    

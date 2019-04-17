@@ -71,8 +71,6 @@ def worker(msg: MSG):
     df = {
         "PVG-AFDS": None,
         "PVG-CDM": None,
-        "START-DATE": None,
-        "END-DATE": None,
         "SELECT-DATE": None,
     }
     for i in range(0, msg.nums, 1):
@@ -83,8 +81,6 @@ def worker(msg: MSG):
     # 读取数据源
     afds = df["PVG-AFDS"]
     cdm = df["PVG-CDM"]
-    start_date = df["START-DATE"]
-    end_date = df["END-DATE"]
     select_date = df["SELECT-DATE"]
     # 列名强制输出大写
     afds = afds.rename(str.upper, axis='columns')
@@ -419,8 +415,6 @@ def msg_init(select_date: str):
     # 消息生成
     msg = MSG()
     msg.add_datum(select_date, "SELECT-DATE")
-    msg.add_datum(start_date, "START-DATE")
-    msg.add_datum(end_date, "END-DATE")
     msg.add_datum(pvg_afds_sql, "PVG-AFDS")
     msg.add_datum(pvg_cdm_sql, "PVG-CDM")
     # 读取数据
