@@ -34,6 +34,8 @@ class TOMAIL:
         # "tomail://sender_mail_username@sender_mail_hostname/sender"
         if isinstance(conn, str):
             self.conn = URL(conn)
+        else:
+            self.conn = conn
         self.conn = self.__dict__["conn"].check
         self.mime = MIMEMultipart()
         self.me = None

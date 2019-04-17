@@ -33,6 +33,8 @@ class FTP:
     def __init__(self, conn: URL):
         if isinstance(conn, str):
             self.conn = URL(conn)
+        else:
+            self.conn = conn
         self.conn = self.__dict__["conn"].check
 
     def write(self, msg: MSG):
@@ -66,6 +68,8 @@ class FTPD:
     def __init__(self, conn: URL):
         if isinstance(conn, str):
             self.conn = URL(conn)
+        else:
+            self.conn = conn
         self.conn = self.__dict__["conn"].check
 
     def ftp_server(self):

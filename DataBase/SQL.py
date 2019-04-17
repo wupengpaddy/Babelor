@@ -30,6 +30,8 @@ class SQL:
         # conn = "mysql://username:password@hostname:3306/service"
         if isinstance(conn, str):
             self.conn = URL(conn)
+        else:
+            self.conn = conn
         self.conn = self.__dict__["conn"].check
         self.engine = create_engine(self.conn.to_string())
 
