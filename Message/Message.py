@@ -444,6 +444,7 @@ class MSG:
             self.__dict__["path"] = self.__dict__["path"] + [path]
             self.__dict__["dtype"] = self.__dict__["dtype"] + [dtype]
         self.__dict__["nums"] = self.__dict__["nums"] + 1
+        return self
 
     def read_datum(self, num: int):
         if self.__dict__["nums"] == 0:
