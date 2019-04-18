@@ -29,18 +29,18 @@ class SQL:
         # conn = "oracle://username:password@hostname:1521/service"
         # conn = "mysql://username:password@hostname:3306/service"
         if isinstance(conn, str):
-            self.conn = URL(conn)
+            self.__conn = URL(conn)
         else:
-            self.conn = conn
-        self.conn = self.__dict__["conn"].check
-        self.engine = create_engine(self.conn.to_string())
+            self.__conn = conn
+        self.__conn = self.__dict__["conn"].check
+        self.__engine = create_engine(self.__conn.to_string())
 
     def read(self, msg: MSG):
         new_msg = msg
         new_msg.nums = 0
         for i in range(0, msg.nums, 1):
             rt = msg.read_datum(i)
-            df = pd.read_sql(sql=rt["stream"], con=self.engine)
+            df = pd.read_sql(sql=rt["stream"], con=self.__engine)
             df = df.rename(str.upper, axis='columns')
             new_msg.add_datum(df.to_msgpack(), path=rt["path"])
         return new_msg
@@ -49,4 +49,4 @@ class SQL:
         for i in range(0, msg.nums, 1):
             rt = msg.read_datum(i)
             df = pd.read_msgpack(rt["stream"])
-            df.to_sql(rt["path"], con=self.engine, if_exists='replace', index=False, index_label=False)
+            df.to_sql(rt["path"], con=self.__engine, if_exists='replace', index=False, index_label=False)
