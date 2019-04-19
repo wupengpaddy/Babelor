@@ -614,8 +614,9 @@ def demo_msg_mysql2ftp():
 
 
 if __name__ == '__main__':
-    demo_tomail()
-    demo_ftp()
-    demo_mysql()
-    demo_tcp()
-    # demo_msg_mysql2ftp()
+    # demo_tomail()
+    # demo_ftp()
+    # demo_mysql()
+    # demo_tcp()
+    demo_msg_mysql2ftp()
+
