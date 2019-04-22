@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="be54182a-218b-4e8e-9234-62a7d88d12fc" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/Message/Message.py" beforeDir="false" afterPath="$PROJECT_DIR$/Message/Message.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Presentation/sender.py" beforeDir="false" afterPath="$PROJECT_DIR$/Presentation/sender.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Process/MQ.py" beforeDir="false" afterPath="$PROJECT_DIR$/Process/MQ.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Process/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/Process/__init__.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -29,19 +31,7 @@
                 <element signature="e#1229#1317#0" />
                 <element signature="e#1383#1491#0" />
                 <element signature="e#1555#1708#0" />
-                <element signature="e#1737#14752#0" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/DataBase/SQL.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="568">
-              <caret line="43" column="53" lean-forward="true" selection-start-line="43" selection-start-column="53" selection-end-line="43" selection-end-column="53" />
-              <folding>
-                <element signature="e#608#617#0" expanded="true" />
+                <element signature="e#1738#14635#0" />
               </folding>
             </state>
           </provider>
@@ -50,29 +40,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Process/MQ.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="549">
-              <caret line="222" column="67" lean-forward="true" selection-start-line="222" selection-start-column="67" selection-end-line="222" selection-end-column="67" />
-              <folding>
-                <element signature="e#609#620#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/requirements.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="209">
-              <caret line="11" column="11" lean-forward="true" selection-start-line="11" selection-start-column="11" selection-end-line="11" selection-end-column="11" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Message/Message.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="5280">
-              <caret line="621" lean-forward="true" selection-start-line="621" selection-end-line="621" />
+            <state relative-caret-position="456">
+              <caret line="165" column="36" lean-forward="true" selection-start-line="165" selection-start-column="36" selection-end-line="165" selection-end-column="36" />
             </state>
           </provider>
         </entry>
@@ -80,10 +49,10 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Presentation/sender.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="532">
-              <caret line="28" column="4" lean-forward="true" selection-start-line="28" selection-start-column="4" selection-end-line="28" selection-end-column="4" />
+            <state relative-caret-position="720">
+              <caret line="61" column="25" lean-forward="true" selection-start-line="61" selection-start-column="25" selection-end-line="61" selection-end-column="25" />
               <folding>
-                <element signature="e#600#634#0" expanded="true" />
+                <element signature="e#621#663#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -121,16 +90,16 @@
         <option value="$PROJECT_DIR$/Session/__init__.py" />
         <option value="$PROJECT_DIR$/Message/__init__.py" />
         <option value="$PROJECT_DIR$/DataBase/__init__.py" />
-        <option value="$PROJECT_DIR$/Process/__init__.py" />
         <option value="$PROJECT_DIR$/Tools/__init__.py" />
         <option value="$PROJECT_DIR$/CONFIG/__init__.py" />
         <option value="$PROJECT_DIR$/CONFIG/config.py" />
         <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/Session/FTP.py" />
         <option value="$PROJECT_DIR$/Session/TOMAIL.py" />
-        <option value="$PROJECT_DIR$/Presentation/sender.py" />
         <option value="$PROJECT_DIR$/DataBase/SQL.py" />
         <option value="$PROJECT_DIR$/Message/Message.py" />
+        <option value="$PROJECT_DIR$/Process/__init__.py" />
+        <option value="$PROJECT_DIR$/Presentation/sender.py" />
         <option value="$PROJECT_DIR$/Process/MQ.py" />
       </list>
     </option>
@@ -208,7 +177,7 @@
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../EarthquakePrediction" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
@@ -353,7 +322,7 @@
       <workItem from="1554258661738" duration="894000" />
       <workItem from="1554271755656" duration="769000" />
       <workItem from="1554303201996" duration="832000" />
-      <workItem from="1554337199722" duration="138436000" />
+      <workItem from="1554337199722" duration="149244000" />
     </task>
     <task id="LOCAL-00001" summary="init">
       <created>1551342044292</created>
@@ -366,18 +335,18 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="334566000" />
+    <option name="totallyTimeSpent" value="345374000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-6" y="-6" width="2263" height="1473" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.292517" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.292517" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32935917" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49977323" visible="true" weight="0.3271237" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49977323" visible="true" weight="0.3271237" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -450,13 +419,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/.PyCharm2018.3/system/python_stubs/-96592820/builtins.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="292">
-          <caret line="2826" column="8" selection-start-line="2826" selection-start-column="8" selection-end-line="2826" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/.PyCharm2018.3/system/python_stubs/-96592820/_io.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-1190">
@@ -494,13 +456,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Process/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="19">
-          <caret line="1" selection-start-line="1" selection-end-line="1" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Tools/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="19">
@@ -515,31 +470,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/CONFIG/config.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="17" column="28" selection-start-line="17" selection-start-column="28" selection-end-line="17" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/requirements.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="209">
           <caret line="11" column="11" lean-forward="true" selection-start-line="11" selection-start-column="11" selection-end-line="11" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="15" selection-start-line="15" selection-end-line="15" />
-          <folding>
-            <element signature="e#607#618#0" expanded="true" />
-            <element signature="e#1229#1317#0" />
-            <element signature="e#1383#1491#0" />
-            <element signature="e#1555#1708#0" />
-            <element signature="e#1737#14752#0" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -563,16 +497,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Presentation/sender.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="532">
-          <caret line="28" column="4" lean-forward="true" selection-start-line="28" selection-start-column="4" selection-end-line="28" selection-end-column="4" />
-          <folding>
-            <element signature="e#600#634#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://C:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/multiprocessing/queues.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-3299">
@@ -592,13 +516,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Message/Message.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5280">
-          <caret line="621" lean-forward="true" selection-start-line="621" selection-end-line="621" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/DataBase/SQL.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="568">
@@ -609,13 +526,76 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="15" selection-start-line="15" selection-end-line="15" />
+          <folding>
+            <element signature="e#607#618#0" expanded="true" />
+            <element signature="e#1229#1317#0" />
+            <element signature="e#1383#1491#0" />
+            <element signature="e#1555#1708#0" />
+            <element signature="e#1738#14635#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Message/Message.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-21">
+          <caret line="267" column="22" selection-start-line="267" selection-start-column="13" selection-end-line="267" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Process/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="55" selection-start-column="55" selection-end-column="55" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CONFIG/config.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="570">
+          <caret line="30" column="33" lean-forward="true" selection-start-line="30" selection-start-column="33" selection-end-line="30" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/typing.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="284">
+          <caret line="834" column="6" selection-start-line="834" selection-start-column="6" selection-end-line="834" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_HOME_DIR$/helpers/typeshed/stdlib/3/multiprocessing/__init__.pyi">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="254">
+          <caret line="43" column="22" lean-forward="true" selection-start-line="43" selection-start-column="22" selection-end-line="43" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.PyCharm2018.3/system/python_stubs/-96592820/builtins.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-620">
+          <caret line="59" column="4" selection-start-line="59" selection-start-column="4" selection-end-line="59" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Presentation/sender.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="720">
+          <caret line="61" column="25" lean-forward="true" selection-start-line="61" selection-start-column="25" selection-end-line="61" selection-end-column="25" />
+          <folding>
+            <element signature="e#621#663#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Process/MQ.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="549">
-          <caret line="222" column="67" lean-forward="true" selection-start-line="222" selection-start-column="67" selection-end-line="222" selection-end-column="67" />
-          <folding>
-            <element signature="e#609#620#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="456">
+          <caret line="165" column="36" lean-forward="true" selection-start-line="165" selection-start-column="36" selection-end-line="165" selection-end-column="36" />
         </state>
       </provider>
     </entry>

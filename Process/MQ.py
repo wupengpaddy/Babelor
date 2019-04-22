@@ -117,19 +117,24 @@ class MessageQueue:
 
     def release(self):
         if self.__active is not None and self.__initialed is not None:
-            self.__dict__["__queue_ctrl"].put((False, False))       # 控制信号（停止）
-            time.sleep(BlockingTime)
-            try:
-                self.__dict__["__process"].close()                  # 进程释放
-            except ValueError:
-                self.__dict__["__process"].kill()                   # 进程释放（强制）
-            self.__dict__["__process"] = None
-            self.__dict__["__queue_in"] = Queue(MSG_Q_MAX_DEPTH)    # 进站队列（初始化）
-            self.__dict__["__queue_out"] = Queue(MSG_Q_MAX_DEPTH)   # 出站队列（初始化）
-            self.__dict__["__queue_ctrl"] = Queue(MSG_Q_MAX_DEPTH)  # 控制队列（初始化）
-            self.__dict__["socket"] = None                          # 通讯接口（释放）
-            self.__dict__["__initialed"] = None                     # 已初始化模式（无模式）
-            self.__dict__["__active"] = None                        # 已激活模式（无模式）
+            if self.__dict__["__process"] is None:                      # 队列控制进程（初始化）
+                self.__dict__["socket"] = None                          # 通讯接口（初始化）
+                self.__dict__["__initialed"] = None                     # 已初始化模式（初始化）
+                self.__dict__["__active"] = None                        # 已激活模式（初始化）
+            else:
+                self.__dict__["__queue_ctrl"].put((False, False))       # 控制信号（停止）
+                time.sleep(BlockingTime)
+                try:
+                    self.__dict__["__process"].close()                  # 进程释放
+                except ValueError:
+                    self.__dict__["__process"].kill()                   # 进程释放（强制）
+                self.__dict__["__process"] = None
+                self.__dict__["__queue_in"] = Queue(MSG_Q_MAX_DEPTH)    # 进站队列（初始化）
+                self.__dict__["__queue_out"] = Queue(MSG_Q_MAX_DEPTH)   # 出站队列（初始化）
+                self.__dict__["__queue_ctrl"] = Queue(MSG_Q_MAX_DEPTH)  # 控制队列（初始化）
+                self.__dict__["socket"] = None                          # 通讯接口（释放）
+                self.__dict__["__initialed"] = None                     # 已初始化模式（无模式）
+                self.__dict__["__active"] = None                        # 已激活模式（无模式）
         return self
 
     def __initial(self, is_active: bool, is_response: bool, me: str, func):
@@ -143,7 +148,8 @@ class MessageQueue:
 
     def request(self, msg: MSG):
         me = "REQUEST"      # 先出后进
-        if self.__initialed not in [me]:
+        if self.__dict__["__initialed"] not in [me]:
+            self.release()
             self.__dict__["__socket"] = self.__dict__["__context"].socket(zmq.REQ)
             self.__dict__["__socket"].connect(self.__dict__["__conn"].to_string(False, False, False, False))
             self.__initial(True, True, me, consumer)
@@ -157,9 +163,10 @@ class MessageQueue:
             self.release()
             return None
 
-    def reply(self, func):
+    def reply(self, func: callable):
         me = "REPLY"        # 先进后出
-        if self.__initialed not in[me]:
+        if self.__dict__["__initialed"] not in[me]:
+            self.release()
             self.__dict__["__socket"] = self.__dict__["__context"].socket(zmq.REP)
             self.__dict__["__socket"].bind(self.__dict__["__conn"].to_string(False, False, False, False))
             self.__initial(True, True, me, producer)
@@ -175,6 +182,7 @@ class MessageQueue:
     def push(self, msg: MSG):
         me = "PUSH"         # 只出
         if self.__dict__["__initialed"] not in [me]:
+            self.release()
             self.__dict__["__socket"] = self.__dict__["__context"].socket(zmq.PUSH)
             self.__dict__["__socket"].connect(self.__dict__["__conn"].to_string(False, False, False, False))
             self.__initial(True, False, me, producer)
@@ -189,6 +197,7 @@ class MessageQueue:
     def pull(self):
         me = "PULL"         # 只进
         if self.__dict__["__initialed"] not in [me]:
+            self.release()
             self.__dict__["__socket"] = self.__dict__["__context"].socket(zmq.PULL)
             self.__dict__["__socket"].bind(self.__dict__["__conn"].to_string(False, False, False, False))
             self.__initial(True, False, me, consumer)
@@ -204,6 +213,7 @@ class MessageQueue:
     def publish(self, msg: MSG):
         me = "PUBLISH"      # 只出
         if self.__dict__["__initialed"] not in [me]:
+            self.release()
             self.__dict__["__socket"] = self.__dict__["__context"].socket(zmq.PUB)
             self.__dict__["__socket"].bind(self.__dict__["__conn"].to_string(False, False, False, False))
             self.__initial(True, False, me, producer)
@@ -218,6 +228,7 @@ class MessageQueue:
     def subscribe(self):
         me = "SUBSCRIBE"    # 只进
         if self.__dict__["__initialed"] not in [me]:
+            self.release()
             self.__dict__["__socket"] = self.__dict__["__context"].socket(zmq.SUB)
             self.__dict__["__socket"].connect(self.__dict__["__conn"].to_string(False, False, False, False))
             self.__dict__["__socket"].setsockopt(zmq.SUBSCRIBE, '')

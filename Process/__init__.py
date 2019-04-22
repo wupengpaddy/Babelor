@@ -1,1 +1,1 @@
-from Process.MQ import MessageQueue
+from Process.MQ import MessageQueue, consumer, producer
