@@ -117,17 +117,13 @@ class MessageQueue:
 
     def release(self):
         if self.__active is not None and self.__initialed is not None:
-            if self.__dict__["__process"] is None:                      # 队列控制进程（初始化）
-                self.__dict__["socket"] = None                          # 通讯接口（初始化）
-                self.__dict__["__initialed"] = None                     # 已初始化模式（初始化）
-                self.__dict__["__active"] = None                        # 已激活模式（初始化）
-            else:
+            if isinstance(self.__dict__["__process"], Process):         # 已分配进程
                 self.__dict__["__queue_ctrl"].put((False, False))       # 控制信号（停止）
                 time.sleep(BlockingTime)
                 try:
-                    self.__dict__["__process"].close()                  # 进程释放
+                    self.__dict__["__process"].close()                  # 进程释放（软释放）
                 except ValueError:
-                    self.__dict__["__process"].kill()                   # 进程释放（强制）
+                    self.__dict__["__process"].kill()                   # 进程释放（硬释放）
                 self.__dict__["__process"] = None
                 self.__dict__["__queue_in"] = Queue(MSG_Q_MAX_DEPTH)    # 进站队列（初始化）
                 self.__dict__["__queue_out"] = Queue(MSG_Q_MAX_DEPTH)   # 出站队列（初始化）
@@ -135,6 +131,11 @@ class MessageQueue:
                 self.__dict__["socket"] = None                          # 通讯接口（释放）
                 self.__dict__["__initialed"] = None                     # 已初始化模式（无模式）
                 self.__dict__["__active"] = None                        # 已激活模式（无模式）
+            else:                                                       # 未分配进程
+                self.__dict__["__process"] = None                       # 队列控制进程（初始化）
+                self.__dict__["socket"] = None                          # 通讯接口（初始化）
+                self.__dict__["__initialed"] = None                     # 已初始化模式（初始化）
+                self.__dict__["__active"] = None                        # 已激活模式（初始化）
         return self
 
     def __initial(self, is_active: bool, is_response: bool, me: str, func):

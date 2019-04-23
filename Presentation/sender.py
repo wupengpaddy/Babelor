@@ -30,45 +30,40 @@ CODING = GLOBAL_CFG["CODING"]
 BlockingTime = GLOBAL_CFG["MSG_Q_BlockingTime"]
 
 
-def queue_consumer(mq: MessageQueue, queue_in: Queue, queue_ctrl: Queue):
+def queue_listen(mq: MessageQueue, queue_ctrl: Queue, func: callable):
+    """
+    # 队列消费者（先出后进）
+    # 控制信号（启动）--> 输出队列（推出）--> 控制信号（需反馈）--> 输入队列（推入）
+    :param mq: MessageQueue     # 消息队列
+    :param queue_ctrl: Queue    # 控制 ("is_active",):(bool,)
+    :param func: callable       # 函数
+    :return: None
+    """
     is_active = queue_ctrl.get()            # 控制信号（初始化）
     while is_active:
         if queue_ctrl.empty():              # 控制信号（无变更），敏捷响应
-            while queue_in.full():
-                time.sleep(BlockingTime)
-            else:
-                queue_in.put(mq.pull())
+            msg = mq.pull()
+            func(msg)
         else:
             is_active = queue_ctrl.get()
+    else:
+        pass
 
 
-def queue_producer():
-
-
-class SENDER:
+class ROOM:
     def __init__(self, conn: URL):
         # conn = "tcp://*:port"
         self.me = MessageQueue(conn)
-        self.active = True                                      # 服务端激活
-        self.__queue_origination_in = Queue(MSG_Q_MAX_DEPTH)    # 来源队列（进站）
-        self.__queue_origination_out = Queue(MSG_Q_MAX_DEPTH)   # 来源队列（出站）
-        self.__queue_destination_in = Queue(MSG_Q_MAX_DEPTH)    # 目标队列（进站）
-        self.__queue_destination_out = Queue(MSG_Q_MAX_DEPTH)   # 目标队列（出站）
-        self.__queue_treatment_out = Queue(MSG_Q_MAX_DEPTH)     # 处理队列（出站）
-        self.__queue_treatment_in = Queue(MSG_Q_MAX_DEPTH)      # 处理队列（进站）
-        self.__queue_mine_in = Queue(MSG_Q_MAX_DEPTH)           # 监听队列（进站）
-        self.__queue_mine_out = Queue(MSG_Q_MAX_DEPTH)          # 监听队列（出站）
         self.__queue_ctrl = Queue(MSG_Q_MAX_DEPTH)              # 控制队列
-        self.mine = Process(target=queue_consumer, args=(self.me, ))
+        self.__queue_ctrl.put(True)
+        self.mine = Thread(target=queue_listen, args=(self.me, self.__queue_ctrl, queue_listen))
+        self.mine.setDaemon(False)
+        self.mine.start()
 
-    def __listen(self):
-        while self.__dict__["active"]:
-            while self.__dict__["__queue_listen"].empty():
-                time.sleep(BlockingTime)
-            else:
-                msg = self.__dict__["__queue_listen"].get()
-        else:
-            pass
+    def close(self):
+        self.__queue_ctrl.put(False)
+
+
 
 
 
