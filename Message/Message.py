@@ -164,14 +164,15 @@ class URL:
     def check(self):
         # "mysql://username:password@hostname:port/service"
         default_port = None
+        check_url = self
         if self.scheme in ["mysql"]:
             # "mysql+pymysql://username:password@hostname:3306/service"
-            self.scheme = "mysql+pymysql"
+            check_url.scheme = "mysql+pymysql"
             default_port = 3306
         # "oracle://username:password@hostname:port/service"
         if self.scheme in ["oracle"]:
             # "oracle+cx_oracle://username:password@hostname:1521/service"
-            self.scheme = "oracle+cx_oracle"
+            check_url.scheme = "oracle+cx_oracle"
             default_port = 1521
         # "ftp://username:password@hostname:port/path#PASV"
         if self.scheme in ["ftp", "ftpd"]:
@@ -195,12 +196,12 @@ class URL:
             default_port = None
         if re.match(PortFmt, str(self.port)) is None:
             if default_port is not None:
-                self.port = default_port
+                check_url.port = default_port
             else:
-                self.port = None
-        if isinstance(self.fragment, URL):
-            self.fragment = self.fragment.check
-        return self
+                check_url.port = None
+        if isinstance(check_url.fragment, URL):
+            check_url.fragment = check_url.fragment.check
+        return check_url
 
     def init(self, scheme=None):
         if scheme in ["ftp"]:

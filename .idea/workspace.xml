@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="be54182a-218b-4e8e-9234-62a7d88d12fc" name="Default Changelist" comment="" />
+    <list default="true" id="be54182a-218b-4e8e-9234-62a7d88d12fc" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Message/Message.py" beforeDir="false" afterPath="$PROJECT_DIR$/Message/Message.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Presentation/sender.py" beforeDir="false" afterPath="$PROJECT_DIR$/Presentation/sender.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README/Babelor-消息.vsdx" beforeDir="false" afterPath="$PROJECT_DIR$/README/Babelor-消息.vsdx" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,6 +26,34 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="285">
               <caret line="15" selection-start-line="15" selection-end-line="15" />
+              <folding>
+                <element signature="e#607#618#0" expanded="true" />
+                <element signature="e#1229#1317#0" />
+                <element signature="e#1383#1491#0" />
+                <element signature="e#1555#1708#0" />
+                <element signature="e#1738#14635#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Process/MQ.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-114">
+              <caret line="163" column="26" lean-forward="true" selection-start-line="163" selection-start-column="26" selection-end-line="163" selection-end-column="26" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Presentation/sender.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="625">
+              <caret line="101" lean-forward="true" selection-start-line="101" selection-end-line="101" />
+              <folding>
+                <element signature="e#621#663#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -28,7 +61,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/DataBase/SQL.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="513">
+            <state relative-caret-position="359">
               <caret line="32" column="4" selection-start-line="32" selection-start-column="4" selection-end-line="32" selection-end-column="4" />
               <folding>
                 <element signature="e#608#617#0" expanded="true" />
@@ -38,34 +71,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Process/MQ.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1900">
-              <caret line="106" column="17" selection-start-line="106" selection-start-column="17" selection-end-line="106" selection-end-column="17" />
-              <folding>
-                <element signature="e#619#630#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Message/Message.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="11704">
-              <caret line="622" selection-start-line="622" selection-end-line="622" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Presentation/sender.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="487">
-              <caret line="61" lean-forward="true" selection-start-line="61" selection-end-line="61" />
-              <folding>
-                <element signature="e#619#661#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="245">
+              <caret line="171" column="60" lean-forward="true" selection-start-line="171" selection-start-column="60" selection-end-line="171" selection-end-column="60" />
             </state>
           </provider>
         </entry>
@@ -109,16 +118,16 @@
         <option value="$PROJECT_DIR$/Session/FTP.py" />
         <option value="$PROJECT_DIR$/Session/TOMAIL.py" />
         <option value="$PROJECT_DIR$/DataBase/SQL.py" />
-        <option value="$PROJECT_DIR$/Message/Message.py" />
         <option value="$PROJECT_DIR$/Process/__init__.py" />
         <option value="$PROJECT_DIR$/Process/MQ.py" />
+        <option value="$PROJECT_DIR$/Message/Message.py" />
         <option value="$PROJECT_DIR$/Presentation/sender.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="7">
-    <option name="x" value="-114" />
-    <option name="y" value="112" />
+    <option name="x" value="22" />
+    <option name="y" value="18" />
     <option name="width" value="2696" />
     <option name="height" value="1584" />
   </component>
@@ -128,6 +137,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -183,7 +193,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -348,12 +357,13 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="352993000" />
+    <option name="totallyTimeSpent" value="359584000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="-7" width="1453" height="933" extended-state="7" />
+    <frame x="-6" y="-6" width="2263" height="1473" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.30136007" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.292517" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -531,12 +541,26 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="285">
           <caret line="15" selection-start-line="15" selection-end-line="15" />
+          <folding>
+            <element signature="e#607#618#0" expanded="true" />
+            <element signature="e#1229#1317#0" />
+            <element signature="e#1383#1491#0" />
+            <element signature="e#1555#1708#0" />
+            <element signature="e#1738#14635#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Process/MQ.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-114">
+          <caret line="163" column="26" lean-forward="true" selection-start-line="163" selection-start-column="26" selection-end-line="163" selection-end-column="26" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/DataBase/SQL.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="513">
+        <state relative-caret-position="359">
           <caret line="32" column="4" selection-start-line="32" selection-start-column="4" selection-end-line="32" selection-end-column="4" />
           <folding>
             <element signature="e#608#617#0" expanded="true" />
@@ -544,29 +568,19 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Process/MQ.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1900">
-          <caret line="106" column="17" selection-start-line="106" selection-start-column="17" selection-end-line="106" selection-end-column="17" />
-          <folding>
-            <element signature="e#619#630#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Message/Message.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="11704">
-          <caret line="622" selection-start-line="622" selection-end-line="622" />
+        <state relative-caret-position="245">
+          <caret line="171" column="60" lean-forward="true" selection-start-line="171" selection-start-column="60" selection-end-line="171" selection-end-column="60" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Presentation/sender.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="487">
-          <caret line="61" lean-forward="true" selection-start-line="61" selection-end-line="61" />
+        <state relative-caret-position="625">
+          <caret line="101" lean-forward="true" selection-start-line="101" selection-end-line="101" />
           <folding>
-            <element signature="e#619#661#0" expanded="true" />
+            <element signature="e#621#663#0" expanded="true" />
           </folding>
         </state>
       </provider>

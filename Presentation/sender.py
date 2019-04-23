@@ -30,40 +30,78 @@ CODING = GLOBAL_CFG["CODING"]
 BlockingTime = GLOBAL_CFG["MSG_Q_BlockingTime"]
 
 
-def queue_listen(mq: MessageQueue, queue_ctrl: Queue, func: callable):
+def employer(mq: MessageQueue, queue_ctrl: Queue, employee: callable):
     """
-    # 队列消费者（先出后进）
-    # 控制信号（启动）--> 输出队列（推出）--> 控制信号（需反馈）--> 输入队列（推入）
+    # 雇主
     :param mq: MessageQueue     # 消息队列
     :param queue_ctrl: Queue    # 控制 ("is_active",):(bool,)
-    :param func: callable       # 函数
+    :param employee: callable   # 被雇者
     :return: None
     """
     is_active = queue_ctrl.get()            # 控制信号（初始化）
     while is_active:
         if queue_ctrl.empty():              # 控制信号（无变更），敏捷响应
             msg = mq.pull()
-            func(msg)
+            employee(msg)
         else:
             is_active = queue_ctrl.get()
     else:
-        pass
+        queue_ctrl.close()
+        mq.release()
 
 
-class ROOM:
+class TOWER:
     def __init__(self, conn: URL):
         # conn = "tcp://*:port"
-        self.me = MessageQueue(conn)
+        self.me = conn
+        self.mq = MessageQueue(conn)
         self.__queue_ctrl = Queue(MSG_Q_MAX_DEPTH)              # 控制队列
-        self.__queue_ctrl.put(True)
-        self.mine = Thread(target=queue_listen, args=(self.me, self.__queue_ctrl, queue_listen))
+        self.__queue_ctrl.put((True, None))
+        self.mine = None
+
+    def start(self, func: callable):
+        self.mine = Thread(target=employer, args=(self.mq, self.__queue_ctrl, func))
         self.mine.setDaemon(False)
         self.mine.start()
 
-    def close(self):
+    def stop(self):
         self.__queue_ctrl.put(False)
 
 
+def allocator(conn: URL):
+    if conn.scheme in ["oracle", "mysql"]:
+        return SQL(conn)
+    if conn.scheme in ["tcp"]:
+        return MessageQueue(conn)
 
 
+def sender(msg: MSG):
+    # employee
+    origination = allocator(msg.origination)
+    destination = allocator(msg.destination)
+    if msg.treatment is None:
+        treatment = None
+    else:
+        treatment = allocator(msg.treatment)
+    if msg.encryption is None:
+        encryption = None
+    else:
+        encryption = allocator(msg.encryption)
+    # process
+    msg_origination = origination.read(msg)
+    if encryption is None:
+        msg_encryption = msg_origination
+    else:
+        msg_encryption = encryption.request(msg_origination)
+    if treatment is None:
+        msg_treatment = msg_encryption
+    else:
+        msg_treatment = treatment.request(msg_encryption)
+    destination.push(msg_treatment)
 
+
+def treater(msg: MSG, func: callable):
+    origination = allocator(msg.origination)
+    if msg.destination is None:
+    destination = allocator(msg.destination)
+    pass
