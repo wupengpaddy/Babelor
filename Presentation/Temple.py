@@ -14,15 +14,14 @@
 # limitations under the License.
 
 # System Required
-from multiprocessing import Queue, Process
+from queue import Queue
 from threading import Thread
-import time
 # Outer Required
-import pandas as pd
 # Inner Required
-from Message import URL, MSG, CASE
-from CONFIG.config import GLOBAL_CFG
+from Message import URL, MSG
+from Config.CONFIG import GLOBAL_CFG
 from Process import MessageQueue
+from Session import TOMAIL, FTP, FTPD
 from DataBase import SQL
 # Global Parameters
 MSG_Q_MAX_DEPTH = GLOBAL_CFG["MSG_Q_MAX_DEPTH"]
@@ -46,11 +45,11 @@ def employer(mq: MessageQueue, queue_ctrl: Queue, employee: callable):
         else:
             is_active = queue_ctrl.get()
     else:
-        queue_ctrl.close()
+        queue_ctrl.join()
         mq.release()
 
 
-class TOWER:
+class TEMPLE:
     def __init__(self, conn: URL):
         # conn = "tcp://*:port"
         self.me = conn
@@ -59,36 +58,42 @@ class TOWER:
         self.__queue_ctrl.put((True, None))
         self.mine = None
 
-    def start(self, func: callable):
+    def open(self, func: callable):
         self.mine = Thread(target=employer, args=(self.mq, self.__queue_ctrl, func))
         self.mine.setDaemon(False)
         self.mine.start()
 
-    def stop(self):
+    def close(self):
         self.__queue_ctrl.put(False)
 
 
 def allocator(conn: URL):
-    if conn.scheme in ["oracle", "mysql"]:
-        return SQL(conn)
-    if conn.scheme in ["tcp"]:
-        return MessageQueue(conn)
+    if conn is None:
+        return None
+    else:
+        if conn.scheme in ["oracle", "mysql"]:
+            return SQL(conn)
+        if conn.scheme in ["tcp"]:
+            return MessageQueue(conn)
+        if conn.scheme in ["ftp"]:
+            return FTP(conn)
+        if conn.scheme in ["ftpd"]:
+            return FTPD(conn)
+        if conn.scheme in ["tomail"]:
+            return TOMAIL(conn)
 
 
 def sender(msg: MSG):
     # employee
     origination = allocator(msg.origination)
     destination = allocator(msg.destination)
-    if msg.treatment is None:
-        treatment = None
-    else:
-        treatment = allocator(msg.treatment)
-    if msg.encryption is None:
-        encryption = None
-    else:
-        encryption = allocator(msg.encryption)
+    treatment = allocator(msg.treatment)
+    encryption = allocator(msg.encryption)
     # process
-    msg_origination = origination.read(msg)
+    if origination is None:
+        msg_origination = msg
+    else:
+        msg_origination = origination.read(msg)
     if encryption is None:
         msg_encryption = msg_origination
     else:
@@ -97,11 +102,32 @@ def sender(msg: MSG):
         msg_treatment = msg_encryption
     else:
         msg_treatment = treatment.request(msg_encryption)
-    destination.push(msg_treatment)
+    if destination is None:
+        pass
+    else:
+        destination.push(msg_treatment)
 
 
 def treater(msg: MSG, func: callable):
     origination = allocator(msg.origination)
-    if msg.destination is None:
     destination = allocator(msg.destination)
-    pass
+    treatment = allocator(msg.treatment)
+    encryption = allocator(msg.encryption)
+    if origination is None:
+        msg_origination = msg
+    else:
+        msg_origination = origination.read(msg)
+    if encryption is None:
+        msg_encryption = msg_origination
+    else:
+        msg_encryption = encryption.request(msg_origination)
+    if treatment is None:
+        msg_treatment = msg_encryption
+    else:
+        msg_treatment = treatment.request(msg_encryption)
+    if destination is None:
+        pass
+    else:
+        destination.push(msg_treatment)
+
+

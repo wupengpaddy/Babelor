@@ -15,7 +15,7 @@
 
 import json
 from xml.etree import ElementTree
-from CONFIG.config import GLOBAL_CFG
+from Config.CONFIG import GLOBAL_CFG
 
 ROOT_TAG = GLOBAL_CFG["ROOT_TAG"]
 CODING = GLOBAL_CFG["CODING"]

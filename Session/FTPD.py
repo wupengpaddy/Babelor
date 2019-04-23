@@ -14,10 +14,12 @@
 # limitations under the License.
 
 # System Required
-import ftplib
 # Outer Required
+from pyftpdlib.authorizers import DummyAuthorizer
+from pyftpdlib.handlers import FTPHandler
+from pyftpdlib.servers import FTPServer
 # Inner Required
-from Message.MESSAGE import URL, MSG
+from Message import URL, MSG
 from Config import GLOBAL_CFG
 # Global Parameters
 BANNER = GLOBAL_CFG["FTP_BANNER"]
@@ -27,7 +29,7 @@ MAX_CONS_PER_IP = GLOBAL_CFG["FTP_MAX_CONS_PER_IP"]
 BUFFER_SIZE = GLOBAL_CFG['FTP_BUFFER_SIZE']
 
 
-class FTP:
+class FTPD:
     def __init__(self, conn: URL):
         if isinstance(conn, str):
             self.conn = URL(conn)
@@ -35,28 +37,20 @@ class FTP:
             self.conn = conn
         self.conn = self.__dict__["conn"].check
 
-    def write(self, msg: MSG):
-        ftp = self.ftp_client()
-        for i in range(0, msg.nums, 1):
-            attachment = msg.read_datum(i)
-            ftp.storbinary('STOR ' + attachment["path"].split("/")[-1], attachment["stream"], BUFFER_SIZE)  # 上传文件
-        ftp.close()
-
-    def read(self, msg: MSG):
-        new_msg = msg
-        new_msg.nums = 0
-        ftp = self.ftp_client()
-        for i in range(0, msg.nums, 1):
-            attachment = msg.read_datum(i)
-            ftp.retrbinary('RETR ' + attachment.split("/")[-1], attachment["stream"], BUFFER_SIZE)  # 下载文件
-            new_msg.add_datum(attachment["stream"], attachment['path'])
-        ftp.close()
-        return new_msg
-
-    def ftp_client(self):
-        ftp = ftplib.FTP()
-        ftp.connect(self.conn.hostname, self.conn.port)      # 连接
-        ftp.login(self.conn.username, self.conn.password)    # 登录
-        if "PASV" in self.conn.fragment:                     # 被动模式
-            ftp.set_pasv(True)
-        return ftp
+    def ftp_server(self):
+        authorizer = DummyAuthorizer()
+        authorizer.add_user(self.conn.username, self.conn.password, self.conn.path, perm='elradfmwM')
+        handler = FTPHandler
+        handler.authorizer = authorizer
+        handler.banner = BANNER
+        if "*" in self.conn.hostname:
+            address = ('', int(self.conn.port))
+        else:
+            handler.masquerade_address = self.conn.hostname
+            address = (self.conn.hostname, int(self.conn.port))
+        if "PASV" in self.conn.fragment:  # 被动模式
+            handler.passive_ports = range(PASV_PORT["START"], PASV_PORT["END"])
+        server = FTPServer(address, handler)
+        server.max_cons = MAX_CONS
+        server.max_cons_per_ip = MAX_CONS_PER_IP
+        server.serve_forever()

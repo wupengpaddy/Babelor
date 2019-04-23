@@ -19,7 +19,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 # 内部依赖
 from Message import URL, MSG
-from CONFIG import GLOBAL_CFG
+from Config import GLOBAL_CFG
 # 全局参数
 os.environ['NLS_LANG'] = GLOBAL_CFG["NLS_LANG"]     # 切换中文字符
 

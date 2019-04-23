@@ -20,7 +20,7 @@ import base64
 import re
 # 内部依赖
 from Tools import dict2json, json2dict, dict2xml, xml2dict
-from CONFIG import GLOBAL_CFG
+from Config import GLOBAL_CFG
 # 全局参数
 DatetimeFmt = GLOBAL_CFG["DatetimeFormat"]
 PortFmt = GLOBAL_CFG["PortFormat"]
@@ -164,7 +164,7 @@ class URL:
     def check(self):
         # "mysql://username:password@hostname:port/service"
         default_port = None
-        check_url = self
+        check_url = URL(self.to_string())
         if self.scheme in ["mysql"]:
             # "mysql+pymysql://username:password@hostname:3306/service"
             check_url.scheme = "mysql+pymysql"
@@ -618,6 +618,7 @@ if __name__ == '__main__':
     # demo_tomail()
     # demo_ftp()
     # demo_mysql()
+    demo_oracle()
     # demo_tcp()
-    demo_msg_mysql2ftp()
+    # demo_msg_mysql2ftp()
 

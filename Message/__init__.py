@@ -1,1 +1,1 @@
-from Message.Message import URL, MSG, CASE
+from Message.MESSAGE import URL, MSG, CASE

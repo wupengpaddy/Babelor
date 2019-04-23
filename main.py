@@ -20,7 +20,7 @@ import pandas as pd
 # 内部依赖
 from Message import MSG, URL, CASE
 from Process import MessageQueue
-from CONFIG import GLOBAL_CFG
+from Config import GLOBAL_CFG
 from DataBase import SQL
 # 全局参数
 DateFormat = GLOBAL_CFG["DateFormat"]

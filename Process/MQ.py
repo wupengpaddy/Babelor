@@ -19,8 +19,8 @@ from multiprocessing import Queue, Process
 # Outer Required
 import zmq
 # Inner Required
-from Message.Message import MSG, URL
-from CONFIG.config import GLOBAL_CFG
+from Message.MESSAGE import MSG, URL
+from Config.CONFIG import GLOBAL_CFG
 # Global Parameters
 MSG_Q_MAX_DEPTH = GLOBAL_CFG["MSG_Q_MAX_DEPTH"]
 CODING = GLOBAL_CFG["CODING"]
@@ -232,7 +232,7 @@ class MessageQueue:
             self.release()
             self.__dict__["__socket"] = self.__dict__["__context"].socket(zmq.SUB)
             self.__dict__["__socket"].connect(self.__dict__["__conn"].to_string(False, False, False, False))
-            self.__dict__["__socket"].setsockopt(zmq.SUBSCRIBE, '')
+            self.__dict__["__socket"].setsockopt(zmq.SUBSCRIBE, '')     # 订阅
             self.__initial(True, False, me, consumer)
         if self.__dict__["__active"] in [me]:
             while self.__dict__["__queue_in"].empty():

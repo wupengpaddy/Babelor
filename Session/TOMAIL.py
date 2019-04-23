@@ -22,7 +22,7 @@ from email.headerregistry import Address
 from email import encoders
 # 内部依赖
 from Message import URL, MSG
-from CONFIG import GLOBAL_CFG
+from Config import GLOBAL_CFG
 # 全局参数
 CODING = GLOBAL_CFG["CODING"]
 
