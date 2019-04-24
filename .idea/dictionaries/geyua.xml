@@ -8,6 +8,8 @@
       <w>aibt</w>
       <w>aobt</w>
       <w>babelor</w>
+      <w>beautifulsoup</w>
+      <w>dateutil</w>
       <w>dtype</w>
       <w>flno</w>
       <w>frommail</w>
@@ -16,7 +18,9 @@
       <w>icao</w>
       <w>lgpl</w>
       <w>orcl</w>
+      <w>pyftpdlib</w>
       <w>pymysql</w>
+      <w>pyzmq</w>
       <w>regne</w>
       <w>retr</w>
       <w>shairport</w>

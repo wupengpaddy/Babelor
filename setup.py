@@ -26,6 +26,16 @@ PACKAGES = ["Babelor",                  # root/ path            库/根
             "Babelor/Session",          # root/session          库/会话层
             "Babelor/Tools",            # root/tools            库/工具层
             ]
+INSTALL_REQUIRED = [
+    "requests>=2.18.4",         # python http connector
+    "beautifulsoup4>=4.6.0",    # python html4 descriptor
+    "SQLAlchemy>=1.2.15",       # python database connector
+    "numpy>=1.15.4",            # python array computing
+    "pandas>=0.23.4",           # python data analysis and statical
+    "python-dateutil>=2.7.5",   # python data util
+    "pyzmq>=17.1.2",            # python binding for 0mq
+    "pyftpdlib>=1.5.4",         # python async ftp server
+]
 DESCRIPTION = """
 Babelor - a ting data analysis and manipulation library for Python
 =====================================================================
@@ -75,9 +85,8 @@ setup(name=NAME, version=VERSION, description=DESCRIPTION, long_description=LONG
           'Operating System :: MacOS :: MacOS X',
           'Operating System :: Microsoft :: Windows',
           'Operating System :: POSIX',
-      ], keywords=KEYWORDS, author=AUTHOR, author_email=AUTHOR_EMAIL, url=URL,
-      license=LICENSE, packages=PACKAGES, include_package_data=True, zip_safe=True,
-      )
+      ], keywords=KEYWORDS, author=AUTHOR, author_email=AUTHOR_EMAIL, url=URL, license=LICENSE,
+      packages=PACKAGES, include_package_data=True, zip_safe=True, install_requires=INSTALL_REQUIRED,)
 
 # check distribute code 校验检查
 # python setup.py check
