@@ -246,6 +246,10 @@ class CASE:
             self.origination = URL(unquote(case[0]))
             self.destination = URL(unquote(case[1]))
             self.timestamp = unquote((case[2]))
+        elif len(case) == 2:
+            self.origination = URL(unquote(case[0]))
+            self.destination = URL(unquote(case[1]))
+            self.timestamp = current_datetime()
         else:
             raise ValueError("地址格式错误")
 

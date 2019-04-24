@@ -9,8 +9,11 @@
       <w>aobt</w>
       <w>babelor</w>
       <w>beautifulsoup</w>
+      <w>cobt</w>
+      <w>ctot</w>
       <w>dateutil</w>
       <w>dtype</w>
+      <w>encrypter</w>
       <w>flno</w>
       <w>frommail</w>
       <w>ftpd</w>
@@ -18,7 +21,10 @@
       <w>iata</w>
       <w>icao</w>
       <w>lgpl</w>
+      <w>openpyxl</w>
       <w>orcl</w>
+      <w>patd</w>
+      <w>pstd</w>
       <w>pyftpdlib</w>
       <w>pymysql</w>
       <w>pyzmq</w>
@@ -27,12 +33,16 @@
       <w>shairport</w>
       <w>smtp</w>
       <w>spia</w>
+      <w>sqlalchemy</w>
       <w>stoa</w>
       <w>stod</w>
       <w>stor</w>
       <w>tomail</w>
+      <w>treater</w>
       <w>unparse</w>
+      <w>xlrd</w>
       <w>xlsx</w>
+      <w>zspd</w>
     </words>
   </dictionary>
 </component>

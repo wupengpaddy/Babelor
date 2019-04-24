@@ -138,6 +138,8 @@ class MessageQueue:
                 self.__dict__["__active"] = None                        # 已激活模式（初始化）
         return self
 
+    close = release
+
     def __initial(self, is_active: bool, is_response: bool, me: str, func):
         self.__dict__["__queue_ctrl"].put((is_active, is_response))  # 控制信号
         self.__dict__["__process"] = Process(target=func,

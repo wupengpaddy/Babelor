@@ -16,6 +16,7 @@
 # Inner Required
 from Babelor.Message.Message import MSG, URL, CASE
 from Babelor.Presentation.Temple import TEMPLE
+from Babelor.Process.MQ import MessageQueue
 
 # Let users know if they're missing any of our hard dependencies
 hard_dependencies = ("pandas", "sqlalchemy", "zmq", "xlrd", "pyftpdlib", "openpyxl")

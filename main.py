@@ -13,24 +13,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# 外部依赖
+# System Required
 import time
 import datetime
+# Outer Required
 import pandas as pd
-# 内部依赖
-from Babelor import MSG, URL
-from Babelor import GLOBAL_CFG
-from Babelor import SQL
-# 全局参数
-DateFormat = GLOBAL_CFG["DateFormat"]
-
+from Babelor import MSG, URL, CASE, TEMPLE, MessageQueue
+# Inner Required
+# Global Parameters
+DateFormat = '%Y-%m-%d'
 CurrentTime = time.localtime(time.time() + (60 * 60 * 8))  # GMT+8
 CurrentDateTime = datetime.datetime.now()
 CurrentDate = CurrentDateTime.strftime(DateFormat)
-
-# 关闭写复制警告
-pd.options.mode.chained_assignment = None
-# 调试输出全显示
+# Outer Required Parameters
+pd.options.mode.chained_assignment = None       # 关闭写复制警告
 pd.set_option('display.max_columns', 100)
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.width', 2000)
@@ -63,24 +59,26 @@ def create_icao_flno(dt: pd.Series):
         return dt["ICAO_CARRIER_ICAO_CODE"] + dt["ICAO_FLIGHT_NUMBER"]
 
 
-def worker(msg: MSG):
-    # 消息文件提取
-    new_msg = msg
-    new_msg.nums = 0
-    df = {
+def func_treatment(msg: MSG):
+    # -———————————————————————————————————------------------------ INIT ---------
+    # 数据参数提取
+    data_tuple = {
         "PVG-AFDS": None,
         "PVG-CDM": None,
         "SELECT-DATE": None,
     }
     for i in range(0, msg.nums, 1):
         attachment = msg.read_datum(i)
-        if attachment["path"] in df.keys():
-            df[attachment["path"]] = attachment["stream"]
-    # ————————————————————————————————————————--------------- CHECK  ------
-    # 读取数据源
-    afds = df["PVG-AFDS"]
-    cdm = df["PVG-CDM"]
-    select_date = df["SELECT-DATE"]
+        if attachment["path"] in data_tuple.keys():
+            data_tuple[attachment["path"]] = attachment["stream"]
+    # 读取参数
+    afds = data_tuple["PVG-AFDS"]
+    cdm = data_tuple["PVG-CDM"]
+    select_date = data_tuple["SELECT-DATE"]
+    # -———————————————————————————————————------------------------ INIT ---------
+    msg_out = msg
+    msg_out.nums = 0
+    # ————————————————————————————————————————--------------- START --------
     # 列名强制输出大写
     afds = afds.rename(str.upper, axis='columns')
     cdm = cdm.rename(str.upper, axis='columns')
@@ -90,10 +88,12 @@ def worker(msg: MSG):
     # 重建索引
     afds = afds.reset_index(drop=True)
     cdm = cdm.reset_index(drop=True)
-    # ————————————————————————————————————————--------------- CHECK  ------
     # AFDS 数据生成
     afds["ICAO_FLNO"] = afds.apply(lambda x: create_icao_flno(x), axis=1)
-    afds["OPERATION"] = afds.apply(lambda x: data_split(x["OPERATION"], 1), axis=1)         # 取对外发布状态
+    afds["OPERATION"] = afds.apply(lambda x: data_split(x["OPERATION"], 1), axis=1)     # 取对外发布状态
+    # ————————————————————————————————————————--------------- START --------
+    del data_tuple
+    # ————————————————————————————————————————--------------- PROCESS :: 1 -
     # AFDS 进港航班和出港航班分表
     afds_arrival = afds[afds["DIRECTION"] == "Arrival"]
     afds_departure = afds[afds["DIRECTION"] == "Departure"]
@@ -108,7 +108,6 @@ def worker(msg: MSG):
     afds_arrival["ICAO_ORG"] = afds_arrival.apply(lambda x: data_split(x["PORT_OF_CALL_ICAO_CODE"], 1), axis=1)
     afds_departure["IATA_DES"] = afds_departure.apply(lambda x: data_split(x["PORT_OF_CALL_IATA_CODE"], 0), axis=1)
     afds_departure["ICAO_DES"] = afds_departure.apply(lambda x: data_split(x["PORT_OF_CALL_ICAO_CODE"], 0), axis=1)
-    # ————————————————————————————————————————--------------- CHECK  ------
     # AFDS 进港数据 字段重命名
     afds_arrival.rename(columns={
         "IATA_FLNO": "ARR_IATA_FLNO",               # 进港航班号      （IATA 二字码）
@@ -154,7 +153,6 @@ def worker(msg: MSG):
         "CTRL_POINT": "ARR_CTRL_POINT",         # 进港流控管制点
         "CTRL_REASON": "ARR_CTRL_REASON",       # 进港流控原因
     }, inplace=True)
-
     # CDM 出港数据 字段重命名
     cdm_departure.rename(columns={
         "ICAO_FLNO": "DEP_ICAO_FLNO",           # 出港航班号      （ICAO 三字码）
@@ -166,7 +164,6 @@ def worker(msg: MSG):
         "CTRL_POINT": "DEP_CTRL_POINT",         # 出港流控管制点
         "CTRL_REASON": "DEP_CTRL_REASON",       # 出港流控原因
     }, inplace=True)
-    # ————————————————————————————————————————--------------- CHECK  ------
     # AFDS 进港数据字段整理
     afds_arrival = pd.DataFrame(afds_arrival[[
         "ARR_IATA_FLNO",        # 进港航班号      （IATA 二字码）
@@ -241,7 +238,9 @@ def worker(msg: MSG):
         "DEP_CTRL_POINT",  # 出港流控管制点
         "DEP_CTRL_REASON",  # 出港流控原因
     ]]).reset_index(drop=True)
-    # ————————————————————————————————————————--------------- CHECK  ------
+    # ————————————————————————————————————————--------------- PROCESS :: 1 -
+    del afds, cdm
+    # ————————————————————————————————————————--------------- PROCESS :: 2 -
     # 选取出港航班
     afds_departure_select = afds_departure[afds_departure["DEP_SCHEDULE_DATE"] == select_date]
     # 出港航班合并
@@ -259,13 +258,15 @@ def worker(msg: MSG):
     pvg_up = pd.merge(pvg_departure, pvg_arrival, how="left", on=["ARR_IATA_FLNO", "ARR_REPEAT", "ARR_SCHEDULE_DATE"])
     pvg_arrival_select = pvg_arrival[pvg_arrival["ARR_SCHEDULE_DATE"] == select_date]
     pvg = pd.concat([pvg_up, pvg_arrival_select], sort=False)
+    # ————————————————————————————————————————--------------- PROCESS :: 2 -
+    del pvg_arrival, pvg_departure, cdm_arrival, cdm_departure, pvg_arrival_select, pvg_up
+    # ————————————————————————————————————————--------------- PROCESS :: 3 -
     pvg.drop_duplicates(subset=["ARR_IATA_FLNO", "ARR_SCHEDULE_DATE", "ARR_REPEAT"], keep='first', inplace=True)
     pvg.drop_duplicates(subset=["DEP_IATA_FLNO", "DEP_SCHEDULE_DATE", "DEP_REPEAT"], keep='first', inplace=True)
     # 无匹配空值 为 "<NaN>"
     pvg = pvg.where(pvg.notnull(), "<NaN>")
     # 置空值设置为 ""
     pvg.replace('<EMPTY>', '', inplace=True)
-    # ————————————————————————————————————————--------------- CHECK  ------
     # 数据整理
     pvg = pd.DataFrame(pvg[[
         "ARR_IATA_FLNO",  # 进港航班号      （IATA 二字码）
@@ -344,85 +345,86 @@ def worker(msg: MSG):
         "DEP_CTRL_REASON": "出港流控原因",
         "DEP_RUNWAY": "起飞跑道"
     }, inplace=True)
-    new_msg.add_datum(pvg.to_msgpack(), "{0}.xlsx".format(select_date.replace("-", "")))
-    return new_msg
+    msg_out.add_datum(pvg.to_msgpack(), "{0}.xlsx".format(select_date.replace("-", "")))
+    # ————————————————————————————————————————--------------- PROCESS :: 3 -
+    del pvg
+    return msg_out
 
 
-def msg_init(select_date: str):
-    # PVG-AFDS SQL 抽取脚本
-    pvg_afds_sql = """
-    select afds.flight_direction                as DIRECTION,
-           afds.flight_identity                 as IATA_FLNO,
-           afds.flight_repeat_count             as REPEAT,
-           afds.icao_carrier_icao_code          as ICAO_CARRIER_ICAO_CODE,
-           afds.icao_flight_number              as ICAO_FLIGHT_NUMBER,
-           afds.port_of_call_iata_code          as PORT_OF_CALL_IATA_CODE,
-           afds.port_of_call_icao_code          as PORT_OF_CALL_ICAO_CODE,
-           afds.previous_station_scheduled_dt   as PSTD,
-           afds.previous_station_airborne_dt    as PATD,
-           afds.scheduled_date                  as SCHEDULE_DATE,
-           afds.scheduled_date_time             as SCHEDULE_DATE_TIME,
-           afds.wheels_down_date_time           as TDT,
-           afds.wheels_up_date_time             as ABT,
-           afds.ACTUAL_ON_BLOCKS_DATE_TIME      as AFDS_AIBT,
-           afds.ACTUAL_OFF_BLOCKS_DATE_TIME     as AFDS_AOBT,
-           afds.stand_position                  as STAND,
-           afds.aircraft_registration           as REG,
-           afds.aircraft_subtype_iata_code      as TYS,
-           afds.flight_classification_code      as CLA,
-           afds.flight_sector_code              as SECTOR,
-           afds.operation_type_code             as OPERATION,
-           afds.linked_flight_identity          as L_IATA_FLNO,
-           afds.linked_flight_repeat_count      as L_REPEAT,
-           afds.linked_scheduled_date           as L_SCHEDULE_DATE
-    from flatter_afds afds
-    where afds.code_share_status <> 'SF'
-      and afds.scheduled_date between '{0}' and '{1}'
-    order by scheduled_date
-    """
-    # PVG-CDM SQL 抽取脚本
-    pvg_cdm_sql = """
-    select cdm.flno             as ICAO_FLNO,
-           cdm.regne            as REG,
-           cdm.adep             as ICAO_ORG,
-           cdm.ades             as ICAO_DES,
-           cdm.runway           as RUNWAY,
-           cdm.stod             as STOD,
-           cdm.stoa             as STOA,
-           cdm.aldt             as ALDT,
-           cdm.aibt             as CDM_AIBT,       
-           cdm.ctot             as CTOT,
-           cdm.cobt             as COBT,
-           cdm.dobt             as DOBT,
-           cdm.atot             as ATOT,
-           cdm.aobt             as CDM_AOBT,
-           cdm.IS_STRICT_CTRL   as CTRL,
-           cdm.ctrl_content     as CTRL_CONTENT,
-           cdm.ctrl_point       as CTRL_POINT,
-           cdm.ctrl_reason      as CTRL_REASON
-    from cdm_flight cdm
-    where cdm.STOD between to_date('{0}', 'yyyy-mm-dd') and to_date('{1}', 'yyyy-mm-dd')
-       or cdm.STOA between to_date('{0}', 'yyyy-mm-dd') and to_date('{1}', 'yyyy-mm-dd')
-    order by STOD, STOA
-    """
+def priest(select_date: str):
     # 数据范围
     start_date = datetime.datetime.strptime(select_date, DateFormat) - datetime.timedelta(days=7)
     end_date = datetime.datetime.strptime(select_date, DateFormat) + datetime.timedelta(days=1)
-    # SQL 生成
-    pvg_afds_sql = pvg_afds_sql.format(start_date.strftime(DateFormat), end_date.strftime(DateFormat))
-    pvg_cdm_sql = pvg_cdm_sql.format(start_date.strftime(DateFormat), end_date.strftime(DateFormat))
+    # PVG-AFDS SQL Shell
+    pvg_afds_sql = """
+select afds.flight_direction                as DIRECTION,
+       afds.flight_identity                 as IATA_FLNO,
+       afds.flight_repeat_count             as REPEAT,
+       afds.icao_carrier_icao_code          as ICAO_CARRIER_ICAO_CODE,
+       afds.icao_flight_number              as ICAO_FLIGHT_NUMBER,
+       afds.port_of_call_iata_code          as PORT_OF_CALL_IATA_CODE,
+       afds.port_of_call_icao_code          as PORT_OF_CALL_ICAO_CODE,
+       afds.previous_station_scheduled_dt   as PSTD,
+       afds.previous_station_airborne_dt    as PATD,
+       afds.scheduled_date                  as SCHEDULE_DATE,
+       afds.scheduled_date_time             as SCHEDULE_DATE_TIME,
+       afds.wheels_down_date_time           as TDT,
+       afds.wheels_up_date_time             as ABT,
+       afds.ACTUAL_ON_BLOCKS_DATE_TIME      as AFDS_AIBT,
+       afds.ACTUAL_OFF_BLOCKS_DATE_TIME     as AFDS_AOBT,
+       afds.stand_position                  as STAND,
+       afds.aircraft_registration           as REG,
+       afds.aircraft_subtype_iata_code      as TYS,
+       afds.flight_classification_code      as CLA,
+       afds.flight_sector_code              as SECTOR,
+       afds.operation_type_code             as OPERATION,
+       afds.linked_flight_identity          as L_IATA_FLNO,
+       afds.linked_flight_repeat_count      as L_REPEAT,
+       afds.linked_scheduled_date           as L_SCHEDULE_DATE
+from flatter_afds afds
+where afds.code_share_status <> 'SF'
+  and afds.scheduled_date between '{0}' and '{1}'
+order by scheduled_date
+""".format(start_date.strftime(DateFormat), end_date.strftime(DateFormat))
+    # PVG-CDM SQL Shell
+    pvg_cdm_sql = """
+select cdm.flno             as ICAO_FLNO,
+       cdm.regne            as REG,
+       cdm.adep             as ICAO_ORG,
+       cdm.ades             as ICAO_DES,
+       cdm.runway           as RUNWAY,
+       cdm.stod             as STOD,
+       cdm.stoa             as STOA,
+       cdm.aldt             as ALDT,
+       cdm.aibt             as CDM_AIBT,       
+       cdm.ctot             as CTOT,
+       cdm.cobt             as COBT,
+       cdm.dobt             as DOBT,
+       cdm.atot             as ATOT,
+       cdm.aobt             as CDM_AOBT,
+       cdm.IS_STRICT_CTRL   as CTRL,
+       cdm.ctrl_content     as CTRL_CONTENT,
+       cdm.ctrl_point       as CTRL_POINT,
+       cdm.ctrl_reason      as CTRL_REASON
+from cdm_flight cdm
+where cdm.STOD between to_date('{0}', 'yyyy-mm-dd') and to_date('{1}', 'yyyy-mm-dd')
+   or cdm.STOA between to_date('{0}', 'yyyy-mm-dd') and to_date('{1}', 'yyyy-mm-dd')
+order by STOD, STOA
+""".format(start_date.strftime(DateFormat), end_date.strftime(DateFormat))
     # 消息生成
     msg = MSG()
-    msg.add_datum(select_date, "SELECT-DATE")
-    msg.add_datum(pvg_afds_sql, "PVG-AFDS")
-    msg.add_datum(pvg_cdm_sql, "PVG-CDM")
-    # 读取数据
-    conn = URL().init("oracle")
-    sql = SQL(conn)
-    msg.origination = conn
-    msg = worker(sql.read(msg))
-    msg.destination = URL().init("ftp")
-    return msg
+    msg.add_datum(datum=select_date, path="SELECT-DATE")
+    msg.add_datum(datum=pvg_afds_sql, path="PVG-AFDS")
+    msg.add_datum(datum=pvg_cdm_sql, path="PVG-CDM")
+    msg.origination = URL("oracle://wonder:password@10.169.0.1:1521/oracle")
+    msg.destination = URL("tcp://10.169.0.43:9000")
+    msg.treatment = URL("tcp://10.169.0.44:9000")
+    msg.case = CASE()
+    msg.case.origination = URL("oracle://wonder:password@10.169.0.1:1521/oracle")
+    msg.case.destination = URL("ftp://user:password@172.21.98.66:21#PASV")
+    mq = MessageQueue(URL("tcp://10.169.0.7:2011"))
+    mq.push(msg)
+    mq.close()
 
 
 def range_worker(year: int):
@@ -434,14 +436,26 @@ def range_worker(year: int):
     # 时间遍历
     for i in range((end_date - begin_date).days + 1):
         select_date = begin_date + datetime.timedelta(days=i)
-        msg = msg_init(select_date.strftime(DateFormat))
+        priest(select_date.strftime(DateFormat))
 
 
-def sender(msg: MSG):
-    pass
+def sender():
+    myself = TEMPLE(URL("tcp://*:2511"))
+    myself.open(role="sender")
+
+
+def treater():
+    myself = TEMPLE(URL("tcp://*:2511"))
+    myself.open(role="treater", func=func_treatment)
+
+
+def receiver():
+    myself = TEMPLE(URL("tcp://*:2511"))
+    myself.open(role="receiver")
 
 
 if __name__ == '__main__':
-    # worker(CurrentDate.strftime(DateFormat))
-    # proxy()
+    # sender()
+    # treater()
+    # receiver()
     range_worker(year=2018)
