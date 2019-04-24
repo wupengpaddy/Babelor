@@ -18,10 +18,9 @@ import time
 import datetime
 import pandas as pd
 # 内部依赖
-from Message import MSG, URL, CASE
-from Process import MessageQueue
-from Config import GLOBAL_CFG
-from DataBase import SQL
+from Babelor import MSG, URL
+from Babelor import GLOBAL_CFG
+from Babelor import SQL
 # 全局参数
 DateFormat = GLOBAL_CFG["DateFormat"]
 
