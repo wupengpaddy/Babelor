@@ -4,6 +4,7 @@ Babelor/__init__.py
 Babelor.egg-info/PKG-INFO
 Babelor.egg-info/SOURCES.txt
 Babelor.egg-info/dependency_links.txt
+Babelor.egg-info/requires.txt
 Babelor.egg-info/top_level.txt
 Babelor.egg-info/zip-safe
 Babelor/Config/Config.py
