@@ -16,13 +16,21 @@ def load_rst_file(rst_file_path):
     return codecs.open(os.path.join(os.path.dirname(__file__), rst_file_path)).read()
 
 
-NAME = "Babelor"                    # package name 库名
-PACKAGES = ["pandas", "sqlalchemy", "zmq", "xlrd", "pyftpdlib", "openpyxl"]      # dependency packages 依赖库
+NAME = "Babelor"                        # package name          库名
+PACKAGES = ["Babelor",                  # root/ path            库/根
+            "Babelor/Config",           # root/config path      库/配置层
+            "Babelor/DataBase",         # root/database path    库/数据库层
+            "Babelor/Message",          # root/message path     库/消息层
+            "Babelor/Presentation",     # root/presentation     库/表示层
+            "Babelor/Process",          # root/process          库/处理层
+            "Babelor/Session",          # root/session          库/会话层
+            "Babelor/Tools",            # root/tools            库/工具层
+            ]
 DESCRIPTION = """
 Babelor - a ting data analysis and manipulation library for Python
 =====================================================================
 
-**pandas** is a Python package providing fast, flexible, and expressive data
+**Babelor** is a Python package providing fast, flexible, and expressive data
 structures designed to make working with "relational" or "labeled" data both
 easy and intuitive. It aims to be the fundamental high-level building block for
 doing practical, **real world** data analysis in Python. Additionally, it has
