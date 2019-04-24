@@ -13,9 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Inner Required
+from Babelor.Message.Message import MSG, URL, CASE
+from Babelor.Presentation.Temple import TEMPLE
 
 # Let users know if they're missing any of our hard dependencies
-hard_dependencies = ("pandas", "sqlalchemy", "zmq", "xlrd", "pyftpdlib", "openpyxl", "cx_Oracle", "")
+hard_dependencies = ("pandas", "sqlalchemy", "zmq", "xlrd", "pyftpdlib", "openpyxl")
 missing_dependencies = []
 for dependency in hard_dependencies:
     try:
@@ -26,6 +29,3 @@ if missing_dependencies:
     raise ImportError(
         "Missing required dependencies {0}".format(missing_dependencies))
 del hard_dependencies, missing_dependencies, dependency
-
-from Babelor.Message.Message import MSG, URL, CASE
-from Babelor.Presentation.Temple import TEMPLE

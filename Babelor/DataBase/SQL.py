@@ -13,14 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# 外部依赖
+# System Required
 import os
+# Outer Required
 import pandas as pd
 from sqlalchemy import create_engine
-# 内部依赖
+# Inner Required
 from Babelor.Message import URL, MSG
 from Babelor.Config import GLOBAL_CFG
-# 全局参数
+# Global Parameters
 os.environ['NLS_LANG'] = GLOBAL_CFG["NLS_LANG"]     # 切换中文字符
 
 

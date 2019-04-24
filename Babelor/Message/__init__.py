@@ -13,4 +13,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Inner Required
 from Babelor.Message.Message import MSG, URL, CASE
