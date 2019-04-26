@@ -75,16 +75,28 @@ CLASSIFIERS = [
 
 # 简单描述
 DESCRIPTION = """
-Babelor - a ting data analysis and manipulation library for Python
-=====================================================================
+Babelor - a ting integration information service bus library for Python
+=======================================================================
 
-**Babelor** is a Python package providing fast, flexible, and expressive data
-structures designed to make working with "relational" or "labeled" data both
-easy and intuitive. It aims to be the fundamental high-level building block for
-doing practical, **real world** data analysis in Python. Additionally, it has
-the broader goal of becoming **the most powerful and flexible open source data
-analysis / manipulation tool available in any language**. It is already well on
-its way toward this goal.
+**Babelor** is a Python package providing fast, flexible, and expressive
+integration information service bus structures designed to make working
+with serializable message transportation and service invocation both easy
+and intuitive. It aims to be the fundamental high-level building block for
+doing practical, **real world** data analysis in Python. Additionally, 
+it has the broader goal of becoming **the most powerful and flexible 
+open source integration information message transportation / service
+invocation tool available in any language**.
+"""
+
+DESCRIPTION_CHN = """
+Babelor - 微型集成信息服务总线 Python 库
+=======================================================================
+
+**Babelor** 基于 Python 开发的集成信息服务总线，提供高速、灵活、多样化得
+信息交互体验，设计用于可序列化消息包（数据）既简单又直观的传输和服务调用。
+它的目标是成为在 Python 中进行的 **现实世界** 信息交互服务的基本高层构建
+模块。此外，它还有更广泛的目标，即成为 **任何语言中最强大和最灵活的开源
+集成信息传输/服务调用工具**。
 """
 
 # 详细描述
