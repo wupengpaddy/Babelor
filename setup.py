@@ -19,7 +19,7 @@ NAME = "Babelor"
 PACKAGES = [
     "Babelor",                  # root/ path            库/根
     "Babelor/Config",           # root/config path      库/配置层
-    "Babelor/Data",         # root/data path    库/数据层
+    "Babelor/Data",             # root/data path        库/数据层
     "Babelor/Message",          # root/message path     库/消息层
     "Babelor/Presentation",     # root/presentation     库/表示层
     "Babelor/Process",          # root/process          库/处理层
