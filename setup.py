@@ -108,7 +108,7 @@ URL = "http://www.strtrek.com/"             # 项目主页
 # N[.N]         阶段主版本号和副版本号(可选)
 # .postN        发行后的更新版本号(可选)
 # .devN         开发期间的发行版本号(可选)
-VERSION = "0.1.1"
+VERSION = "0.1.1.post1"
 
 # 许可证
 LICENSE = """
