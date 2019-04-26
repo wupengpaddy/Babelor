@@ -14,4 +14,4 @@
 # limitations under the License.
 
 # Inner Required
-from Babelor.Process.MQ import MessageQueue, consumer, producer
+from Babelor.Process.MQ import MessageQueue

@@ -16,6 +16,8 @@
 # System Required
 import time
 import datetime
+from queue import Queue
+from threading import Thread
 # Outer Required
 import pandas as pd
 from Babelor import MSG, URL, CASE, TEMPLE, MessageQueue
@@ -454,8 +456,24 @@ def receiver():
     myself.open(role="receiver")
 
 
+def test_push():
+    msg = MSG()
+    msg.origination = URL("tcp://127.0.0.1:2511")
+    mq = MessageQueue("tcp://127.0.0.1:2511")
+    print("push msg:", msg)
+    mq.push(msg)
+
+
+def test_pull():
+    mq = MessageQueue("tcp://*:2511")
+    msg = mq.pull()
+    print("pull msg:", msg)
+
+
 if __name__ == '__main__':
-    # sender()
+    p1 = Thread(target=test_pull)
+    p1.start()
+    test_push()
     # treater()
     # receiver()
-    range_worker(year=2018)
+    # range_worker(year=2018)

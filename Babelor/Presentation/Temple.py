@@ -14,6 +14,7 @@
 # limitations under the License.
 
 # System Required
+import time
 from queue import Queue
 from threading import Thread
 # Outer Required
@@ -29,31 +30,60 @@ CODING = GLOBAL_CFG["CODING"]
 BlockingTime = GLOBAL_CFG["MSG_Q_BlockingTime"]
 
 
+def mine(conn: URL, queue_ctrl: Queue, queue_out: Queue):
+    mq = MessageQueue(conn)
+    is_active = queue_ctrl.get()
+    while is_active:
+        if queue_ctrl.empty():
+            while queue_out.full():
+                time.sleep(BlockingTime)
+            else:
+                queue_out.put(mq.pull())
+        else:
+            is_active = queue_ctrl.get()
+    else:
+        queue_ctrl.join()
+        queue_out.join()
+        mq.close()
+        del mq
+
+
 class TEMPLE:
     def __init__(self, conn: URL):
         # conn = "tcp://*:port"
         self.me = conn
-        self.mq = MessageQueue(conn)
-        self.__queue_ctrl = Queue(MSG_Q_MAX_DEPTH)              # 控制队列
-        self.__queue_ctrl.put((True, None))
-        self.mine = None
+        self.__queue_mine = Queue(MSG_Q_MAX_DEPTH)
+        self.__queue_mine_ctrl = Queue(MSG_Q_MAX_DEPTH)
+        self.__queue_process_ctrl = Queue(MSG_Q_MAX_DEPTH)              # 角色进程控制队列
+        self.__queue_mine_ctrl.put(True)
+        self.process = None                                             # 角色进程
+        self.mine = Thread(target=mine, args=(self.me, self.__queue_mine_ctrl, self.__queue_mine))
 
     def open(self, role: str, func: callable = None):
-        if role in ["sender"]:
-            self.mine = Thread(target=sender, args=(self.mq, self.__queue_ctrl, func))
-        elif role in ["treater"]:
-            self.mine = Thread(target=treater, args=(self.mq, self.__queue_ctrl, func))
-        elif role in ["encrypter"]:
-            self.mine = Thread(target=encrypter, args=(self.mq, self.__queue_ctrl, func))
-        elif role in ["receiver"]:
-            self.mine = Thread(target=receiver, args=(self.mq, self.__queue_ctrl, func))
-        else:       # default
-            self.mine = Thread(target=receiver, args=(self.mq, self.__queue_ctrl, func))
         self.mine.setDaemon(False)
         self.mine.start()
 
+        while self.__queue_mine.empty():
+            time.sleep(BlockingTime)
+        else:
+            msg = self.__queue_mine.get()
+            print("temple CFC receiver:", msg)
+            self.__queue_process_ctrl.put(True)
+            if role in ["sender"]:
+                self.process = Thread(target=sender, args=(msg, self.__queue_process_ctrl, func))
+            elif role in ["treater"]:
+                self.process = Thread(target=treater, args=(msg, self.__queue_process_ctrl, func))
+            elif role in ["encrypter"]:
+                self.process = Thread(target=encrypter, args=(msg, self.__queue_process_ctrl, func))
+            elif role in ["receiver"]:
+                self.process = Thread(target=receiver, args=(msg, self.__queue_process_ctrl, func))
+            else:       # default
+                self.process = Thread(target=receiver, args=(msg, self.__queue_process_ctrl, func))
+            self.process.setDaemon(False)
+            self.process.start()
+
     def close(self):
-        self.__queue_ctrl.put(False)
+        self.__queue_process_ctrl.put(False)
 
 
 def allocator(conn: URL):
@@ -80,6 +110,7 @@ def sender(msg: MSG, queue_ctrl: Queue, func: callable = None):
     :return: None
     """
     # employee
+    print("sender :", msg)
     origination = allocator(msg.origination)
     destination = allocator(msg.destination)    # MessageQueue
     treatment = allocator(msg.treatment)        # MessageQueue
