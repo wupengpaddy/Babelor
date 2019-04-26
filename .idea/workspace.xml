@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="be54182a-218b-4e8e-9234-62a7d88d12fc" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/Babelor/DataBase/EXCEL.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Data/EXCEL.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Babelor/DataBase/HTML.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Data/HTML.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Babelor/DataBase/SQL.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Data/SQL.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Babelor/DataBase/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Data/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Babelor/Presentation/Temple.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Presentation/Temple.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
-    </list>
+    <list default="true" id="be54182a-218b-4e8e-9234-62a7d88d12fc" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,7 +34,7 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Babelor/Presentation/Temple.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="475">
+            <state relative-caret-position="-3883">
               <caret line="25" column="28" lean-forward="true" selection-start-line="25" selection-start-column="28" selection-end-line="25" selection-end-column="28" />
               <folding>
                 <element signature="e#619#630#0" expanded="true" />
@@ -144,30 +137,6 @@
               <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
               <item name="Babelor" type="462c0819:PsiDirectoryNode" />
               <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-              <item name="Config" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-              <item name="Data" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-              <item name="Message" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-              <item name="Presentation" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
@@ -337,7 +306,7 @@
       <workItem from="1555984134932" duration="701000" />
       <workItem from="1556023869002" duration="4706000" />
       <workItem from="1556106368066" duration="12295000" />
-      <workItem from="1556161162184" duration="26787000" />
+      <workItem from="1556161162184" duration="27487000" />
     </task>
     <task id="LOCAL-00001" summary="init">
       <created>1551342044292</created>
@@ -350,7 +319,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="423821000" />
+    <option name="totallyTimeSpent" value="424521000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1453" height="933" extended-state="6" />
@@ -629,7 +598,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Babelor/Presentation/Temple.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="475">
+        <state relative-caret-position="-3883">
           <caret line="25" column="28" lean-forward="true" selection-start-line="25" selection-start-column="28" selection-end-line="25" selection-end-column="28" />
           <folding>
             <element signature="e#619#630#0" expanded="true" />

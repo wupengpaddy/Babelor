@@ -96,12 +96,6 @@ Babelor - 微型集成信息服务总线 Python 库
 集成信息传输/服务调用工具**。
 """
 
-# 详细描述
-if os.path.exists("README.rst"):
-    LONG_DESCRIPTION = load_rst_file("README.rst")
-else:
-    LONG_DESCRIPTION = open("README.txt", "r").read()
-
 # 关键字
 KEYWORDS = "Service Bus"
 
@@ -119,6 +113,12 @@ MAINTAINER_EMAIL = "geyuanji@strtrek.com"
 
 # 项目主页
 URL = "http://www.strtrek.com/"
+
+# 详细描述
+if os.path.exists("README.rst"):
+    LONG_DESCRIPTION = load_rst_file("README.rst")
+else:
+    LONG_DESCRIPTION = open("README.txt", "r").read()
 
 # 版本号
 # r"N.N[.N]+[{a|b|c|rc}N[.N]+][.postN][.devN]"
