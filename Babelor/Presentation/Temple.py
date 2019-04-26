@@ -23,7 +23,7 @@ from Babelor.Message import URL, MSG
 from Babelor.Config import GLOBAL_CFG
 from Babelor.Process import MessageQueue
 from Babelor.Session import TOMAIL, FTP, FTPD
-from Babelor.DataBase import SQL
+from Babelor.Data import SQL
 # Global Parameters
 MSG_Q_MAX_DEPTH = GLOBAL_CFG["MSG_Q_MAX_DEPTH"]
 CODING = GLOBAL_CFG["CODING"]

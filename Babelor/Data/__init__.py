@@ -14,4 +14,4 @@
 # limitations under the License.
 
 # Inner Required
-from Babelor.DataBase.SQL import SQL
+from Babelor.Data.SQL import SQL

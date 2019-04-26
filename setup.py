@@ -2,10 +2,6 @@
 # System Required
 import codecs
 import os
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
 
 
 def load_rst_file(rst_file_path):
@@ -20,26 +16,27 @@ def load_rst_file(rst_file_path):
 NAME = "Babelor"
 
 # 库包含路径
-PACKAGES = ["Babelor",                  # root/ path            库/根
-            "Babelor/Config",           # root/config path      库/配置层
-            "Babelor/DataBase",         # root/database path    库/数据库层
-            "Babelor/Message",          # root/message path     库/消息层
-            "Babelor/Presentation",     # root/presentation     库/表示层
-            "Babelor/Process",          # root/process          库/处理层
-            "Babelor/Session",          # root/session          库/会话层
-            "Babelor/Tools",            # root/tools            库/工具层
-            ]
+PACKAGES = [
+    "Babelor",                  # root/ path            库/根
+    "Babelor/Config",           # root/config path      库/配置层
+    "Babelor/Data",         # root/data path    库/数据层
+    "Babelor/Message",          # root/message path     库/消息层
+    "Babelor/Presentation",     # root/presentation     库/表示层
+    "Babelor/Process",          # root/process          库/处理层
+    "Babelor/Session",          # root/session          库/会话层
+    "Babelor/Tools",            # root/tools            库/工具层
+]
 
 # 库依赖外部包
 INSTALL_REQUIRED = [
-    "requests>=2.18.4",         # python http connector
-    "beautifulsoup4>=4.6.0",    # python html4 descriptor
-    "SQLAlchemy>=1.2.15",       # python database connector
-    "numpy>=1.15.4",            # python array computing
-    "pandas>=0.23.4",           # python data analysis and statical
-    "python-dateutil>=2.7.5",   # python data util
-    "pyzmq>=17.1.2",            # python binding for 0mq
-    "pyftpdlib>=1.5.4",         # python async ftp server
+    "requests>=2.18.4",         # python http connector         HTTP 连接器
+    "beautifulsoup4>=4.6.0",    # python html4 descriptor       HTML 解释器
+    "SQLAlchemy>=1.2.15",       # python database connector     SQL 连接器
+    "numpy>=1.15.4",            # python array computing                解释器：数组分析
+    "pandas>=0.23.4",           # python data analysis and statical     解释器：关系和标签类数据分析和统计
+    "python-dateutil>=2.7.5",   # python data util              解释器：通用数据结构
+    "pyzmq>=17.1.2",            # python binding for 0mq        消息中间件
+    "pyftpdlib>=1.5.4",         # python async ftp server       FTPD 服务器
 ]
 
 # 库分类
@@ -51,7 +48,7 @@ CLASSIFIERS = [
     # 许可证
     'License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)',
     'License :: OSI Approved :: Apache Software License',
-    # 目标用户群体
+    # 目标用户
     'Intended Audience :: Developers',
     'Intended Audience :: Financial and Insurance Industry',
     'Intended Audience :: Information Technology',
@@ -73,7 +70,7 @@ CLASSIFIERS = [
     'Operating System :: POSIX',
 ]
 
-# 简单描述
+# 简述
 DESCRIPTION = """
 Babelor - a ting integration information service bus library for Python
 =======================================================================
@@ -87,7 +84,7 @@ it has the broader goal of becoming **the most powerful and flexible
 open source integration information message transportation / service
 invocation tool available in any language**.
 """
-
+# 中文简述
 DESCRIPTION_CHN = """
 Babelor - 微型集成信息服务总线 Python 库
 =======================================================================
@@ -107,11 +104,22 @@ else:
 
 # 关键字
 KEYWORDS = "Service Bus"
-AUTHOR = "StrTrek Team Authors"             # 作者
-AUTHOR_EMAIL = "geyuanji@strtrek.com"       # 作者联系邮件
-MAINTAINER = "StrTrek Team Authors"         # 维护者
-MAINTAINER_EMAIL = "geyuanji@strtrek.com"   # 维护者联系邮件
-URL = "http://www.strtrek.com/"             # 项目主页
+
+# 作者
+AUTHOR = "StrTrek Team Authors"
+
+# 作者联系方式
+AUTHOR_EMAIL = "geyuanji@strtrek.com"
+
+# 维护者
+MAINTAINER = "StrTrek Team Authors"
+
+# 维护者联系方式
+MAINTAINER_EMAIL = "geyuanji@strtrek.com"
+
+# 项目主页
+URL = "http://www.strtrek.com/"
+
 # 版本号
 # r"N.N[.N]+[{a|b|c|rc}N[.N]+][.postN][.devN]"
 # N.N           主版本号和副版本号
@@ -139,10 +147,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-# 封库
-setup(name=NAME, version=VERSION, description=DESCRIPTION, long_description=LONG_DESCRIPTION, classifiers=CLASSIFIERS,
-      keywords=KEYWORDS, author=AUTHOR, author_email=AUTHOR_EMAIL, url=URL, license=LICENSE, packages=PACKAGES,
-      include_package_data=True, zip_safe=True, install_requires=INSTALL_REQUIRED,)
+if __name__ == '__main__':
+    # System Required
+    try:
+        from setuptools import setup
+    except ImportError:
+        from distutils.core import setup
+
+    # 封库
+    setup(name=NAME, version=VERSION, description=DESCRIPTION, long_description=LONG_DESCRIPTION, classifiers=CLASSIFIERS,
+          keywords=KEYWORDS, author=AUTHOR, author_email=AUTHOR_EMAIL, url=URL, license=LICENSE, packages=PACKAGES,
+          include_package_data=True, zip_safe=True, install_requires=INSTALL_REQUIRED,)
+
 
 # 外部执行封库命令
 
