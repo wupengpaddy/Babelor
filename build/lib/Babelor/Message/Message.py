@@ -68,9 +68,6 @@ class URL:
         if key in ["netloc"]:
             self._decompose_netloc()
 
-    def __getattr__(self, item):
-        return self.__dict__[item]
-
     def _decompose_netloc(self):
         netloc = self.__dict__["netloc"]
         if not isinstance(netloc, str):
