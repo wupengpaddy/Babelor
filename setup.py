@@ -154,10 +154,10 @@ if __name__ == '__main__':
     except ImportError:
         from distutils.core import setup
 
-    # 封库
-    setup(name=NAME, version=VERSION, description=DESCRIPTION, long_description=LONG_DESCRIPTION, classifiers=CLASSIFIERS,
-          keywords=KEYWORDS, author=AUTHOR, author_email=AUTHOR_EMAIL, url=URL, license=LICENSE, packages=PACKAGES,
-          include_package_data=True, zip_safe=True, install_requires=INSTALL_REQUIRED,)
+    setup(name=NAME, version=VERSION, description=DESCRIPTION, long_description=LONG_DESCRIPTION,
+          classifiers=CLASSIFIERS, keywords=KEYWORDS, author=AUTHOR, author_email=AUTHOR_EMAIL,
+          url=URL, license=LICENSE, packages=PACKAGES, include_package_data=True, zip_safe=True,
+          install_requires=INSTALL_REQUIRED,)             # 封库
 
 
 # 外部执行封库命令

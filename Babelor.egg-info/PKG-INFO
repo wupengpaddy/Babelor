@@ -2,16 +2,17 @@ Metadata-Version: 1.1
 Name: Babelor
 Version: 0.1.1.post1
 Summary: 
-Babelor - a ting data analysis and manipulation library for Python
-=====================================================================
+Babelor - a ting integration information service bus library for Python
+=======================================================================
 
-**Babelor** is a Python package providing fast, flexible, and expressive data
-structures designed to make working with "relational" or "labeled" data both
-easy and intuitive. It aims to be the fundamental high-level building block for
-doing practical, **real world** data analysis in Python. Additionally, it has
-the broader goal of becoming **the most powerful and flexible open source data
-analysis / manipulation tool available in any language**. It is already well on
-its way toward this goal.
+**Babelor** is a Python package providing fast, flexible, and expressive
+integration information service bus structures designed to make working
+with serializable message transportation and service invocation both easy
+and intuitive. It aims to be the fundamental high-level building block for
+doing practical, **real world** data analysis in Python. Additionally, 
+it has the broader goal of becoming **the most powerful and flexible 
+open source integration information message transportation / service
+invocation tool available in any language**.
 
 Home-page: http://www.strtrek.com/
 Author: StrTrek Team Authors

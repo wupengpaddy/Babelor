@@ -9,10 +9,10 @@ Babelor.egg-info/top_level.txt
 Babelor.egg-info/zip-safe
 Babelor/Config/Config.py
 Babelor/Config/__init__.py
-Babelor/DataBase/EXCEL.py
-Babelor/DataBase/HTML.py
-Babelor/DataBase/SQL.py
-Babelor/DataBase/__init__.py
+Babelor/Data/EXCEL.py
+Babelor/Data/HTML.py
+Babelor/Data/SQL.py
+Babelor/Data/__init__.py
 Babelor/Message/Message.py
 Babelor/Message/__init__.py
 Babelor/Presentation/Temple.py
@@ -27,10 +27,6 @@ Babelor/Tools/Conversion.py
 Babelor/Tools/__init__.py
 Babelor/Config/Config.py
 Babelor/Config/__init__.py
-Babelor/DataBase/EXCEL.py
-Babelor/DataBase/HTML.py
-Babelor/DataBase/SQL.py
-Babelor/DataBase/__init__.py
 Babelor/Message/Message.py
 Babelor/Message/__init__.py
 Babelor/Presentation/Temple.py

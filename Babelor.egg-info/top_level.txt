@@ -1,6 +1,6 @@
 Babelor
 Babelor/Config
-Babelor/DataBase
+Babelor/Data
 Babelor/Message
 Babelor/Presentation
 Babelor/Process
