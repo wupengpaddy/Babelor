@@ -2,13 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="be54182a-218b-4e8e-9234-62a7d88d12fc" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/Babelor-协议.vsdx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/Babelor-消息.vsdx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/Babelor-结构.vsdx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/Babelor-设计.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/Babelor-设计.vdx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/Babelor-设计.vsdx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -27,10 +22,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/setup.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="475">
+            <state relative-caret-position="-608">
               <caret line="70" column="1" selection-start-line="70" selection-start-column="1" selection-end-line="70" selection-end-column="1" />
               <folding>
                 <element signature="e#33#46#0" expanded="true" />
@@ -51,11 +46,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="278">
-              <caret line="460" column="49" selection-start-line="460" selection-start-column="49" selection-end-line="460" selection-end-column="49" />
+            <state relative-caret-position="282">
+              <caret line="512" column="42" selection-start-line="512" selection-start-column="42" selection-end-line="512" selection-end-column="42" />
               <folding>
                 <element signature="e#619#630#0" expanded="true" />
                 <element signature="e#1792#15195#0" />
@@ -143,9 +138,9 @@
         <option value="$PROJECT_DIR$/Babelor/Process/__init__.py" />
         <option value="$PROJECT_DIR$/Babelor/Message/Message.py" />
         <option value="$PROJECT_DIR$/Babelor/Process/MQ.py" />
-        <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/setup.py" />
         <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/main.py" />
       </list>
     </option>
   </component>
@@ -171,13 +166,7 @@
             <path>
               <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
               <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-              <item name="docs" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
               <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-              <item name="docs" type="462c0819:PsiDirectoryNode" />
-              <item name="imgs" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
@@ -344,7 +333,7 @@
       <workItem from="1556023869002" duration="4706000" />
       <workItem from="1556106368066" duration="12295000" />
       <workItem from="1556161162184" duration="27719000" />
-      <workItem from="1556287068201" duration="9036000" />
+      <workItem from="1556287068201" duration="12105000" />
     </task>
     <task id="LOCAL-00001" summary="init">
       <created>1551342044292</created>
@@ -357,17 +346,18 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="434364000" />
+    <option name="totallyTimeSpent" value="437433000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1453" height="933" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.15461704" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.15461704" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32876712" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49977323" weight="0.32627645" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49977323" visible="true" weight="0.32627645" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -395,7 +385,7 @@
     <option name="LAST_COMMIT_MESSAGE" value="init" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Babelor$main.coverage" NAME="main Coverage Results" MODIFIED="1556254120163" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Babelor$main.coverage" NAME="main Coverage Results" MODIFIED="1556440860996" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Babelor$Message.coverage" NAME="Message Coverage Results" MODIFIED="1556024917261" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Message" />
   </component>
   <component name="editorHistoryManager">
@@ -588,16 +578,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Babelor/Process/MQ.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-668">
-          <caret line="238" column="54" lean-forward="true" selection-start-line="238" selection-start-column="54" selection-end-line="238" selection-end-column="54" />
-          <folding>
-            <element signature="e#619#630#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Babelor/Message/Message.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="7614">
@@ -628,25 +608,35 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/setup.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-608">
+          <caret line="70" column="1" selection-start-line="70" selection-start-column="1" selection-end-line="70" selection-end-column="1" />
+          <folding>
+            <element signature="e#33#46#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Babelor/Process/MQ.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="259">
+          <caret line="246" column="8" selection-start-line="246" selection-start-column="8" selection-end-line="246" selection-end-column="8" />
+          <folding>
+            <element signature="e#619#630#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="278">
-          <caret line="460" column="49" selection-start-line="460" selection-start-column="49" selection-end-line="460" selection-end-column="49" />
+        <state relative-caret-position="282">
+          <caret line="512" column="42" selection-start-line="512" selection-start-column="42" selection-end-line="512" selection-end-column="42" />
           <folding>
             <element signature="e#619#630#0" expanded="true" />
             <element signature="e#1792#15195#0" />
             <element signature="e#15477#17027#0" />
             <element signature="e#17141#18073#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/setup.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="475">
-          <caret line="70" column="1" selection-start-line="70" selection-start-column="1" selection-end-line="70" selection-end-column="1" />
-          <folding>
-            <element signature="e#33#46#0" expanded="true" />
           </folding>
         </state>
       </provider>

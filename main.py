@@ -418,12 +418,12 @@ order by STOD, STOA
     msg.add_datum(datum=select_date, path="SELECT-DATE")
     msg.add_datum(datum=pvg_afds_sql, path="PVG-AFDS")
     msg.add_datum(datum=pvg_cdm_sql, path="PVG-CDM")
-    msg.origination = URL("oracle://wonder:password@10.169.0.1:1521/oracle")
+    msg.origination = URL("oracle://wonders:password@10.169.0.1:1521/oracle")
     msg.destination = URL("tcp://10.169.0.43:9000")
     msg.treatment = URL("tcp://10.169.0.44:9000")
     msg.case = CASE()
-    msg.case.origination = URL("oracle://wonder:password@10.169.0.1:1521/oracle")
-    msg.case.destination = URL("ftp://user:password@172.21.98.66:21#PASV")
+    msg.case.origination = URL("oracle://username:password@10.169.0.1:1521/oracle")
+    msg.case.destination = URL("ftp://username:password@172.21.98.66:21#PASV")
     mq = MessageQueue(URL("tcp://10.169.0.7:2011"))
     mq.push(msg)
     mq.close()
@@ -456,24 +456,76 @@ def receiver():
     myself.open(role="receiver")
 
 
-def test_push():
+def try_push():
     msg = MSG()
-    msg.origination = URL("tcp://127.0.0.1:2511")
-    mq = MessageQueue("tcp://127.0.0.1:2511")
+    msg.origination = URL("tcp://127.0.0.1:10001")
+    mq = MessageQueue(URL("tcp://127.0.0.1:10001"))
     print("push msg:", msg)
     mq.push(msg)
 
 
-def test_pull():
-    mq = MessageQueue("tcp://*:2511")
+def try_pull():
+    mq = MessageQueue(URL("tcp://*:10001"))
     msg = mq.pull()
     print("pull msg:", msg)
 
 
+def test_push_pull():
+    thread = Thread(target=try_pull)
+    thread.start()
+    try_push()
+
+
+def try_request():
+    msg = MSG()
+    msg.origination = URL("tcp://127.0.0.1:10001")
+    mq = MessageQueue(URL("tcp://127.0.0.1:10001"))
+    print("request msg:", msg)
+    msg = mq.request(msg)
+    print("reply msg:", msg)
+
+
+def try_reply_func(msg: MSG):
+    msg.destination = URL().init("oracle")
+    return msg
+
+
+def try_reply():
+    mq = MessageQueue(URL("tcp://*:10001"))
+    mq .reply(try_reply_func)
+
+
+def test_request_reply():
+    thread = Thread(target=try_reply)
+    thread.start()
+    try_request()
+
+
+def try_publish():
+    msg = MSG()
+    msg.origination = URL("tcp://127.0.0.1:10001")
+    mq = MessageQueue(URL("tcp://*:10001"))
+    print("publish msg:", msg)
+    mq.publish(msg)
+
+
+def try_subscribe():
+    mq = MessageQueue(URL("tcp://127.0.0.1:10001"))
+    msg = mq.subscribe()
+    print("subscribe msg:", msg)
+
+
+def test_publish_subscribe():
+    thread = Thread(target=try_publish)
+    thread.start()
+    time.sleep(2)
+    try_subscribe()
+
+
 if __name__ == '__main__':
-    p1 = Thread(target=test_pull)
-    p1.start()
-    test_push()
+    # test_push_pull()
+    # test_request_reply()
+    test_publish_subscribe()
     # treater()
     # receiver()
     # range_worker(year=2018)

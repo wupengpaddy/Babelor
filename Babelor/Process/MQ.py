@@ -104,7 +104,8 @@ def first_in_last_out(conn: str, me: str, queue_ctrl: Queue, queue_in: Queue, qu
     elif me in ["SUBSCRIBE"]:
         socket = context.socket(zmq.SUB)
         socket.connect(conn)
-        socket.setsockopt(zmq.SUBSCRIBE, '')        # 初次握手订阅
+        # socket.setsockopt(zmq.SUBSCRIBE, '')        # 初次握手订阅
+        socket.setsockopt_string(zmq.SUBSCRIBE, '')
         has_response = False
     else:   # PULL
         socket = context.socket(zmq.PULL)
