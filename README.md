@@ -11,8 +11,8 @@
 
 ## 如何使用本项目
 
-* [部署](https://babelor.readthedocs.io/en/latest/deployment.html)
-* [文档](https://babelor.readthedocs.io)
+* [部署](https://Babelor.readthedocs.io/en/latest/deployment.html)
+* [文档](https://Babelor.readthedocs.io)
 
 
 ## Getting help
