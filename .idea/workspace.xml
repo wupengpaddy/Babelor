@@ -2,31 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="be54182a-218b-4e8e-9234-62a7d88d12fc" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Babelor/Application/demo.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Babelor/Presentation/CASE.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Babelor/Presentation/URL.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Babelor/Presentation/demo.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Babelor/Session/demo.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Babelor/Data/SQL.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Data/SQL.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Babelor/Data/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Data/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Babelor/Message/Message.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Presentation/MSG.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Babelor/Message/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Babelor/Presentation/Temple.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Application/Temple.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Babelor/Presentation/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Presentation/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Babelor/Process/MQ.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Session/MQ.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Babelor/Process/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Application/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Babelor/Session/FTP.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Data/FTP.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Babelor/Session/FTPD.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Data/FTPD.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Babelor/Session/TOMAIL.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Data/TOMAIL.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Babelor/Session/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Session/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Babelor/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/Babelor-2019-Data-Structure.vsdx" beforeDir="false" afterPath="$PROJECT_DIR$/docs/Babelor-2019-Data-Structure.vsdx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/Babelor-2019-Strcture.vsdx" beforeDir="false" afterPath="$PROJECT_DIR$/docs/Babelor-2019-Strcture.vsdx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/Babelor-2019-protocol.vsdx" beforeDir="false" afterPath="$PROJECT_DIR$/docs/Babelor-2019-protocol.vsdx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/imgs/structure/Babelor/Babelor-2019-full-Strcture.png" beforeDir="false" afterPath="$PROJECT_DIR$/docs/imgs/structure/Babelor/Babelor-2019-full-Strcture.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/Babelor-2019-protocol.vsdx" beforeDir="false" afterPath="$PROJECT_DIR$/docs/Babelor-2019-Protocol.vsdx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/imgs/protocol/Babelor-2019-protocol.png" beforeDir="false" afterPath="$PROJECT_DIR$/docs/imgs/protocol/Babelor-2019-protocol.png" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -145,36 +123,6 @@
               <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
               <item name="Babelor" type="462c0819:PsiDirectoryNode" />
               <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-              <item name="Application" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-              <item name="Config" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-              <item name="Data" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-              <item name="Presentation" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-              <item name="Session" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
@@ -366,7 +314,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="441546000" />
+    <option name="totallyTimeSpent" value="442298000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-6" y="-6" width="2263" height="1473" extended-state="6" />
