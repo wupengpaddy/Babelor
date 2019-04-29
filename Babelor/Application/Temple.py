@@ -88,7 +88,7 @@ class TEMPLE:
             self.believer.close()
         except ValueError:
             self.believer.kill()
-        
+
 
 def allocator(conn: URL):
     if conn is None:
@@ -115,9 +115,9 @@ def sender(msg: MSG, queue_ctrl: Queue, func: callable = None):
     """
     # employee
     origination = allocator(msg.origination)
-    destination = allocator(msg.destination)    # MessageQueue
-    treatment = allocator(msg.treatment)        # MessageQueue
-    encryption = allocator(msg.encryption)      # MessageQueue
+    treatment = allocator(msg.treatment)      # MessageQueue
+    encryption = allocator(msg.encryption)    # MessageQueue
+    destination = allocator(msg.destination)  # MessageQueue
 
     def process_msg(msg_orig):
         if encryption is None:
@@ -140,7 +140,10 @@ def sender(msg: MSG, queue_ctrl: Queue, func: callable = None):
         else:
             msg_origination = origination.read(msg)
         msg_out = process_msg(msg_origination)
-        destination.push(msg_out)
+        if isinstance(destination, MessageQueue):
+            destination.push(msg_out)
+        else:
+            destination.write(msg_out)
     else:
         queue_ctrl.close()                 # 队列关闭
         del origination, encryption, treatment, destination
@@ -181,7 +184,10 @@ def treater(msg: MSG, queue_ctrl: Queue, func: callable = None):
     is_active = queue_ctrl.get()                # 控制信号（初始化）
     while is_active:                            # 控制信号（启动）
         if queue_ctrl.empty():                  # 控制信号（无变更），敏捷响应
-            origination.reply(process_msg)
+            if isinstance(destination, MessageQueue):
+                origination.reply(process_msg)
+            else:
+                origination.read(process_msg(msg))
         else:
             is_active = queue_ctrl.get()        # 控制信号（变更）
     else:
