@@ -19,7 +19,7 @@ import os
 import pandas as pd
 from sqlalchemy import create_engine
 # Inner Required
-from Babelor.Message import URL, MSG
+from Babelor.Presentation import URL, MSG
 from Babelor.Config import GLOBAL_CFG
 # Global Parameters
 os.environ['NLS_LANG'] = GLOBAL_CFG["NLS_LANG"]     # 切换中文字符

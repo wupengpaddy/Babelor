@@ -1,8 +1,7 @@
 Babelor
+Babelor/Application
 Babelor/Config
 Babelor/Data
-Babelor/Message
 Babelor/Presentation
-Babelor/Process
 Babelor/Session
 Babelor/Tools

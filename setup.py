@@ -16,27 +16,28 @@ def load_rst_file(rst_file_path):
 NAME = "Babelor"
 
 # 库包含路径
+# Inner Required
 PACKAGES = [
-    "Babelor",                  # root/ path            库/根
-    "Babelor/Config",           # root/config path      库/配置层
+    "Babelor",                  # root/                 库/根
+    "Babelor/Application",      # root/Application      库/应用层
     "Babelor/Data",             # root/data path        库/数据层
-    "Babelor/Presentation",          # root/message path     库/消息层
-    "Babelor/Application",     # root/presentation     库/表示层
-    "Babelor/Process",          # root/process          库/处理层
-    "Babelor/Session",          # root/session          库/会话层
-    "Babelor/Tools",            # root/tools            库/工具层
+    "Babelor/Presentation",     # root/Presentation     库/表示层
+    "Babelor/Session",          # root/Session          库/会话层
+    "Babelor/Config",           # root/Config           库/配置层
+    "Babelor/Tools",            # root/Tools            库/工具层
 ]
 
 # 库依赖外部包
+# Outer Required
 INSTALL_REQUIRED = [
-    "requests>=2.18.4",         # python http connector         HTTP 连接器
-    "beautifulsoup4>=4.6.0",    # python html4 descriptor       HTML 解释器
-    "SQLAlchemy>=1.2.15",       # python database connector     SQL 连接器
+    "requests>=2.18.4",         # python http connector                 HTTP 连接器
+    "beautifulsoup4>=4.6.0",    # python html4 descriptor               HTML 解释器
+    "SQLAlchemy>=1.2.15",       # python database connector             SQL 连接器
     "numpy>=1.15.4",            # python array computing                解释器：数组分析
     "pandas>=0.23.4",           # python data analysis and statical     解释器：关系和标签类数据分析和统计
-    "python-dateutil>=2.7.5",   # python data util              解释器：通用数据结构
-    "pyzmq>=17.1.2",            # python binding for 0mq        消息中间件
-    "pyftpdlib>=1.5.4",         # python async ftp server       FTPD 服务器
+    "python-dateutil>=2.7.5",   # python data util                      解释器：通用数据结构
+    "pyzmq>=17.1.2",            # python binding for 0mq                消息中间件
+    "pyftpdlib>=1.5.4",         # python async ftp server               FTPD 服务器
 ]
 
 # 库分类
@@ -64,6 +65,7 @@ CLASSIFIERS = [
     'Programming Language :: Python :: 3',
     'Programming Language :: Python :: 3.5',
     'Programming Language :: Python :: 3.6',
+    'Programming Language :: Python :: 3.7',
     # 目标操作系统
     'Operating System :: MacOS :: MacOS X',
     'Operating System :: Microsoft :: Windows',
@@ -97,7 +99,7 @@ Babelor - 微型集成信息服务总线 Python 库
 """
 
 # 关键字
-KEYWORDS = "Service Bus"
+KEYWORDS = ["Service Bus", ]
 
 # 作者
 AUTHOR = "StrTrek Team Authors"
@@ -128,7 +130,7 @@ else:
 # N[.N]         阶段主版本号和副版本号(可选)
 # .postN        发行后的更新版本号(可选)
 # .devN         开发期间的发行版本号(可选)
-VERSION = "0.1.1.post1"
+VERSION = "0.1.1.post2"
 
 # 许可证
 LICENSE = """
