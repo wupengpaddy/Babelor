@@ -14,6 +14,7 @@
 # limitations under the License.
 
 # System Required
+from multiprocessing import Queue, Process
 # Outer Required
 # Inner Required
 from Babelor.Application import TEMPLE
@@ -28,28 +29,55 @@ def func_treater(msg_in: MSG):
         attachment = msg_in.read_datum(i)
         if attachment["path"] in data_tuple.keys():
             data_tuple[attachment["path"]] = attachment["stream"]
-    # -———————————————————————————————————------------------------ PROCESS -------
+    # -———————————————————————————————————------------------------ PROCESS ------
     msg_out = msg_in
-    # -———————————————————————————————————------------------------ END -----------
+    # -———————————————————————————————————------------------------ END ----------
+    return msg_out
+
+
+def func_encrypter(msg_in: MSG):
+    # -———————————————————————————————————------------------------ INIT ---------
+    data_tuple = {}
+    for i in range(0, msg_in.nums, 1):
+        attachment = msg_in.read_datum(i)
+        if attachment["path"] in data_tuple.keys():
+            data_tuple[attachment["path"]] = attachment["stream"]
+    # -———————————————————————————————————------------------------ PROCESS ------
+    msg_out = msg_in
+    # -———————————————————————————————————------------------------ END ----------
     return msg_out
 
 
 def sender():
-    myself = TEMPLE(URL("tcp://*:2511"))
+    myself = TEMPLE(URL("tcp://*:3001"))
     myself.open(role="sender")
 
 
 def treater():
-    myself = TEMPLE(URL("tcp://*:2511"))
+    myself = TEMPLE(URL("tcp://*:3002"))
     myself.open(role="treater", func=func_treater)
 
 
+def encrypter():
+    myself = TEMPLE(URL("tcp://*:3003"))
+    myself.open(role="encrypter", func=func_encrypter)
+
+
 def receiver():
-    myself = TEMPLE(URL("tcp://*:2511"))
+    myself = TEMPLE(URL("tcp://*:3004"))
     myself.open(role="receiver")
 
 
 if __name__ == '__main__':
-    sender()
-    # treater()
-    # receiver()
+    temple = {
+        "sender": Process(target=sender),
+        "treater": Process(target=treater),
+        "encrypter": Process(target=encrypter),
+        "receiver": Process(target=receiver),
+    }
+    for obj in temple.items():
+        key, value = obj
+        value.start()
+
+
+

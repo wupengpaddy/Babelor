@@ -348,6 +348,7 @@ def func_treatment(msg: MSG):
     msg_out.add_datum(pvg.to_msgpack(), "{0}.xlsx".format(select_date.replace("-", "")))
     # ————————————————————————————————————————--------------- PROCESS :: 3 -
     del pvg
+    msg.destination = msg.case.destination
     return msg_out
 
 
