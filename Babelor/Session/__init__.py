@@ -14,4 +14,4 @@
 # limitations under the License.
 
 # Inner Required
-from Babelor.Session.TOMAIL import TOMAIL
+from Babelor.Session.MQ import MessageQueue

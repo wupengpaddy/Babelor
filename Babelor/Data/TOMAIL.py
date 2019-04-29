@@ -21,7 +21,7 @@ from email.mime.base import MIMEBase
 from email.headerregistry import Address
 from email import encoders
 # 内部依赖
-from Babelor.Message import URL, MSG
+from Babelor.Presentation import URL, MSG
 from Babelor.Config import GLOBAL_CFG
 # 全局参数
 CODING = GLOBAL_CFG["CODING"]

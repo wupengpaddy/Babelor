@@ -19,31 +19,30 @@ from queue import Queue
 from threading import Thread
 # Outer Required
 # Inner Required
-from Babelor.Message import URL, MSG
+from Babelor.Presentation import URL, MSG
 from Babelor.Config import GLOBAL_CFG
-from Babelor.Process import MessageQueue
-from Babelor.Session import TOMAIL, FTP, FTPD
-from Babelor.Data import SQL
+from Babelor.Session import MessageQueue
+from Babelor.Data import SQL, FTP, FTPD, TOMAIL
 # Global Parameters
 MSG_Q_MAX_DEPTH = GLOBAL_CFG["MSG_Q_MAX_DEPTH"]
 CODING = GLOBAL_CFG["CODING"]
 BlockingTime = GLOBAL_CFG["MSG_Q_BlockingTime"]
 
 
-def mine(conn: URL, queue_ctrl: Queue, queue_out: Queue):
+def priest(conn: URL, queue_ctrl: Queue, queue: Queue):
     mq = MessageQueue(conn)
     is_active = queue_ctrl.get()
     while is_active:
         if queue_ctrl.empty():
-            while queue_out.full():
+            while queue.full():
                 time.sleep(BlockingTime)
             else:
-                queue_out.put(mq.pull())
+                queue.put(mq.pull())
         else:
             is_active = queue_ctrl.get()
     else:
         queue_ctrl.join()
-        queue_out.join()
+        queue.join()
         mq.close()
         del mq
 
@@ -52,38 +51,38 @@ class TEMPLE:
     def __init__(self, conn: URL):
         # conn = "tcp://*:port"
         self.me = conn
-        self.__queue_mine = Queue(MSG_Q_MAX_DEPTH)
+        self._queue_priest = Queue(MSG_Q_MAX_DEPTH)
         self.__queue_mine_ctrl = Queue(MSG_Q_MAX_DEPTH)
-        self.__queue_process_ctrl = Queue(MSG_Q_MAX_DEPTH)              # 角色进程控制队列
-        self.__queue_mine_ctrl.put(True)
+        self.__queue_priest_ctrl = Queue(MSG_Q_MAX_DEPTH)              # 角色进程控制队列
+        self.__queue_priest_ctrl.put(True)
         self.process = None                                             # 角色进程
-        self.mine = Thread(target=mine, args=(self.me, self.__queue_mine_ctrl, self.__queue_mine))
+        self.priest = Thread(target=priest, args=(self.me, self.__queue_mine_ctrl, self._queue_priest))
 
     def open(self, role: str, func: callable = None):
-        self.mine.setDaemon(False)
-        self.mine.start()
+        self.priest.setDaemon(False)
+        self.priest.start()
 
-        while self.__queue_mine.empty():
+        while self._queue_priest.empty():
             time.sleep(BlockingTime)
         else:
-            msg = self.__queue_mine.get()
+            msg = self._queue_priest.get()
             print("temple CFC receiver:", msg)
-            self.__queue_process_ctrl.put(True)
+            self.__queue_priest_ctrl.put(True)
             if role in ["sender"]:
-                self.process = Thread(target=sender, args=(msg, self.__queue_process_ctrl, func))
+                self.process = Thread(target=sender, args=(msg, self.__queue_priest_ctrl, func))
             elif role in ["treater"]:
-                self.process = Thread(target=treater, args=(msg, self.__queue_process_ctrl, func))
+                self.process = Thread(target=treater, args=(msg, self.__queue_priest_ctrl, func))
             elif role in ["encrypter"]:
-                self.process = Thread(target=encrypter, args=(msg, self.__queue_process_ctrl, func))
+                self.process = Thread(target=encrypter, args=(msg, self.__queue_priest_ctrl, func))
             elif role in ["receiver"]:
-                self.process = Thread(target=receiver, args=(msg, self.__queue_process_ctrl, func))
+                self.process = Thread(target=receiver, args=(msg, self.__queue_priest_ctrl, func))
             else:       # default
-                self.process = Thread(target=receiver, args=(msg, self.__queue_process_ctrl, func))
+                self.process = Thread(target=receiver, args=(msg, self.__queue_priest_ctrl, func))
             self.process.setDaemon(False)
             self.process.start()
 
     def close(self):
-        self.__queue_process_ctrl.put(False)
+        self.__queue_priest_ctrl.put(False)
 
 
 def allocator(conn: URL):

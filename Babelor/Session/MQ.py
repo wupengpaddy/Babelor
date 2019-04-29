@@ -17,7 +17,7 @@
 import time
 from multiprocessing import Queue, Process
 # Inner Required
-from Babelor.Message import MSG, URL
+from Babelor.Presentation import MSG, URL
 from Babelor.Config import GLOBAL_CFG
 # Global Parameters
 MSG_Q_MAX_DEPTH = GLOBAL_CFG["MSG_Q_MAX_DEPTH"]

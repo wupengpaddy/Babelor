@@ -14,4 +14,6 @@
 # limitations under the License.
 
 # Inner Required
-from Babelor.Presentation.Temple import TEMPLE
+from Babelor.Presentation.MSG import MSG
+from Babelor.Presentation.CASE import CASE
+from Babelor.Presentation.URL import URL

@@ -16,11 +16,9 @@
 # System Required
 import time
 import datetime
-from queue import Queue
-from threading import Thread
 # Outer Required
 import pandas as pd
-from Babelor import MSG, URL, CASE, TEMPLE, MessageQueue
+from Babelor import MSG, URL, CASE, MessageQueue
 # Inner Required
 # Global Parameters
 DateFormat = '%Y-%m-%d'
@@ -353,7 +351,7 @@ def func_treatment(msg: MSG):
     return msg_out
 
 
-def priest(select_date: str):
+def pvg2flight_quality_analysis(select_date: str):
     # 数据范围
     start_date = datetime.datetime.strptime(select_date, DateFormat) - datetime.timedelta(days=7)
     end_date = datetime.datetime.strptime(select_date, DateFormat) + datetime.timedelta(days=1)
@@ -438,94 +436,8 @@ def range_worker(year: int):
     # 时间遍历
     for i in range((end_date - begin_date).days + 1):
         select_date = begin_date + datetime.timedelta(days=i)
-        priest(select_date.strftime(DateFormat))
-
-
-def sender():
-    myself = TEMPLE(URL("tcp://*:2511"))
-    myself.open(role="sender")
-
-
-def treater():
-    myself = TEMPLE(URL("tcp://*:2511"))
-    myself.open(role="treater", func=func_treatment)
-
-
-def receiver():
-    myself = TEMPLE(URL("tcp://*:2511"))
-    myself.open(role="receiver")
-
-
-def try_push():
-    msg = MSG()
-    msg.origination = URL("tcp://127.0.0.1:10001")
-    mq = MessageQueue(URL("tcp://127.0.0.1:10001"))
-    print("push msg:", msg)
-    mq.push(msg)
-
-
-def try_pull():
-    mq = MessageQueue(URL("tcp://*:10001"))
-    msg = mq.pull()
-    print("pull msg:", msg)
-
-
-def test_push_pull():
-    thread = Thread(target=try_pull)
-    thread.start()
-    try_push()
-
-
-def try_request():
-    msg = MSG()
-    msg.origination = URL("tcp://127.0.0.1:10001")
-    mq = MessageQueue(URL("tcp://127.0.0.1:10001"))
-    print("request msg:", msg)
-    msg = mq.request(msg)
-    print("reply msg:", msg)
-
-
-def try_reply_func(msg: MSG):
-    msg.destination = URL().init("oracle")
-    return msg
-
-
-def try_reply():
-    mq = MessageQueue(URL("tcp://*:10001"))
-    mq .reply(try_reply_func)
-
-
-def test_request_reply():
-    thread = Thread(target=try_reply)
-    thread.start()
-    try_request()
-
-
-def try_publish():
-    msg = MSG()
-    msg.origination = URL("tcp://127.0.0.1:10001")
-    mq = MessageQueue(URL("tcp://*:10001"))
-    print("publish msg:", msg)
-    mq.publish(msg)
-
-
-def try_subscribe():
-    mq = MessageQueue(URL("tcp://127.0.0.1:10001"))
-    msg = mq.subscribe()
-    print("subscribe msg:", msg)
-
-
-def test_publish_subscribe():
-    thread = Thread(target=try_publish)
-    thread.start()
-    time.sleep(2)
-    try_subscribe()
+        pvg2flight_quality_analysis(select_date.strftime(DateFormat))
 
 
 if __name__ == '__main__':
-    # test_push_pull()
-    # test_request_reply()
-    test_publish_subscribe()
-    # treater()
-    # receiver()
-    # range_worker(year=2018)
+    range_worker(year=2018)
