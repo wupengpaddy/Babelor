@@ -36,7 +36,7 @@ class FTP:
         self.conn = self.__dict__["conn"].check
 
     def write(self, msg: MSG):
-        ftp = self.ftp_client()
+        ftp = self.open()
         for i in range(0, msg.nums, 1):
             attachment = msg.read_datum(i)
             ftp.storbinary('STOR ' + attachment["path"].split("/")[-1], attachment["stream"], BUFFER_SIZE)  # 上传文件
@@ -45,7 +45,7 @@ class FTP:
     def read(self, msg: MSG):
         new_msg = msg
         new_msg.nums = 0
-        ftp = self.ftp_client()
+        ftp = self.open()
         for i in range(0, msg.nums, 1):
             attachment = msg.read_datum(i)
             ftp.retrbinary('RETR ' + attachment.split("/")[-1], attachment["stream"], BUFFER_SIZE)  # 下载文件
@@ -53,10 +53,10 @@ class FTP:
         ftp.close()
         return new_msg
 
-    def ftp_client(self):
+    def open(self):
         ftp = ftplib.FTP()
         ftp.connect(self.conn.hostname, self.conn.port)      # 连接
         ftp.login(self.conn.username, self.conn.password)    # 登录
-        if "PASV" in self.conn.fragment:                     # 被动模式
+        if str(self.conn.fragment) in ["PASV"]:              # 被动模式
             ftp.set_pasv(True)
         return ftp

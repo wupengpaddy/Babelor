@@ -38,6 +38,7 @@ INSTALL_REQUIRED = [
     "python-dateutil>=2.7.5",   # python data util                      解释器：通用数据结构
     "pyzmq>=17.1.2",            # python binding for 0mq                消息中间件
     "pyftpdlib>=1.5.4",         # python async ftp server               FTPD 服务器
+    "xlrd>=1.2.0",              # python excel file connector           EXCEL 连接器
 ]
 
 # 库分类
