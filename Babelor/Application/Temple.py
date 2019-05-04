@@ -115,66 +115,74 @@ def sender(msg: MSG, queue_ctrl: Queue, func: callable = None):
     :param func: callable       # 自定义处理过程
     :return: None
     """
-    # flow path
-    origination = allocator(msg.origination)  # Data.read(msg)
-    treatment = allocator(msg.treatment)      # MessageQueue
-    encryption = allocator(msg.encryption)    # MessageQueue
-    destination = allocator(msg.destination)  # MessageQueue
-
-    def process_msg(msg_orig):
-        if encryption is None:
-            msg_encryption = msg_orig
-        else:
-            msg_encryption = encryption.request(msg_orig)
-        if treatment is None:
-            msg_treatment = msg_encryption
-        else:
-            msg_treatment = treatment.request(msg_encryption)
-        if func is None:
-            return msg_treatment
-        else:
-            return func(msg_treatment)
-
-    is_active = queue_ctrl.get()            # 控制信号（初始化）
-    if is_active:                           # 控制信号（启动）
-        if origination is None:
-            msg_origination = msg
-        else:
+    # init
+    origination = allocator(msg.origination)    # Data.read(msg)
+    treatment = allocator(msg.treatment)        # MessageQueue
+    encryption = allocator(msg.encryption)      # MessageQueue
+    destination = allocator(msg.destination)    # MessageQueue
+    # Control Flow
+    is_active = queue_ctrl.get()                # 控制信号（初始化）
+    if is_active:                               # 控制信号（启动）
+        if queue_ctrl.empty():                  # 控制信号（无变更），敏捷响应
             msg_origination = origination.read(msg)
-        msg_out = process_msg(msg_origination)
-        destination.push(msg_out)
+            # -----------------------------------------------------
+            if encryption is None:
+                msg_encryption = msg_origination
+            else:
+                msg_encryption = encryption.request(msg_origination)
+            del msg_origination
+            # ------------------------------------------------------
+            if treatment is None:
+                msg_treatment = msg_encryption
+            else:
+                msg_treatment = treatment.request(msg_encryption)
+            del msg_encryption
+            # ------------------------------------------------------
+            if func is None:
+                msg_function = msg_treatment
+            else:
+                msg_function = func(msg_treatment)
+            del msg_treatment
+            # ------------------------------------------------------
+            destination.push(msg_function)
+        else:
+            is_active = queue_ctrl.get()
     else:
         queue_ctrl.close()                 # 队列关闭
         del origination, encryption, treatment, destination
 
 
 def receiver(msg: MSG, queue_ctrl: Queue, func: callable = None):
-    # flow path
+    # init
     origination = allocator(msg.origination)    # MessageQueue
     treatment = allocator(msg.treatment)        # MessageQueue
     encryption = allocator(msg.encryption)      # MessageQueue
     destination = allocator(msg.destination)    # Data.write
-
-    def process_msg(msg_in):
-        if encryption is None:
-            msg_encryption = msg_in
-        else:
-            msg_encryption = encryption.request(msg_in)
-        if treatment is None:
-            msg_treatment = msg_encryption
-        else:
-            msg_treatment = treatment.request(msg_encryption)
-        if func is None:
-            return msg_treatment
-        else:
-            return func(msg_treatment)
-
+    # Control Flow
     is_active = queue_ctrl.get()                # 控制信号（初始化）
     while is_active:                            # 控制信号（启动）
         if queue_ctrl.empty():                  # 控制信号（无变更），敏捷响应
             msg_origination = origination.pull()
-            msg_out = process_msg(msg_origination)
-            destination.write(msg_out)
+            # -----------------------------------------------------
+            if encryption is None:
+                msg_encryption = msg_origination
+            else:
+                msg_encryption = encryption.request(msg_origination)
+            del msg_origination
+            # ------------------------------------------------------
+            if treatment is None:
+                msg_treatment = msg_encryption
+            else:
+                msg_treatment = treatment.request(msg_encryption)
+            del msg_encryption
+            # ------------------------------------------------------
+            if func is None:
+                msg_function = msg_treatment
+            else:
+                msg_function = func(msg_treatment)
+            del msg_treatment
+            # ------------------------------------------------------
+            destination.write(msg_function)
         else:
             is_active = queue_ctrl.get()        # 控制信号（变更）
     else:
@@ -189,38 +197,71 @@ def treater(msg: MSG, queue_ctrl: Queue, func: callable = None):
     :param func: callable       # 自定义处理过程
     :return: None
     """
-    # flow path
+    # init
     origination = allocator(msg.origination)    # Data.read()
     treatment = allocator(msg.treatment)        # MessageQueue
     encryption = allocator(msg.encryption)      # MessageQueue
     destination = allocator(msg.destination)    # Data.write()
 
-    def process_msg(msg_in):
+    def process_msg(msg_orig):
         if encryption is None:
-            msg_encryption = msg_in
+            msg_encry = msg_orig
         else:
-            msg_encryption = encryption.request(msg_in)
+            msg_encry = encryption.request(msg_orig)
+        # ------------------------------------------------------
         if treatment is None:
-            msg_treatment = msg_encryption
+            msg_treat = msg_encry
         else:
-            msg_treatment = treatment.request(msg_encryption)
+            msg_treat = treatment.request(msg_encry)
+        del msg_encry
+        # ------------------------------------------------------
         if func is None:
-            msg_func = msg_treatment
+            msg_func = msg_treat
         else:
-            msg_func = func(msg_treatment)
+            msg_func = func(msg_treat)
+        del msg_treat
+        # ------------------------------------------------------
         if destination is None:
             pass
         else:
-            destination.push(msg_func)
+            if isinstance(destination, MessageQueue):
+                destination.push(msg_func)
+            else:
+                destination.write(msg_func)
         return msg_func
 
+    # Control Flow
     is_active = queue_ctrl.get()                # 控制信号（初始化）
     while is_active:                            # 控制信号（启动）
         if queue_ctrl.empty():                  # 控制信号（无变更），敏捷响应
-            if isinstance(destination, MessageQueue):
+            # ------------------------------------------------------
+            if isinstance(origination, MessageQueue):
                 origination.reply(process_msg)
             else:
-                origination.read(process_msg(msg))
+                msg_origination = origination.read(msg)
+                # ------------------------------------------------------
+                if encryption is None:
+                    msg_encryption = msg_origination
+                else:
+                    msg_encryption = encryption.request(msg_origination)
+                del msg_origination
+                # ------------------------------------------------------
+                if treatment is None:
+                    msg_treatment = msg_encryption
+                else:
+                    msg_treatment = treatment.request(msg_encryption)
+                del msg_encryption
+                # ------------------------------------------------------
+                if func is None:
+                    msg_function = msg_treatment
+                else:
+                    msg_function = func(msg_treatment)
+                del msg_treatment
+                # ------------------------------------------------------
+                if isinstance(destination, MessageQueue):
+                    destination.push(msg_function)
+                else:
+                    destination.write(msg_function)
         else:
             is_active = queue_ctrl.get()        # 控制信号（变更）
     else:

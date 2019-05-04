@@ -15,6 +15,7 @@
 
 # System Required
 import os
+import base64
 # Outer Required
 # Inner Required
 from Babelor.Presentation import URL, MSG
@@ -32,8 +33,12 @@ class FILE:
         self.conn = self.__dict__["conn"].check
 
     def read(self, msg: MSG):
-        msg_new = msg
-        return msg_new
+        with open(self.conn.path, "rb") as f:
+            stream = base64.b64encode(f.read())
+            msg.add_datum(datum=stream, path=self.conn.path)
+        return msg
 
     def write(self, msg: MSG):
-        pass
+        for i in range(0, msg.nums, 1):
+            stream = msg.read_datum(i)
+            f = base64.b64decode(stream["stream"])
