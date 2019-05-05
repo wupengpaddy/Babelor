@@ -43,22 +43,22 @@ def null_keep(item: object, item_type: classmethod = str) -> object:
 
 class MSG:
     def __init__(self, msg=None):
-        self.timestamp = current_datetime()     # 时间戳
-        self.origination = None                 # 来源节点
-        self.destination = None                 # 目标节点
-        self.case = None                        # 案例
-        self.activity = None                    # 事件
-        self.treatment = None                   # 计算节点
-        self.encryption = None                  # 加/解密节点
-        self.nums = 0                           # 文件数量
-        self.coding = None                      # 编码
-        self.dtype = None                      # 格式
-        self.stream = None                      # 流
-        self.path = None                        # 路径
+        self.timestamp = current_datetime()     # 时间戳        -   Time Stamp
+        self.origination = None                 # 来源节点      -   Source Node
+        self.destination = None                 # 目标节点      -   Target Node
+        self.case = None                        # 实例          -   Instance
+        self.activity = None                    # 步骤          -   Step in Instance
+        self.treatment = None                   # 计算节点      -   Computing Node
+        self.encryption = None                  # 加/解密节点   -   Encrypted Node
+        self.nums = 0                           # 参数个数      -   Number of Arguments
+        self.coding = None                      # 文字编码      -   Character Coding
+        self.dtype = None                       # 数据编码      -   Data Encoding
+        self.stream = None                      # 数据流        -   Data Stream
+        self.path = None                        # 路径          -   Path
         if isinstance(msg, str):
-            if MSG_TYPE is "json":
+            if MSG_TYPE in ["json"]:
                 self.from_json(msg)
-            elif MSG_TYPE is "xml":
+            elif MSG_TYPE in ["xml"]:
                 self.from_xml(msg)
             else:
                 raise NotImplementedError("仅支持 xml 和 json 类消息")
@@ -88,20 +88,20 @@ class MSG:
     def to_dict(self):
         return {
             "head": {
-                "timestamp": self.timestamp,        # 时间戳
-                "origination": self.origination,    # 来源    -   节点
-                "destination": self.destination,    # 目标    -   节点
-                "treatment": self.treatment,        # 计算    -   节点
-                "encryption": self.encryption,      # 加/解密  -  节点
-                "case": self.case,
-                "activity": self.activity,
+                "timestamp": self.timestamp,        # 时间戳        -   Time Stamp
+                "origination": self.origination,    # 来源节点      -   Source Node
+                "destination": self.destination,    # 目标节点      -   Target Node
+                "treatment": self.treatment,        # 计算节点      -   Computing Node
+                "encryption": self.encryption,      # 加/解密节点   -   Encrypted Node
+                "case": self.case,                  # 实例          -   Instance
+                "activity": self.activity,          # 步骤          -   Step in Instance
             },
             "body": {
-                "nums": self.nums,
-                "coding": self.coding,
-                "dtype": self.dtype,
-                "path": self.path,
-                "stream": self.stream,
+                "nums": self.nums,                  # 参数个数      -   Number of Arguments
+                "coding": self.coding,              # 文字编码      -   Character Coding
+                "dtype": self.dtype,                # 数据编码      -   Data Encoding
+                "path": self.path,                  # 路径          -   Path
+                "stream": self.stream,              # 数据流        -   Data Stream
             },
         }
 
@@ -131,7 +131,7 @@ class MSG:
         elif MSG_TYPE is "xml":
             return self.to_xml()
         else:
-            raise NotImplementedError("仅支持 xml 和 json 类消息")
+            raise NotImplementedError("Support xml and json pattern only.")
 
     def to_json(self):
         return dict2json(self.to_serialize())
@@ -145,9 +145,8 @@ class MSG:
                 self.__dict__[key] = null_keep(item[key], datum_type)
             else:
                 self.__dict__[key] = None
-
         if not isinstance(msg, dict):
-            raise AttributeError("参数类型错误")
+            raise AttributeError("{0} is not dict type.".format(str(msg)))
         if "head" in msg.keys():
             # set timestamp from msg
             _value_check("timestamp", msg["head"])
@@ -283,23 +282,4 @@ def stream_to_datum(stream, coding=None, dtype=None):
         elif dtype in ["str"]:
             return stream
         else:
-            raise NotImplementedError("不支持此类型{0}".format(dtype))
-
-
-def check_success_reply_msg(*args) -> bool:
-    # Function Input Check
-    if len(args) > 1:
-        raise AttributeError("输入参数过多")
-    if isinstance(args[0], str):
-        msg = MSG(args[0])
-    elif isinstance(args[0], MSG):
-        msg = args[0]
-    else:
-        raise ValueError("未知的数据类型")
-    if isinstance(msg.data, dict):
-        if "SUCCESS" in msg.data.keys():
-            return msg.data["SUCCESS"]
-        else:
-            return False
-    else:
-        return False
+            raise NotImplementedError("Not support type:{0}".format(dtype))

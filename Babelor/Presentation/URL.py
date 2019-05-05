@@ -196,10 +196,10 @@ class URL:
             check_url.scheme = "oracle+cx_oracle"
             default_port = 1521
         if self.scheme in ["ftp", "ftpd"]:
-            # "ftp://<username>:<password>@<hostname>:<port>/<path>;<params>#?model=PASV
-            # "ftp://<username>:<password>@<hostname>:21/<path>;<params>#?model=PASV
-            # "ftp://<username>:<password>@<hostname>:<port>/<path>;<params>"
-            # "ftp://<username>:<password>@<hostname>:21/<path>;<params>#?model=PORT
+            # "ftp://<username>:<password>@<hostname>:<port>#?model=PASV
+            # "ftp://<username>:<password>@<hostname>:21#?model=PASV
+            # "ftp://<username>:<password>@<hostname>:<port>"
+            # "ftp://<username>:<password>@<hostname>:21#?model=PORT
             default_port = 21
         if self.scheme in ["smtp"]:
             # "smtp://<username>:<password>@<hostname>:<port>"
@@ -232,7 +232,7 @@ class URL:
 
     def init(self, scheme=None):
         if scheme in ["ftp"]:
-            self.__init__("ftp://username:password@hostname:port/path#?model=PASV")
+            self.__init__("ftp://username:password@hostname:port#?model=PASV")
         if scheme in ["ftpd"]:
             self.__init__("ftpd://username:password@hostname:port/path#?model=PASV")
         if scheme in ["mysql"]:
