@@ -14,17 +14,21 @@
 # limitations under the License.
 
 # System Required
+from datetime import datetime
 from urllib.parse import unquote, quote
 # Outer Required
 # Inner Required
 from Babelor.Config import GLOBAL_CFG
 from Babelor.Presentation import URL
-from Babelor.Presentation.MSG import current_datetime
 # Global Parameters
 DatetimeFmt = GLOBAL_CFG["DatetimeFormat"]
 PortFmt = GLOBAL_CFG["PortFormat"]
 CODING = GLOBAL_CFG["CODING"]
 MSG_TYPE = GLOBAL_CFG["MSG_TYPE"]
+
+
+def current_datetime() -> str:
+    return datetime.now().strftime(DatetimeFmt)
 
 
 class CASE:

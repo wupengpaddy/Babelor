@@ -11,6 +11,9 @@
 * [Deploy Babelor](https://babelor.readthedocs.io/en/latest/deployment.html)
 * [Documentation](https://babelor.readthedocs.io)
 
+[RFC3986:URI](https://tools.ietf.org/rfc/rfc3986.txt); [RFC793:TCP](https://tools.ietf.org/rfc/rfc793.txt); [RFC3208:PGM](https://tools.ietf.org/rfc/rfc3208.txt); [RFC959:FTP](https://tools.ietf.org/rfc/rfc959.txt); [RFC5321:SMTP](https://tools.ietf.org/rfc/rfc5321.txt); [RFC1081:POP](https://tools.ietf.org/rfc/rfc1081.txt)
+
+
 ## 如何使用本项目
 
 * [部署](https://Babelor.readthedocs.io/en/latest/deployment.html)

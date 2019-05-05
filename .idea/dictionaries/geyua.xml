@@ -21,6 +21,7 @@
       <w>healthcare</w>
       <w>iata</w>
       <w>icao</w>
+      <w>jdcal</w>
       <w>lgpl</w>
       <w>openpyxl</w>
       <w>orcl</w>
@@ -43,6 +44,7 @@
       <w>unparse</w>
       <w>xlrd</w>
       <w>xlsx</w>
+      <w>xmlfile</w>
       <w>zspd</w>
     </words>
   </dictionary>
