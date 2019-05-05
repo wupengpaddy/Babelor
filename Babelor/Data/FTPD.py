@@ -40,7 +40,7 @@ class FTPD:
     def ftp_server(self):
         authorizer = DummyAuthorizer()
         authorizer.add_user(self.conn.username, self.conn.password, self.conn.path, perm='elradfmwM')
-        handler = FTPHandler
+        handler = FTPDHandler
         handler.authorizer = authorizer
         handler.banner = BANNER
         if "*" in self.conn.hostname:
@@ -57,3 +57,13 @@ class FTPD:
         server.max_cons = MAX_CONS
         server.max_cons_per_ip = MAX_CONS_PER_IP
         server.serve_forever()
+
+
+class FTPDHandler(FTPHandler):
+    def on_file_received(self, file):
+        # do something when a file has been received
+        pass
+
+    def on_file_sent(self, file):
+        # do something when a file has been received
+        pass
