@@ -16,7 +16,7 @@
 # System Required
 # Outer Required
 # Inner Required
-from Babelor.Presentation import URL, CASE, MSG
+from Babelor.Presentation import URL, MSG, CASE
 # Global Parameters
 
 
@@ -71,7 +71,7 @@ def demo_ftp_url():
     print("服务地址", url.hostname)
     print("服务端口", url.port)
     print("服务路径", url.path)
-    print("服务模式", url.fragment)
+    print("服务模式", url.fragment.query["model"])
 
 
 def demo_tcp_url():
@@ -112,9 +112,9 @@ def demo_msg_mysql2ftp():
 
 
 if __name__ == '__main__':
-    # demo_tomail_url()
-    # demo_ftp_url()
-    # demo_mysql_url()
+    demo_tomail_url()
+    demo_ftp_url()
+    demo_mysql_url()
     demo_oracle_url()
-    # demo_tcp_url()
+    demo_tcp_url()
     # demo_msg_mysql2ftp()

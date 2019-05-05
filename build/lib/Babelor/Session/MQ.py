@@ -21,6 +21,7 @@ from Babelor.Presentation import MSG, URL
 from Babelor.Config import GLOBAL_CFG
 # Global Parameters
 MSG_Q_MAX_DEPTH = GLOBAL_CFG["MSG_Q_MAX_DEPTH"]
+CTRL_Q_MAX_DEPTH = GLOBAL_CFG["CTRL_Q_MAX_DEPTH"]
 CODING = GLOBAL_CFG["CODING"]
 BlockingTime = GLOBAL_CFG["MSG_Q_BlockingTime"]
 
@@ -150,12 +151,12 @@ class MessageQueue:
         if self.conn.scheme not in ["tcp", "pgm", "inproc"]:       # 协议（校验）
             raise ValueError("Invalid scheme{0}.".format(self.conn.scheme))
         self.conn = self.conn.check   # 默认端口（校验）
-        self.__queue_in = Queue(MSG_Q_MAX_DEPTH)    # 进站队列（初始化）
-        self.__queue_out = Queue(MSG_Q_MAX_DEPTH)   # 出站队列（初始化）
-        self.__queue_ctrl = Queue(MSG_Q_MAX_DEPTH)  # 控制队列（初始化）
-        self.active = False                         # 激活状态（初始 不激活）
-        self.__initialed = None                     # 已初始化模式
-        self.process = None                         # 队列控制进程
+        self.__queue_in = Queue(MSG_Q_MAX_DEPTH)     # 进站队列（初始化）
+        self.__queue_out = Queue(MSG_Q_MAX_DEPTH)    # 出站队列（初始化）
+        self.__queue_ctrl = Queue(CTRL_Q_MAX_DEPTH)  # 控制队列（初始化）
+        self.active = False                          # 激活状态（初始 不激活）
+        self.__initialed = None                      # 已初始化模式
+        self.process = None                          # 队列控制进程
 
     def release(self):
         if self.active:                             # 激活状态
@@ -169,11 +170,11 @@ class MessageQueue:
                 except ValueError:
                     self.process.kill()                     # 进程释放（硬释放）
                 self.process = None
-                self.__queue_in = Queue(MSG_Q_MAX_DEPTH)    # 进站队列（初始化）
-                self.__queue_out = Queue(MSG_Q_MAX_DEPTH)   # 出站队列（初始化）
-                self.__queue_ctrl = Queue(MSG_Q_MAX_DEPTH)  # 控制队列（初始化）
-                self.__initialed = None                     # 已初始化模式（无模式，初始化）
-                self.active = False                         # 激活状态（未激活，初始化）
+                self.__queue_in = Queue(MSG_Q_MAX_DEPTH)     # 进站队列（初始化）
+                self.__queue_out = Queue(MSG_Q_MAX_DEPTH)    # 出站队列（初始化）
+                self.__queue_ctrl = Queue(CTRL_Q_MAX_DEPTH)  # 控制队列（初始化）
+                self.__initialed = None                      # 已初始化模式（无模式，初始化）
+                self.active = False                          # 激活状态（未激活，初始化）
         else:
             pass
 

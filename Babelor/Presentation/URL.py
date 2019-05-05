@@ -205,18 +205,20 @@ class URL:
             # "smtp://<username>:<password>@<hostname>:<port>"
             # "smtp://<username>:<password>@<hostname>:25"
             default_port = 25
-        # "pop3://username:password@hostname:port"
         if self.scheme in ["pop3"]:
-            # "pop3://username:password@hostname:port"
+            # "pop://<username>:<password>@<hostname>:<port>"
+            # "pop://<username>:<password>@<hostname>:110"
             default_port = 110
-        # "http://username:password@hostname:port"
         if self.scheme in ["http"]:
-            # "http://username:password@hostname:port"
+            # "http://<username>:<password>@<hostname>:<port>"
+            # "http://<username>:<password>@<hostname>:80"
             default_port = 80
-        # "file://username:password@hostname:port/path"
         if self.scheme in ["file"]:
-            # "file://username:password@hostname/path"
+            # "file://<username>:<password>@<hostname>/<path>"
             default_port = None
+        if self.scheme in ["tcp"]:
+            # "tcp://<hostname>:<port>"
+            default_port = 10001
         # ----------------------------------------------------------------------
         if re.match(PortFmt, str(self.port)) is None:
             if default_port is not None:

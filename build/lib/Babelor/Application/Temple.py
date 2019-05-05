@@ -15,34 +15,34 @@
 
 # System Required
 import time
-from queue import Queue
-from threading import Thread
+from multiprocessing import Queue, Process
 # Outer Required
 # Inner Required
 from Babelor.Presentation import URL, MSG
 from Babelor.Config import GLOBAL_CFG
 from Babelor.Session import MessageQueue
-from Babelor.Data import SQL, FTP, FTPD, TOMAIL
+from Babelor.Data import SQL, FTP, FTPD, TOMAIL, FILE
 # Global Parameters
 MSG_Q_MAX_DEPTH = GLOBAL_CFG["MSG_Q_MAX_DEPTH"]
+CTRL_Q_MAX_DEPTH = GLOBAL_CFG["CTRL_Q_MAX_DEPTH"]
 CODING = GLOBAL_CFG["CODING"]
 BlockingTime = GLOBAL_CFG["MSG_Q_BlockingTime"]
 
 
-def priest(conn: URL, queue_ctrl: Queue, queue: Queue):
+def priest(conn: URL, queue_ctrl: Queue, queue_in: Queue):
     mq = MessageQueue(conn)
     is_active = queue_ctrl.get()
     while is_active:
         if queue_ctrl.empty():
-            while queue.full():
+            while queue_in.full():
                 time.sleep(BlockingTime)
             else:
-                queue.put(mq.pull())
+                queue_in.put(mq.pull())
         else:
             is_active = queue_ctrl.get()
     else:
-        queue_ctrl.join()
-        queue.join()
+        queue_ctrl.close()
+        queue_in.close()
         mq.close()
         del mq
 
@@ -51,38 +51,43 @@ class TEMPLE:
     def __init__(self, conn: URL):
         # conn = "tcp://*:port"
         self.me = conn
-        self._queue_priest = Queue(MSG_Q_MAX_DEPTH)
-        self.__queue_mine_ctrl = Queue(MSG_Q_MAX_DEPTH)
-        self.__queue_priest_ctrl = Queue(MSG_Q_MAX_DEPTH)              # 角色进程控制队列
-        self.__queue_priest_ctrl.put(True)
-        self.process = None                                             # 角色进程
-        self.priest = Thread(target=priest, args=(self.me, self.__queue_mine_ctrl, self._queue_priest))
+        self.__priest_queue_in = Queue(MSG_Q_MAX_DEPTH)
+        self.__priest_queue_ctrl = Queue(CTRL_Q_MAX_DEPTH)
+        self.__priest_queue_ctrl.put(True)
+        self.priest = Process(target=priest,
+                              args=(self.me, self.__priest_queue_ctrl, self.__priest_queue_in))
+        self.__believer_queue_ctrl = Queue(CTRL_Q_MAX_DEPTH)
+        self.believer = None
 
     def open(self, role: str, func: callable = None):
-        self.priest.setDaemon(False)
         self.priest.start()
 
-        while self._queue_priest.empty():
+        while self.__priest_queue_in.empty():
             time.sleep(BlockingTime)
         else:
-            msg = self._queue_priest.get()
-            print("temple CFC receiver:", msg)
-            self.__queue_priest_ctrl.put(True)
+            msg = self.__priest_queue_in.get()
+            self.__believer_queue_ctrl.put(True)
             if role in ["sender"]:
-                self.process = Thread(target=sender, args=(msg, self.__queue_priest_ctrl, func))
-            elif role in ["treater"]:
-                self.process = Thread(target=treater, args=(msg, self.__queue_priest_ctrl, func))
-            elif role in ["encrypter"]:
-                self.process = Thread(target=encrypter, args=(msg, self.__queue_priest_ctrl, func))
+                self.believer = Process(target=sender, args=(msg, self.__believer_queue_ctrl, func))
+            elif role in ["treater", "encrypter"]:
+                self.believer = Process(target=treater, args=(msg, self.__believer_queue_ctrl, func))
             elif role in ["receiver"]:
-                self.process = Thread(target=receiver, args=(msg, self.__queue_priest_ctrl, func))
+                self.believer = Process(target=receiver, args=(msg, self.__believer_queue_ctrl, func))
             else:       # default
-                self.process = Thread(target=receiver, args=(msg, self.__queue_priest_ctrl, func))
-            self.process.setDaemon(False)
-            self.process.start()
+                self.believer = Process(target=receiver, args=(msg, self.__believer_queue_ctrl, func))
+            self.believer.start()
 
     def close(self):
-        self.__queue_priest_ctrl.put(False)
+        self.__believer_queue_ctrl.put(False)
+        self.__priest_queue_ctrl.put(False)
+        try:
+            self.priest.close()
+        except ValueError:
+            self.priest.kill()
+        try:
+            self.believer.close()
+        except ValueError:
+            self.believer.kill()
 
 
 def allocator(conn: URL):
@@ -99,6 +104,8 @@ def allocator(conn: URL):
             return FTPD(conn)
         if conn.scheme in ["tomail"]:
             return TOMAIL(conn)
+        if conn.scheme in ["file"]:
+            return FILE(conn)
 
 
 def sender(msg: MSG, queue_ctrl: Queue, func: callable = None):
@@ -108,37 +115,78 @@ def sender(msg: MSG, queue_ctrl: Queue, func: callable = None):
     :param func: callable       # 自定义处理过程
     :return: None
     """
-    # employee
-    print("sender :", msg)
-    origination = allocator(msg.origination)
-    destination = allocator(msg.destination)    # MessageQueue
+    # init
+    origination = allocator(msg.origination)    # Data.read(msg)
     treatment = allocator(msg.treatment)        # MessageQueue
     encryption = allocator(msg.encryption)      # MessageQueue
-
-    def process_msg(msg_orig):
-        if encryption is None:
-            msg_encryption = msg_orig
-        else:
-            msg_encryption = encryption.request(msg_orig)
-        if treatment is None:
-            msg_treatment = msg_encryption
-        else:
-            msg_treatment = treatment.request(msg_encryption)
-        if func is None:
-            return msg_treatment
-        else:
-            return func(msg_treatment)
-
-    is_active = queue_ctrl.get()            # 控制信号（初始化）
-    if is_active:                           # 控制信号（启动）
-        if origination is None:
-            msg_origination = msg
-        else:
+    destination = allocator(msg.destination)    # MessageQueue
+    # Control Flow
+    is_active = queue_ctrl.get()                # 控制信号（初始化）
+    if is_active:                               # 控制信号（启动）
+        if queue_ctrl.empty():                  # 控制信号（无变更），敏捷响应
             msg_origination = origination.read(msg)
-        msg_out = process_msg(msg_origination)
-        destination.push(msg_out)
+            # -----------------------------------------------------
+            if encryption is None:
+                msg_encryption = msg_origination
+            else:
+                msg_encryption = encryption.request(msg_origination)
+            del msg_origination
+            # ------------------------------------------------------
+            if treatment is None:
+                msg_treatment = msg_encryption
+            else:
+                msg_treatment = treatment.request(msg_encryption)
+            del msg_encryption
+            # ------------------------------------------------------
+            if func is None:
+                msg_function = msg_treatment
+            else:
+                msg_function = func(msg_treatment)
+            del msg_treatment
+            # ------------------------------------------------------
+            destination.push(msg_function)
+        else:
+            is_active = queue_ctrl.get()
     else:
-        queue_ctrl.join()                   # 队列关闭
+        queue_ctrl.close()                 # 队列关闭
+        del origination, encryption, treatment, destination
+
+
+def receiver(msg: MSG, queue_ctrl: Queue, func: callable = None):
+    # init
+    origination = allocator(msg.origination)    # MessageQueue
+    treatment = allocator(msg.treatment)        # MessageQueue
+    encryption = allocator(msg.encryption)      # MessageQueue
+    destination = allocator(msg.destination)    # Data.write
+    # Control Flow
+    is_active = queue_ctrl.get()                # 控制信号（初始化）
+    while is_active:                            # 控制信号（启动）
+        if queue_ctrl.empty():                  # 控制信号（无变更），敏捷响应
+            msg_origination = origination.pull()
+            # -----------------------------------------------------
+            if encryption is None:
+                msg_encryption = msg_origination
+            else:
+                msg_encryption = encryption.request(msg_origination)
+            del msg_origination
+            # ------------------------------------------------------
+            if treatment is None:
+                msg_treatment = msg_encryption
+            else:
+                msg_treatment = treatment.request(msg_encryption)
+            del msg_encryption
+            # ------------------------------------------------------
+            if func is None:
+                msg_function = msg_treatment
+            else:
+                msg_function = func(msg_treatment)
+            del msg_treatment
+            # ------------------------------------------------------
+            destination.write(msg_function)
+        else:
+            is_active = queue_ctrl.get()        # 控制信号（变更）
+    else:
+        queue_ctrl.close()                       # 队列关闭
         del origination, encryption, treatment, destination
 
 
@@ -149,114 +197,73 @@ def treater(msg: MSG, queue_ctrl: Queue, func: callable = None):
     :param func: callable       # 自定义处理过程
     :return: None
     """
-    # employee
-    origination = allocator(msg.origination)    # MessageQueue
+    # init
+    origination = allocator(msg.origination)    # Data.read()
     treatment = allocator(msg.treatment)        # MessageQueue
     encryption = allocator(msg.encryption)      # MessageQueue
-    destination = allocator(msg.encryption)     # MessageQueue
+    destination = allocator(msg.destination)    # Data.write()
 
-    def process_msg(msg_in):
+    def process_msg(msg_orig):
         if encryption is None:
-            msg_encryption = msg_in
+            msg_encry = msg_orig
         else:
-            msg_encryption = encryption.request(msg_in)
+            msg_encry = encryption.request(msg_orig)
+        # ------------------------------------------------------
         if treatment is None:
-            msg_treatment = msg_encryption
+            msg_treat = msg_encry
         else:
-            msg_treatment = treatment.request(msg_encryption)
+            msg_treat = treatment.request(msg_encry)
+        del msg_encry
+        # ------------------------------------------------------
         if func is None:
-            msg_func = msg_treatment
+            msg_func = msg_treat
         else:
-            msg_func = func(msg_treatment)
+            msg_func = func(msg_treat)
+        del msg_treat
+        # ------------------------------------------------------
         if destination is None:
             pass
         else:
-            destination.push(msg_func)
+            if isinstance(destination, MessageQueue):
+                destination.push(msg_func)
+            else:
+                destination.write(msg_func)
         return msg_func
 
+    # Control Flow
     is_active = queue_ctrl.get()                # 控制信号（初始化）
     while is_active:                            # 控制信号（启动）
         if queue_ctrl.empty():                  # 控制信号（无变更），敏捷响应
-            origination.reply(process_msg)
+            # ------------------------------------------------------
+            if isinstance(origination, MessageQueue):
+                origination.reply(process_msg)
+            else:
+                msg_origination = origination.read(msg)
+                # ------------------------------------------------------
+                if encryption is None:
+                    msg_encryption = msg_origination
+                else:
+                    msg_encryption = encryption.request(msg_origination)
+                del msg_origination
+                # ------------------------------------------------------
+                if treatment is None:
+                    msg_treatment = msg_encryption
+                else:
+                    msg_treatment = treatment.request(msg_encryption)
+                del msg_encryption
+                # ------------------------------------------------------
+                if func is None:
+                    msg_function = msg_treatment
+                else:
+                    msg_function = func(msg_treatment)
+                del msg_treatment
+                # ------------------------------------------------------
+                if isinstance(destination, MessageQueue):
+                    destination.push(msg_function)
+                else:
+                    destination.write(msg_function)
         else:
             is_active = queue_ctrl.get()        # 控制信号（变更）
     else:
-        queue_ctrl.join()                       # 队列关闭
-        del origination, encryption, treatment, destination
-
-
-def receiver(msg: MSG, queue_ctrl: Queue, func: callable = None):
-    # employee
-    origination = allocator(msg.origination)    # MessageQueue
-    treatment = allocator(msg.treatment)        # MessageQueue
-    encryption = allocator(msg.encryption)      # MessageQueue
-    destination = allocator(msg.destination)
-
-    def process_msg(msg_in):
-        if encryption is None:
-            msg_encryption = msg_in
-        else:
-            msg_encryption = encryption.request(msg_in)
-        if treatment is None:
-            msg_treatment = msg_encryption
-        else:
-            msg_treatment = treatment.request(msg_encryption)
-        if func is None:
-            return msg_treatment
-        else:
-            return func(msg_treatment)
-
-    is_active = queue_ctrl.get()                # 控制信号（初始化）
-    while is_active:                            # 控制信号（启动）
-        if queue_ctrl.empty():                  # 控制信号（无变更），敏捷响应
-            msg_origination = origination.pull()
-            msg_out = process_msg(msg_origination)
-            destination.write(msg_out)
-        else:
-            is_active = queue_ctrl.get()        # 控制信号（变更）
-    else:
-        queue_ctrl.join()                       # 队列关闭
-        del origination, encryption, treatment, destination
-
-
-def encrypter(msg: MSG, queue_ctrl: Queue, func: callable = None):
-    """
-    :param msg: MSG             # 消息报
-    :param queue_ctrl: Queue    # 控制 ("is_active",):(bool,)
-    :param func: callable       # 自定义处理过程
-    :return: None
-    """
-    # employee
-    origination = allocator(msg.origination)    # MessageQueue
-    treatment = allocator(msg.treatment)        # MessageQueue
-    encryption = allocator(msg.encryption)      # MessageQueue
-    destination = allocator(msg.encryption)     # MessageQueue
-
-    def process_msg(msg_in):
-        if encryption is None:
-            msg_encryption = msg_in
-        else:
-            msg_encryption = encryption.request(msg_in)
-        if treatment is None:
-            msg_treatment = msg_encryption
-        else:
-            msg_treatment = treatment.request(msg_encryption)
-        if func is None:
-            msg_func = msg_treatment
-        else:
-            msg_func = func(msg_treatment)
-        if destination is None:
-            pass
-        else:
-            destination.push(msg_func)
-        return msg_func
-
-    is_active = queue_ctrl.get()                # 控制信号（初始化）
-    while is_active:                            # 控制信号（启动）
-        if queue_ctrl.empty():                  # 控制信号（无变更），敏捷响应
-            origination.reply(process_msg)
-        else:
-            is_active = queue_ctrl.get()        # 控制信号（变更）
-    else:
-        queue_ctrl.join()                       # 队列关闭
+        queue_ctrl.close()                      # 队列关闭
         del origination, encryption, treatment, destination

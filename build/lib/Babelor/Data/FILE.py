@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2019 StrTrek Team Authors.
+# Copyright 2018 StrTrek Team Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,15 +15,16 @@
 
 # System Required
 import os
+import base64
 # Outer Required
-import pandas as pd
-import xlrd
 # Inner Required
 from Babelor.Presentation import URL, MSG
+from Babelor.Config import GLOBAL_CFG
+from Babelor.Data import EXCEL
 # Global Parameters
 
 
-class EXCEL:
+class FILE:
     def __init__(self, conn: URL):
         if isinstance(conn, str):
             self.conn = URL(conn)
@@ -32,30 +33,12 @@ class EXCEL:
         self.conn = self.__dict__["conn"].check
 
     def read(self, msg: MSG):
-        msg_new = msg
-        return msg_new
+        with open(self.conn.path, "rb") as f:
+            stream = base64.b64encode(f.read())
+            msg.add_datum(datum=stream, path=self.conn.path)
+        return msg
 
     def write(self, msg: MSG):
-        pass
-
-
-def sheets_merge(read_path, write_path):
-    """
-    :param read_path: 读取路径
-    :param write_path: 写入路径
-    :return: None
-    """
-    book = xlrd.open_workbook(read_path)
-    writer = None
-    for sheet in book.sheets():
-        reader = pd.read_excel(read_path, sheet_name=sheet.name)
-        if writer is None:
-            writer = reader
-        else:
-            writer = writer.append(reader.fillna(""))       # NaN clean up
-    writer = writer.reset_index(drop=True)                  # idx clean up
-    writer.to_excel(write_path)
-
-
-if __name__ == '__main__':
-    sheets_merge("excel.xlsx", "excel_out.xlsx")
+        for i in range(0, msg.nums, 1):
+            stream = msg.read_datum(i)
+            f = base64.b64decode(stream["stream"])

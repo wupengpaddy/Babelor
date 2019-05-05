@@ -55,8 +55,10 @@ class FTP:
 
     def open(self):
         ftp = ftplib.FTP()
-        ftp.connect(self.conn.hostname, self.conn.port)      # 连接
-        ftp.login(self.conn.username, self.conn.password)    # 登录
-        if str(self.conn.fragment) in ["PASV"]:              # 被动模式
-            ftp.set_pasv(True)
-        return ftp
+        ftp.connect(self.conn.hostname, self.conn.port)     # 连接
+        ftp.login(self.conn.username, self.conn.password)   # 登录
+        if isinstance(self.conn.fragment, URL):             # 被动模式
+            if self.conn.fragment.query not in [""]:
+                if self.conn.fragment.query["model"] in ["PASV"]:
+                    ftp.set_pasv(True)
+            return ftp

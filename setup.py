@@ -131,7 +131,7 @@ else:
 # N[.N]         阶段主版本号和副版本号(可选)
 # .postN        发行后的更新版本号(可选)
 # .devN         开发期间的发行版本号(可选)
-VERSION = "0.1.1.post2"
+VERSION = "0.1.1.post3"
 
 # 许可证
 LICENSE = """
@@ -157,10 +157,24 @@ if __name__ == '__main__':
     except ImportError:
         from distutils.core import setup
 
-    setup(name=NAME, version=VERSION, description=DESCRIPTION, long_description=LONG_DESCRIPTION,
-          classifiers=CLASSIFIERS, keywords=KEYWORDS, author=AUTHOR, author_email=AUTHOR_EMAIL,
-          url=URL, license=LICENSE, packages=PACKAGES, include_package_data=True, zip_safe=True,
-          install_requires=INSTALL_REQUIRED,)             # 封库
+    setup(
+        name=NAME,                                      # 项目名称
+        version=VERSION,                                # 项目版本
+        description=DESCRIPTION,                        # 项目简述
+        long_description=LONG_DESCRIPTION,              # 项目说明
+        classifiers=CLASSIFIERS,                        # 项目分类
+        keywords=KEYWORDS,                              # 关键字
+        author=AUTHOR,                                  # 项目作者
+        author_email=AUTHOR_EMAIL,                      # 作者邮件
+        maintainer=MAINTAINER,                          # 项目维护
+        maintainer_email=MAINTAINER_EMAIL,              # 维护邮件
+        url=URL,                                        # 项目主页
+        license=LICENSE,                                # 版权申明
+        packages=PACKAGES,                              # 项目库
+        include_package_data=True,                      # 库包含数据
+        zip_safe=True,                                  # 压缩安全
+        # install_requires=INSTALL_REQUIRED,              # 安装外部依赖库
+    )   # 封库
 
 
 # 外部执行封库命令

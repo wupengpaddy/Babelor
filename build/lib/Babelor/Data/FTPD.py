@@ -48,8 +48,10 @@ class FTPD:
         else:
             handler.masquerade_address = self.conn.hostname
             address = (self.conn.hostname, int(self.conn.port))
-        if "PASV" in self.conn.fragment:  # 被动模式
-            handler.passive_ports = range(PASV_PORT["START"], PASV_PORT["END"])
+        if isinstance(self.conn.fragment, URL):                     # 被动模式
+            if self.conn.fragment.query not in [""]:
+                if self.conn.fragment.query["model"] in ["PASV"]:
+                    handler.passive_ports = range(PASV_PORT["START"], PASV_PORT["END"])
         server = FTPServer(address, handler)
         server.max_cons = MAX_CONS
         server.max_cons_per_ip = MAX_CONS_PER_IP

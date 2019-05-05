@@ -1,6 +1,6 @@
-Metadata-Version: 1.1
+Metadata-Version: 1.2
 Name: Babelor
-Version: 0.1.1.post2
+Version: 0.1.1.post3
 Summary: 
 Babelor - a tiny integration information service bus library for Python
 =======================================================================
@@ -17,6 +17,8 @@ invocation tool available in any language**.
 Home-page: http://www.strtrek.com/
 Author: StrTrek Team Authors
 Author-email: geyuanji@strtrek.com
+Maintainer: StrTrek Team Authors
+Maintainer-email: geyuanji@strtrek.com
 License: 
 Copyright 2019 StrTrek Team Authors.
 

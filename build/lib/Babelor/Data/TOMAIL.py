@@ -44,6 +44,7 @@ class TOMAIL:
         self.content = None
 
     def _create_mime(self, msg: MSG):
+
         sender_user = self.conn.fragment.username               # 寄件人用户名
         receiver_user = self.conn.username                      # 收件人用户名
         sender_name = self.conn.fragment.fragment.path          # 寄件人名
