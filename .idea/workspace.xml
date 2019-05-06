@@ -4,8 +4,9 @@
     <list default="true" id="be54182a-218b-4e8e-9234-62a7d88d12fc" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/dictionaries/geyua.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/geyua.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Babelor/Application/Temple.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Application/Temple.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Babelor/Application/demo.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Application/demo.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Babelor/Presentation/Message.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Presentation/Message.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Babelor/Session/MessageQueue.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Session/MessageQueue.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Babelor/Session/demo.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Session/demo.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -26,10 +27,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Babelor/Application/demo.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="627">
+            <state relative-caret-position="1499">
               <caret line="123" column="23" selection-start-line="123" selection-start-column="23" selection-end-line="123" selection-end-column="23" />
               <folding>
                 <element signature="e#619#625#0" expanded="true" />
@@ -41,8 +42,38 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Babelor/Application/Temple.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1214">
-              <caret line="257" column="42" lean-forward="true" selection-start-line="257" selection-start-column="42" selection-end-line="257" selection-end-column="42" />
+            <state relative-caret-position="-1389">
+              <caret line="23" selection-start-line="23" selection-end-line="23" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Babelor/Session/MessageQueue.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="264">
+              <caret line="65" column="39" lean-forward="true" selection-start-line="65" selection-start-column="39" selection-end-line="65" selection-end-column="39" />
+              <folding>
+                <element signature="e#619#630#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Babelor/Config/Config.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="76">
+              <caret line="22" column="21" selection-start-line="22" selection-start-column="14" selection-end-line="22" selection-end-column="21" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Babelor/Session/demo.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="456">
+              <caret line="48" column="16" selection-start-line="48" selection-start-column="16" selection-end-line="48" selection-end-column="16" />
               <folding>
                 <element signature="e#619#630#0" expanded="true" />
               </folding>
@@ -118,14 +149,14 @@
         <option value="$PROJECT_DIR$/Babelor/Presentation/URL.py" />
         <option value="$PROJECT_DIR$/Babelor/Presentation/CASE.py" />
         <option value="$PROJECT_DIR$/Babelor/Data/__init__.py" />
-        <option value="$PROJECT_DIR$/Babelor/Session/MessageQueue.py" />
         <option value="$PROJECT_DIR$/Babelor/Session/__init__.py" />
         <option value="$PROJECT_DIR$/Babelor/__init__.py" />
-        <option value="$PROJECT_DIR$/Babelor/Session/demo.py" />
         <option value="$PROJECT_DIR$/main.py" />
+        <option value="$PROJECT_DIR$/Babelor/Application/demo.py" />
         <option value="$PROJECT_DIR$/Babelor/Presentation/Message.py" />
         <option value="$PROJECT_DIR$/Babelor/Application/Temple.py" />
-        <option value="$PROJECT_DIR$/Babelor/Application/demo.py" />
+        <option value="$PROJECT_DIR$/Babelor/Session/demo.py" />
+        <option value="$PROJECT_DIR$/Babelor/Session/MessageQueue.py" />
       </list>
     </option>
   </component>
@@ -163,7 +194,19 @@
               <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
               <item name="Babelor" type="462c0819:PsiDirectoryNode" />
               <item name="Babelor" type="462c0819:PsiDirectoryNode" />
+              <item name="Config" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
+              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
               <item name="Presentation" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
+              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
+              <item name="Session" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
@@ -204,51 +247,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.demo (1)">
-    <configuration name="Message" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="Babelor" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Message" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="C:\Users\geyua\PycharmProjects\Babelor\Message\MESSAGE.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="config" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="Babelor" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/CONFIG" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="C:\Users\geyua\PycharmProjects\Babelor\CONFIG\CONFIG.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
+  <component name="RunManager" selected="Python.demo (2)">
     <configuration name="demo (1)" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="Babelor" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -263,6 +262,28 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Babelor/Application/demo.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="demo (2)" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="Babelor" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Babelor/Session" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Babelor/Session/demo.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -315,13 +336,29 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="pytest in demo.py" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="Babelor" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Babelor/Session" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;$PROJECT_DIR$/Babelor/Session/demo.py&quot;" />
+      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.demo (2)" />
+        <item itemvalue="Python tests.pytest in demo.py" />
         <item itemvalue="Python.demo (1)" />
         <item itemvalue="Python.demo" />
         <item itemvalue="Python.main" />
-        <item itemvalue="Python.Message" />
-        <item itemvalue="Python.config" />
       </list>
     </recent_temporary>
   </component>
@@ -369,17 +406,26 @@
     <option name="localTasksCounter" value="2" />
     <servers />
   </component>
+  <component name="TestHistory">
+    <history-entry file="pytest_in_demo_py - 2019.05.06 at 21h 54m 06s.xml">
+      <configuration name="pytest in demo.py" configurationId="tests" />
+    </history-entry>
+    <history-entry file="pytest_in_demo_py - 2019.05.06 at 21h 55m 26s.xml">
+      <configuration name="pytest in demo.py" configurationId="tests" />
+    </history-entry>
+  </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="500254000" />
+    <option name="totallyTimeSpent" value="508874000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="-7" width="1453" height="933" extended-state="7" />
+    <frame x="-7" y="-7" width="1453" height="933" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.31281316" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32786885" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.3275218" />
       <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49977323" visible="true" weight="0.32503113" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
@@ -408,10 +454,12 @@
     <option name="LAST_COMMIT_MESSAGE" value="init" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Babelor$demo__1_.coverage" NAME="demo (1) Coverage Results" MODIFIED="1557145613418" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Babelor/Application" />
+    <SUITE FILE_PATH="coverage/Babelor$demo__1_.coverage" NAME="demo (1) Coverage Results" MODIFIED="1557150280020" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Babelor/Application" />
+    <SUITE FILE_PATH="coverage/Babelor$demo__2_.coverage" NAME="demo (2) Coverage Results" MODIFIED="1557156367661" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Babelor/Session" />
     <SUITE FILE_PATH="coverage/Babelor$main.coverage" NAME="main Coverage Results" MODIFIED="1556440860996" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Babelor$Message.coverage" NAME="Message Coverage Results" MODIFIED="1556024917261" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Message" />
     <SUITE FILE_PATH="coverage/Babelor$demo.coverage" NAME="demo Coverage Results" MODIFIED="1557021017089" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Babelor/Presentation" />
+    <SUITE FILE_PATH="coverage/Babelor$pytest_in_demo_py.coverage" NAME="pytest in demo.py Coverage Results" MODIFIED="1557150855244" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Babelor/Session" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$USER_HOME$/.PyCharm2018.3/system/python_stubs/-96592820/builtins.py" />
@@ -593,13 +641,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Babelor/Config/Config.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="418">
-          <caret line="22" column="21" selection-start-line="22" selection-start-column="14" selection-end-line="22" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Babelor/Data/File.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="418">
@@ -640,16 +681,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Babelor/Session/demo.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="627">
-          <caret line="83" lean-forward="true" selection-start-line="83" selection-end-line="83" />
-          <folding>
-            <element signature="e#619#630#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Babelor/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="456">
@@ -664,16 +695,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="304">
           <caret line="16" column="50" lean-forward="true" selection-start-line="16" selection-start-column="50" selection-end-line="16" selection-end-column="50" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Babelor/Session/MessageQueue.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1007">
-          <caret line="101" column="36" selection-start-line="101" selection-start-column="36" selection-end-line="101" selection-end-column="36" />
-          <folding>
-            <element signature="e#619#630#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -708,32 +729,56 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Babelor/Application/demo.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1499">
+          <caret line="123" column="23" selection-start-line="123" selection-start-column="23" selection-end-line="123" selection-end-column="23" />
+          <folding>
+            <element signature="e#619#625#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Babelor/Presentation/Message.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2396">
-          <caret line="144" column="17" selection-start-line="144" selection-start-column="17" selection-end-line="144" selection-end-column="17" />
+        <state relative-caret-position="152">
+          <caret line="88" column="8" lean-forward="true" selection-start-line="88" selection-start-column="8" selection-end-line="88" selection-end-column="8" />
           <folding>
             <element signature="e#619#648#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Babelor/Config/Config.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="76">
+          <caret line="22" column="21" selection-start-line="22" selection-start-column="14" selection-end-line="22" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Babelor/Application/Temple.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1214">
-          <caret line="257" column="42" lean-forward="true" selection-start-line="257" selection-start-column="42" selection-end-line="257" selection-end-column="42" />
+        <state relative-caret-position="-1389">
+          <caret line="23" selection-start-line="23" selection-end-line="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Babelor/Session/demo.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="456">
+          <caret line="48" column="16" selection-start-line="48" selection-start-column="16" selection-end-line="48" selection-end-column="16" />
           <folding>
             <element signature="e#619#630#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Babelor/Application/demo.py">
+    <entry file="file://$PROJECT_DIR$/Babelor/Session/MessageQueue.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="627">
-          <caret line="123" column="23" selection-start-line="123" selection-start-column="23" selection-end-line="123" selection-end-column="23" />
+        <state relative-caret-position="264">
+          <caret line="65" column="39" lean-forward="true" selection-start-line="65" selection-start-column="39" selection-end-line="65" selection-end-column="39" />
           <folding>
-            <element signature="e#619#625#0" expanded="true" />
+            <element signature="e#619#630#0" expanded="true" />
           </folding>
         </state>
       </provider>

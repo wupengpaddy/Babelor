@@ -47,6 +47,7 @@ def first_out_last_in(conn: str, me: str, queue_ctrl: Queue, queue_in: Queue, qu
         has_response = True
     elif me in ["PUBLISH"]:
         socket = context.socket(zmq.PUB)
+        socket.setsockopt(zmq.SNDHWM, MSG_Q_MAX_DEPTH)
         socket.bind(conn)
         has_response = False
     else:   # PUSH
@@ -61,26 +62,23 @@ def first_out_last_in(conn: str, me: str, queue_ctrl: Queue, queue_in: Queue, qu
                 time.sleep(BlockingTime)
             else:
                 msg_out = queue_out.get()           # 输出队列（推出）
-                if isinstance(msg_out, MSG):
-                    message_out = str(msg_out).encode(CODING)
-                    socket.send(message_out)        # 消息 出
-                    del message_out                 # 释放 msg_out
-                del msg_out
-                if has_response:                    # 控制信号（需反馈）
-                    while queue_in.full():          # 进 / put / recv
-                        time.sleep(BlockingTime)
-                    else:
-                        message_in = socket.recv()  # 消息 进
-                        msg_in = MSG(message_in.decode(CODING))
-                        queue_in.put(msg_in)        # 输入队列（推入）
-                        del message_in, msg_in      # 释放 msg_in
+            print("ZMQ send:", msg_out)
+            message_out = str(msg_out).encode(CODING)
+            # print("ZMQ send:", message_out)
+            socket.send(message_out)        # 消息 出
+            if has_response:                    # 控制信号（需反馈）
+                while queue_in.full():          # 进 / put / recv
+                    time.sleep(BlockingTime)
+                else:
+                    message_in = socket.recv()  # 消息 进
+                    msg_in = MSG(message_in.decode(CODING))
+                    queue_in.put(msg_in)        # 输入队列（推入）
         else:                                       # 控制信号（变更）
             is_active = queue_ctrl.get()
     else:                                           # 队列关闭
         queue_ctrl.close()
         queue_out.close()
         queue_in.close()
-        del socket, context
 
 
 def first_in_last_out(conn: str, me: str, queue_ctrl: Queue, queue_in: Queue, queue_out: Queue):
@@ -110,40 +108,37 @@ def first_in_last_out(conn: str, me: str, queue_ctrl: Queue, queue_in: Queue, qu
         has_response = False
     else:   # PULL
         socket = context.socket(zmq.PULL)
+        socket.setsockopt(zmq.SNDHWM, MSG_Q_MAX_DEPTH)
         socket.bind(conn)
         has_response = False
     is_active = queue_ctrl.get()                    # 控制信号（初始化）
     # 消息队列 from message queue
     while is_active:                                # 控制信号（启动）
         if queue_ctrl.empty():                      # 控制信号（无变更），敏捷响应
+            message_in = socket.recv()              # 消息 进
+            # print("ZMQ receive:", message_in)
+            msg_in = MSG(message_in.decode(CODING))
             while queue_in.full():                  # 进 / put / recv
                 time.sleep(BlockingTime)
             else:
-                message_in = socket.recv()          # 消息 进
-                msg_in = MSG(message_in.decode(CODING))
                 queue_in.put(msg_in)                # 输入队列（推入）
-                del message_in, msg_in              # 释放 msg_in
-                if has_response:                    # 控制信号（需反馈）
-                    while queue_out.empty():        # 出 / get / send
-                        time.sleep(BlockingTime)
-                    else:
-                        msg_out = queue_out.get()   # 输出队列（推出）
-                        if isinstance(msg_out, MSG):
-                            message_out = str(msg_out).encode(CODING)
-                            socket.send(message_out)  # 消息 出
-                            del message_out
-                        del msg_out                 # 释放 msg_out
+            if has_response:                        # 控制信号（需反馈）
+                while queue_out.empty():            # 出 / get / send
+                    time.sleep(BlockingTime)
+                else:
+                    msg_out = queue_out.get()       # 输出队列（推出）
+                    message_out = str(msg_out).encode(CODING)
+                    socket.send(message_out)        # 消息 出
         else:                                       # 控制信号（变更）
             is_active = queue_ctrl.get()
     else:                                           # 队列关闭
         queue_ctrl.close()
         queue_out.close()
         queue_in.close()
-        del socket, context
 
 
 class ZMQ:
-    def __init__(self, conn: URL):
+    def __init__(self, conn: (URL, str)):
         if isinstance(conn, str):
             self.conn = URL(conn)                 # 套接字
         else:
@@ -151,29 +146,29 @@ class ZMQ:
         if self.conn.scheme not in ["tcp", "pgm", "inproc"]:       # 协议（校验）
             raise ValueError("Invalid scheme{0}.".format(self.conn.scheme))
         self.conn = self.conn.check   # 默认端口（校验）
-        self.__queue_in = Queue(MSG_Q_MAX_DEPTH)     # 进站队列（初始化）
-        self.__queue_out = Queue(MSG_Q_MAX_DEPTH)    # 出站队列（初始化）
-        self.__queue_ctrl = Queue(CTRL_Q_MAX_DEPTH)  # 控制队列（初始化）
-        self.active = False                          # 激活状态（初始 不激活）
-        self.__initialed = None                      # 已初始化模式
-        self.process = None                          # 队列控制进程
+        self.queue_in = Queue(MSG_Q_MAX_DEPTH)     # 进站队列（初始化）
+        self.queue_out = Queue(MSG_Q_MAX_DEPTH)    # 出站队列（初始化）
+        self.queue_ctrl = Queue(CTRL_Q_MAX_DEPTH)  # 控制队列（初始化）
+        self.active = False                        # 激活状态（初始 不激活）
+        self.initialed = None                      # 已初始化模式
+        self.process = None                        # 队列控制进程
 
     def release(self):
-        if self.active:                             # 激活状态
-            if self.__initialed is None:            # 未初始化模式
+        if self.active:                                    # 激活状态
+            if self.initialed is None:                     # 未初始化模式
                 self.active = False
-            else:                                   # 已初始化模式
-                self.__queue_ctrl.put(False)                # 控制信号（停止）
+            else:                                          # 已初始化模式
+                self.queue_ctrl.put(False)                 # 控制信号（停止）
                 time.sleep(BlockingTime)
                 try:
-                    self.process.close()                    # 进程释放（软释放）
+                    self.process.close()                   # 进程释放（软释放）
                 except ValueError:
-                    self.process.kill()                     # 进程释放（硬释放）
+                    self.process.kill()                    # 进程释放（硬释放）
                 self.process = None
-                self.__queue_in = Queue(MSG_Q_MAX_DEPTH)     # 进站队列（初始化）
-                self.__queue_out = Queue(MSG_Q_MAX_DEPTH)    # 出站队列（初始化）
-                self.__queue_ctrl = Queue(CTRL_Q_MAX_DEPTH)  # 控制队列（初始化）
-                self.__initialed = None                      # 已初始化模式（无模式，初始化）
+                self.queue_in = Queue(MSG_Q_MAX_DEPTH)     # 进站队列（初始化）
+                self.queue_out = Queue(MSG_Q_MAX_DEPTH)    # 出站队列（初始化）
+                self.queue_ctrl = Queue(CTRL_Q_MAX_DEPTH)  # 控制队列（初始化）
+                self.initialed = None                      # 已初始化模式（无模式，初始化）
                 self.active = False                          # 激活状态（未激活，初始化）
         else:
             pass
@@ -182,29 +177,29 @@ class ZMQ:
 
     def __start(self, me: str, func: callable):
         is_active = True
-        if self.__initialed is not None:    # 已初始化
+        if self.initialed is not None:    # 已初始化
             self.release()
-        self.__queue_ctrl.put(is_active)    # 控制信号
+        self.queue_ctrl.put(is_active)    # 控制信号
         self.process = Process(target=func, name="zmq.{0}".format(me),
-                               args=(str(self.conn), me, self.__queue_ctrl, self.__queue_in, self.__queue_out))
+                               args=(str(self.conn), me, self.queue_ctrl, self.queue_in, self.queue_out))
         self.process.start()
-        self.__initialed = me
+        self.initialed = me
         self.active = True
 
     def request(self, msg_out: MSG):        # 先出后进
         me = "REQUEST"
-        if self.__initialed not in [me]:
+        if self.initialed not in [me, ]:
             self.__start(me=me, func=first_out_last_in)
         if self.active:
-            while self.__queue_out.full():                      # 出 / put
+            while self.queue_out.full():                      # 出 / put
                 time.sleep(BlockingTime)
             else:
                 if isinstance(msg_out, MSG):                    # MSG 校验
-                    self.__queue_out.put(msg_out)               # 输出数据
-                    while self.__queue_in.empty():              # 进 / get
+                    self.queue_out.put(msg_out)               # 输出数据
+                    while self.queue_in.empty():              # 进 / get
                         time.sleep(BlockingTime)
                     else:
-                        msg_in = self.__queue_in.get()          # 输入数据
+                        msg_in = self.queue_in.get()          # 输入数据
                         if isinstance(msg_in, MSG):             # MSG 校验
                             return msg_in
                         del msg_in
@@ -214,78 +209,75 @@ class ZMQ:
 
     def reply(self, func: callable):    # 先进后出
         me = "REPLY"
-        if self.__initialed not in[me]:
+        if self.initialed not in [me, ]:
             self.__start(me=me, func=first_in_last_out)
         if self.active:
-            while self.__queue_in.empty():
+            while self.queue_in.empty():
                 time.sleep(BlockingTime)
             else:
-                msg_in = self.__queue_in.get()                  # 输入数据
+                msg_in = self.queue_in.get()                  # 输入数据
                 if isinstance(msg_in, MSG):                     # MSG 校验
                     msg_out = func(msg_in)
                     if isinstance(msg_out, MSG):                # MSG 校验
-                        while self.__queue_out.full():
+                        while self.queue_out.full():
                             time.sleep(BlockingTime)
                         else:
-                            self.__queue_out.put(msg_out)       # 输出数据
+                            self.queue_out.put(msg_out)       # 输出数据
                     del msg_out
         else:
             self.release()
 
     def push(self, msg_out: MSG):       # 只出
         me = "PUSH"
-        if self.__initialed not in[me]:
+        if self.initialed not in [me, ]:
             self.__start(me=me, func=first_out_last_in)
         if self.active:
-            # print("MessageQueue PUSH out:", msg_out)
-            if isinstance(msg_out, MSG):                        # MSG 校验
-                while self.__queue_out.full():
-                    time.sleep(BlockingTime)
-                else:
-                    self.__queue_out.put(msg_out)               # 输出数据
+            print("ZMQ PUSH:", self.queue_out.full(), msg_out)
+            while self.queue_out.full():
+                time.sleep(BlockingTime)
+            else:
+                self.queue_out.put(msg_out)               # 输出数据
+                time.sleep(BlockingTime)
         else:
             self.release()
 
     def pull(self):     # 只进
         me = "PULL"
-        if self.__initialed not in[me]:
+        if self.initialed not in [me, ]:
             self.__start(me=me, func=first_in_last_out)
         if self.active:
-            while self.__queue_in.empty():
+            while self.queue_in.empty():
                 time.sleep(BlockingTime)
             else:
-                msg_in = self.__queue_in.get()                 # 输入数据
-                # print("MessageQueue PULL IN:", msg_in)
-                if isinstance(msg_in, MSG):                    # MSG 校验
-                    return msg_in
-                else:
-                    del msg_in
+                msg_in = self.queue_in.get()                 # 输入数据
+                # print("ZMQ PULL:", msg_in)
+                return msg_in
         else:
             self.release()
             return None
 
     def publish(self, msg_out: MSG):    # 只出
         me = "PUBLISH"
-        if self.__initialed not in [me]:
+        if self.initialed not in [me]:
             self.__start(me=me, func=first_out_last_in)
         if self.active:
             if isinstance(msg_out, MSG):                    # MSG 校验
-                while self.__queue_out.full():
+                while self.queue_out.full():
                     time.sleep(BlockingTime)
                 else:
-                    self.__queue_out.put(msg_out)           # 输出数据
+                    self.queue_out.put(msg_out)           # 输出数据
         else:
             self.release()
 
     def subscribe(self):    # 只进
         me = "SUBSCRIBE"
-        if self.__initialed not in [me]:
+        if self.initialed not in [me]:
             self.__start(me=me, func=first_in_last_out)
         if self.active:
-            while self.__queue_in.empty():
+            while self.queue_in.empty():
                 time.sleep(BlockingTime)
             else:
-                msg_in = self.__queue_in.get()        # 输入数据
+                msg_in = self.queue_in.get()        # 输入数据
                 if isinstance(msg_in, MSG):
                     return msg_in
                 else:

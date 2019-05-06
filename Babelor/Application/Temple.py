@@ -30,6 +30,8 @@ BlockingTime = GLOBAL_CFG["MSG_Q_BlockingTime"]
 
 
 def priest(conn: URL, queue_ctrl: Queue, queue_in: Queue):
+    # Inner Required
+    from Babelor.Session import MQ
     mq = MQ(conn)
     is_active = queue_ctrl.get()
     while is_active:
@@ -37,7 +39,9 @@ def priest(conn: URL, queue_ctrl: Queue, queue_in: Queue):
             while queue_in.full():
                 time.sleep(BlockingTime)
             else:
-                queue_in.put(mq.pull())
+                msg = mq.pull()
+                print("priest:", conn, msg)
+                queue_in.put(msg)
         else:
             is_active = queue_ctrl.get()
     else:
@@ -51,34 +55,34 @@ class TEMPLE:
     def __init__(self, conn: URL):
         # conn = "tcp://*:port"
         self.me = conn
-        self.__priest_queue_in = Queue(MSG_Q_MAX_DEPTH)
-        self.__priest_queue_ctrl = Queue(CTRL_Q_MAX_DEPTH)
-        self.__priest_queue_ctrl.put(True)
+        self.priest_queue_in = Queue(MSG_Q_MAX_DEPTH)
+        self.priest_queue_ctrl = Queue(CTRL_Q_MAX_DEPTH)
+        self.priest_queue_ctrl.put(True)
         self.priest = Process(target=priest,
-                              args=(self.me, self.__priest_queue_ctrl, self.__priest_queue_in))
-        self.__believer_queue_ctrl = Queue(CTRL_Q_MAX_DEPTH)
+                              args=(self.me, self.priest_queue_ctrl, self.priest_queue_in))
+        self.believer_queue_ctrl = Queue(CTRL_Q_MAX_DEPTH)
         self.believer = None
 
     def open(self, role: str, func: callable = None):
         self.priest.start()
-        while self.__priest_queue_in.empty():
+        while self.priest_queue_in.empty():
             time.sleep(BlockingTime)
         else:
-            msg = self.__priest_queue_in.get()
-            self.__believer_queue_ctrl.put(True)
+            msg = self.priest_queue_in.get()
+            self.believer_queue_ctrl.put(True)
             if role in ["sender"]:
-                self.believer = Process(target=sender, args=(msg, self.__believer_queue_ctrl, func))
+                self.believer = Process(target=sender, args=(msg, self.believer_queue_ctrl, func))
             elif role in ["treater", "encrypter"]:
-                self.believer = Process(target=treater, args=(msg, self.__believer_queue_ctrl, func))
+                self.believer = Process(target=treater, args=(msg, self.believer_queue_ctrl, func))
             elif role in ["receiver"]:
-                self.believer = Process(target=receiver, args=(msg, self.__believer_queue_ctrl, func))
+                self.believer = Process(target=receiver, args=(msg, self.believer_queue_ctrl, func))
             else:       # default is treater
-                self.believer = Process(target=treater, args=(msg, self.__believer_queue_ctrl, func))
+                self.believer = Process(target=treater, args=(msg, self.believer_queue_ctrl, func))
             self.believer.start()
 
     def close(self):
-        self.__believer_queue_ctrl.put(False)
-        self.__priest_queue_ctrl.put(False)
+        self.believer_queue_ctrl.put(False)
+        self.priest_queue_ctrl.put(False)
         try:
             self.priest.close()
         except ValueError:

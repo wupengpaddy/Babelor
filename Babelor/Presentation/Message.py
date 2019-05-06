@@ -84,6 +84,9 @@ class MSG:
         if key not in ["timestamp"]:
             self.__dict__["timestamp"] = current_datetime()
 
+    def update(self):
+        self.timestamp = current_datetime()
+
     def to_dict(self):
         return {
             "head": {

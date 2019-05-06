@@ -15,7 +15,7 @@
 
 # System Required
 import time
-from threading import Thread
+from multiprocessing import Process
 # Outer Required
 # Inner Required
 from Babelor.Session import MQ
@@ -25,21 +25,28 @@ from Babelor.Presentation import MSG, URL
 
 def try_push():
     msg = MSG()
-    msg.origination = URL("tcp://127.0.0.1:10001")
-    mq = MQ(URL("tcp://127.0.0.1:10001"))
-    print("push msg:", msg)
-    mq.push(msg)
+    msg.origination = URL("tcp://*:10001")
+    msg.destination = URL("tcp://127.0.0.1:10001")
+    mq = MQ("tcp://127.0.0.1:10001")
+    for i in range(0, 100, 1):
+        # print("push msg:", msg)
+        msg.activity = str(i)
+        # print("push msg:", i, msg)
+        mq.push(msg)
+        time.sleep(0.001)
 
 
 def try_pull():
-    mq = MQ(URL("tcp://*:10001"))
-    msg = mq.pull()
-    print("pull msg:", msg)
+    mq = MQ("tcp://*:10001")
+    for i in range(0, 100, 1):
+        msg = mq.pull()
+        # print("pull msg:", i, msg)
 
 
-def test_push_pull():
-    thread = Thread(target=try_pull)
-    thread.start()
+def demo_push_pull():
+    process = Process(target=try_pull)
+    process.start()
+    time.sleep(1)
     try_push()
 
 
@@ -62,7 +69,7 @@ def try_reply():
     mq .reply(try_reply_func)
 
 
-def test_request_reply():
+def demo_request_reply():
     thread = Thread(target=try_reply)
     thread.start()
     try_request()
@@ -82,7 +89,7 @@ def try_subscribe():
     print("subscribe msg:", msg)
 
 
-def test_publish_subscribe():
+def demo_publish_subscribe():
     thread = Thread(target=try_publish)
     thread.start()
     time.sleep(2)
@@ -90,6 +97,6 @@ def test_publish_subscribe():
 
 
 if __name__ == '__main__':
-    # test_push_pull()
-    # test_request_reply()
-    test_publish_subscribe()
+    demo_push_pull()
+    # demo_request_reply()
+    # demo_publish_subscribe()
