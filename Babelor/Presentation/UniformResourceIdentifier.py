@@ -13,12 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# 外部依赖
+# System Required
 from urllib.parse import urlparse, unquote, urlunparse, quote, parse_qs, urlencode
 import re
-# 内部依赖
-from Babelor.Config import GLOBAL_CFG
-# 全局参数
+# Outer Required
+# Inner Required
+from Babelor.Config.Config import GLOBAL_CFG
+# Global Parameters
 DatetimeFmt = GLOBAL_CFG["DatetimeFormat"]
 PortFmt = GLOBAL_CFG["PortFormat"]
 
@@ -64,7 +65,7 @@ class URL:
 
     def _decompose_netloc(self):
         if not isinstance(self.__dict__["netloc"], str):
-            raise ValueError("netloc 错误赋值")
+            raise ValueError("netloc must be string")
         # ----------------------------------------------------------------------
         if "@" in self.__dict__["netloc"]:
             auth, location = self.__dict__["netloc"].split("@")
@@ -200,6 +201,7 @@ class URL:
             # "ftp://<username>:<password>@<hostname>:21#?model=PASV
             # "ftp://<username>:<password>@<hostname>:<port>"
             # "ftp://<username>:<password>@<hostname>:21#?model=PORT
+            # "ftpd://<username>:<password>@<hostname>:<port>#?model=PASV&ports=[<port>,<port>,]"
             default_port = 21
         if self.scheme in ["smtp"]:
             # "smtp://<username>:<password>@<hostname>:<port>"
@@ -215,6 +217,7 @@ class URL:
             default_port = 80
         if self.scheme in ["file"]:
             # "file://<username>:<password>@<hostname>/<path>"
+            # "file:///<path>"
             default_port = None
         if self.scheme in ["tcp"]:
             # "tcp://<hostname>:<port>"
@@ -234,7 +237,7 @@ class URL:
         if scheme in ["ftp"]:
             self.__init__("ftp://username:password@hostname:port#?model=PASV")
         if scheme in ["ftpd"]:
-            self.__init__("ftpd://username:password@hostname:port/path#?model=PASV")
+            self.__init__("ftpd://username:password@hostname:port/path#?model=PASV&ports=[10001,10002,10003]")
         if scheme in ["mysql"]:
             self.__init__("mysql://username:password@hostname:port/path")
         if scheme in ["oracle"]:
@@ -251,5 +254,5 @@ class URL:
         if scheme in ["https"]:
             self.__init__("https://username:password@hostname:port/path;params?query#fragment")
         if scheme in ["file"]:
-            self.__init__("file://username:password@hostname/path;params")
+            self.__init__("file://username:password@hostname/path")
         return self

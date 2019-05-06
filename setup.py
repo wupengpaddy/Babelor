@@ -15,6 +15,16 @@ def load_rst_file(rst_file_path):
 # 库名
 NAME = "Babelor"
 
+# 版本号
+# r"N.N[.N]+[{a|b|c|rc}N[.N]+][.postN][.devN]"
+# N.N           主版本号和副版本号
+# [.N]          次要版本号
+# {a|b|c|rc}    阶段代号(可选), a:alpha, b:beta, c:candidate, rc:release candidate
+# N[.N]         阶段主版本号和副版本号(可选)
+# .postN        发行后的更新版本号(可选)
+# .devN         开发期间的发行版本号(可选)
+VERSION = "0.1.1.post3.dev1"
+
 # 库包含路径
 # Inner Required
 PACKAGES = [
@@ -44,8 +54,8 @@ INSTALL_REQUIRED = [
 # 库分类
 CLASSIFIERS = [
     # 开发状态
-    #  1 - Planning             2 - Pre-Alpha       3 - Alpha       4 - Beta
-    #  5 - Production/Stable    6 - Mature          7 - Inactive
+    #  1 - Planning 计划              2 - Pre-Alpha 预览内测      3 - Alpha 内测        4 - Beta 公测
+    #  5 - Production/Stable 正式     6 - Mature 到期             7 - Inactive 停止
     'Development Status :: 2 - Pre-Alpha',
     # 许可证
     'License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)',
@@ -123,16 +133,6 @@ if os.path.exists("README.rst"):
 else:
     LONG_DESCRIPTION = open("README.txt", "r").read()
 
-# 版本号
-# r"N.N[.N]+[{a|b|c|rc}N[.N]+][.postN][.devN]"
-# N.N           主版本号和副版本号
-# [.N]          次要版本号
-# {a|b|c|rc}    阶段代号(可选), a:alpha, b:beta, c:candidate, rc:release candidate
-# N[.N]         阶段主版本号和副版本号(可选)
-# .postN        发行后的更新版本号(可选)
-# .devN         开发期间的发行版本号(可选)
-VERSION = "0.1.1.post3"
-
 # 许可证
 LICENSE = """
 Copyright 2019 StrTrek Team Authors.
@@ -158,23 +158,23 @@ if __name__ == '__main__':
         from distutils.core import setup
 
     setup(
-        name=NAME,                                      # 项目名称
-        version=VERSION,                                # 项目版本
-        description=DESCRIPTION,                        # 项目简述
-        long_description=LONG_DESCRIPTION,              # 项目说明
-        classifiers=CLASSIFIERS,                        # 项目分类
-        keywords=KEYWORDS,                              # 关键字
-        author=AUTHOR,                                  # 项目作者
-        author_email=AUTHOR_EMAIL,                      # 作者邮件
-        maintainer=MAINTAINER,                          # 项目维护
-        maintainer_email=MAINTAINER_EMAIL,              # 维护邮件
-        url=URL,                                        # 项目主页
-        license=LICENSE,                                # 版权申明
-        packages=PACKAGES,                              # 项目库
-        include_package_data=True,                      # 库包含数据
-        zip_safe=True,                                  # 压缩安全
-        # install_requires=INSTALL_REQUIRED,              # 安装外部依赖库
-    )   # 封库
+        name=NAME,                              # 项目名称
+        version=VERSION,                        # 项目版本
+        description=DESCRIPTION,                # 项目简述
+        long_description=LONG_DESCRIPTION,      # 项目说明
+        classifiers=CLASSIFIERS,                # 项目分类
+        keywords=KEYWORDS,                      # 关键字
+        author=AUTHOR,                          # 项目作者
+        author_email=AUTHOR_EMAIL,              # 作者邮件
+        maintainer=MAINTAINER,                  # 项目维护
+        maintainer_email=MAINTAINER_EMAIL,      # 维护邮件
+        url=URL,                                # 项目主页
+        license=LICENSE,                        # 版权申明
+        packages=PACKAGES,                      # 项目库
+        include_package_data=True,              # 库包含数据
+        zip_safe=True,                          # 压缩安全
+        install_requires=INSTALL_REQUIRED,      # 安装外部依赖库
+    )   # 封库    Packaged
 
 
 # 外部执行封库命令

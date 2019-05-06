@@ -14,7 +14,7 @@
 # limitations under the License.
 
 # Inner Required
-from Babelor.Presentation.MSG import MSG, URL, CASE
+from Babelor.Presentation.Message import MSG, URL, CASE
 from Babelor.Application.Temple import TEMPLE
 from Babelor.Session.MQ import MessageQueue
 

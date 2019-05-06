@@ -20,7 +20,8 @@ import base64
 # Inner Required
 from Babelor.Tools import dict2json, json2dict, dict2xml, xml2dict
 from Babelor.Config import GLOBAL_CFG
-from Babelor.Presentation import URL, CASE
+from Babelor.Presentation.UniformResourceIdentifier import URL
+from Babelor.Presentation.Case import CASE
 # Global Parameters
 DatetimeFmt = GLOBAL_CFG["DatetimeFormat"]
 PortFmt = GLOBAL_CFG["PortFormat"]
@@ -42,7 +43,7 @@ def null_keep(item: object, item_type: classmethod = str) -> object:
 
 
 class MSG:
-    def __init__(self, msg=None):
+    def __init__(self, msg: str = None):
         self.timestamp = current_datetime()     # 时间戳        -   Time Stamp
         self.origination = None                 # 来源节点      -   Source Node
         self.destination = None                 # 目标节点      -   Target Node
@@ -62,8 +63,6 @@ class MSG:
                 self.from_xml(msg)
             else:
                 raise NotImplementedError("仅支持 xml 和 json 类消息")
-        if isinstance(msg, dict):
-            self.from_dict(msg)
 
     def __str__(self):
         return self.to_string()
@@ -139,31 +138,36 @@ class MSG:
     def to_xml(self):
         return dict2xml(self.to_serialize())
 
-    def from_dict(self, msg: dict):
-        def _value_check(key: str, item: dict, datum_type: classmethod = str):
-            if key in item.keys():
-                self.__dict__[key] = null_keep(item[key], datum_type)
+    def _from_key_url(self, key: str, dt: dict, cls: classmethod, default: object = None):
+        if key in dt.keys():
+            if dt[key] is None:
+                self.__dict__[key] = default
             else:
-                self.__dict__[key] = None
-        if not isinstance(msg, dict):
-            raise AttributeError("{0} is not dict type.".format(str(msg)))
+                print(type(dt[key]), type(cls), cls)
+                if isinstance(dt[key], cls):
+                    self.__dict__[key] = dt[key]
+                else:
+                    self.__dict__[key] = cls(dt[key])
+        else:
+            self.__dict__[key] = default
+
+    def from_dict(self, msg: dict):
+        # set value from msg head
         if "head" in msg.keys():
-            # set timestamp from msg
-            _value_check("timestamp", msg["head"])
-            if self.__dict__["timestamp"] is None:
-                self.__dict__["timestamp"] = current_datetime()
-            # set origination from msg
-            _value_check("origination", msg["head"], URL)
-            # set destination from msg
-            _value_check("destination", msg["head"], URL)
-            # set treatment from msg
-            _value_check("treatment", msg["head"], URL)
-            # set encryption from msg
-            _value_check("encryption", msg["head"], URL)
-            # set case from msg
-            _value_check("case", msg["head"], CASE)
-            # set activity from msg
-            _value_check("activity", msg["head"])
+            # set timestamp from msg head ------------------------------------
+            self._from_key_url("timestamp", msg["head"], str, current_datetime())
+            # set origination from msg head ----------------------------------
+            self._from_key_url("origination", msg["head"], URL, None)
+            # set destination from msg head ----------------------------------
+            self._from_key_url("destination", msg["head"], URL, None)
+            # set treatment from msg head ------------------------------------
+            self._from_key_url("treatment", msg["head"], URL, None)
+            # set encryption from msg head -----------------------------------
+            self._from_key_url("encryption", msg["head"], URL, None)
+            # set case from msg head -----------------------------------------
+            self._from_key_url("case", msg["head"], CASE, None)
+            # set activity from msg head -------------------------------------
+            self._from_key_url("activity", msg["head"], str)
         else:
             self.__dict__["timestamp"] = current_datetime()
             self.__dict__["origination"] = None
@@ -172,17 +176,18 @@ class MSG:
             self.__dict__["encryption"] = None
             self.__dict__["case"] = None
             self.__dict__["activity"] = None
+        # set value from msg body
         if "body" in msg.keys():
-            # set nums from msg
-            _value_check("nums", msg["body"], int)
-            # set coding from msg
-            self.__dict__["coding"] = msg["body"]["coding"]
-            # set path from msg
-            self.__dict__["path"] = msg["body"]["path"]
-            # set dtype from msg
-            self.__dict__["dtype"] = msg["body"]["dtype"]
-            # set stream from msg
-            self.__dict__["stream"] = msg["body"]["stream"]
+            # set nums from msg body -----------------------------------------
+            self._from_key_url("nums", msg["body"], int, None)
+            # set coding from msg body ---------------------------------------
+            self._from_key_url("coding", msg["body"], list, None)
+            # set path from msg body -----------------------------------------
+            self._from_key_url("path", msg["body"], list, None)
+            # set dtype from msg body ----------------------------------------
+            self._from_key_url("dtype", msg["body"], list, None)
+            # set stream from msg body ---------------------------------------
+            self._from_key_url("stream", msg["body"], list, None)
         else:
             self.__dict__["nums"] = 0
             self.__dict__["coding"] = None
@@ -208,36 +213,23 @@ class MSG:
         return self
 
     def add_datum(self, datum, path=None):
-        stream, coding, dtype = datum_to_stream(datum)
+        dt = datum_to_stream(datum)
         path = null_keep(path)
         if self.__dict__["nums"] == 0:
-            self.__dict__["stream"] = stream
-            self.__dict__["coding"] = coding
-            self.__dict__["path"] = path
-            self.__dict__["dtype"] = dtype
-        if self.__dict__["nums"] == 1:
-            self.__dict__["stream"] = [self.__dict__["stream"], stream]
-            self.__dict__["coding"] = [self.__dict__["coding"], coding]
-            self.__dict__["path"] = [self.__dict__["path"], path]
-            self.__dict__["dtype"] = [self.__dict__["dtype"], dtype]
-        if self.__dict__["nums"] > 1:
-            self.__dict__["stream"] = self.__dict__["stream"] + [stream]
-            self.__dict__["coding"] = self.__dict__["coding"] + [coding]
-            self.__dict__["path"] = self.__dict__["path"] + [path]
-            self.__dict__["dtype"] = self.__dict__["dtype"] + [dtype]
+            self.__dict__["stream"] = [dt["stream"], ]
+            self.__dict__["coding"] = [dt["coding"], ]
+            self.__dict__["path"] = [path, ]
+            self.__dict__["dtype"] = [dt["dtype"], ]
+        else:
+            self.__dict__["stream"] = self.__dict__["stream"] + [dt["stream"], ]
+            self.__dict__["coding"] = self.__dict__["coding"] + [dt["coding"], ]
+            self.__dict__["path"] = self.__dict__["path"] + [path, ]
+            self.__dict__["dtype"] = self.__dict__["dtype"] + [dt["dtype"], ]
         self.__dict__["nums"] = self.__dict__["nums"] + 1
-        return self
 
     def read_datum(self, num: int):
         if self.__dict__["nums"] == 0:
             return {"stream": None, "path": None}
-        elif num > self.__dict__["nums"]:
-            return {"stream": None, "path": None}
-        elif self.__dict__["nums"] == 1:
-            return {
-                "stream": stream_to_datum(self.__dict__["stream"], self.__dict__["coding"], self.__dict__["dtype"]),
-                "path": self.__dict__["path"],
-            }
         else:
             return {
                 "stream": stream_to_datum(self.__dict__["stream"][num - 1], self.__dict__["coding"][num - 1],
@@ -245,7 +237,7 @@ class MSG:
                 "path": self.__dict__["path"][num - 1],
             }
 
-    def delete_datum(self, num: int):
+    def del_datum(self, num: int):
         if self.__dict__["nums"] == 0:
             pass
         elif self.__dict__["nums"] == 1:
@@ -255,27 +247,41 @@ class MSG:
             del self.__dict__["coding"][num]
             del self.__dict__["path"][num]
             del self.__dict__["dtype"][num]
-            self.nums = self.__dict__["nums"] - 1   # Out of list by __setattr__
-            self.stream = self.__dict__["stream"]
-            self.coding = self.__dict__["coding"]
-            self.path = self.__dict__["path"]
-            self.dtype = self.__dict__["dtype"]
+            self.nums = self.__dict__["nums"] - 1
 
 
 def datum_to_stream(datum=None):
+    """
+    :param datum:
+    :return: rt:
+    {
+        "stream": [None, str],
+        "coding": [None, str],
+        "dtype": [None, "str", "base64"]
+    }
+    """
     if datum is None:
-        return None, None, None
+        rt = {
+            "stream": None,
+            "coding": None,
+            "dtype": None,
+        }
     elif isinstance(datum, str):
-        return datum, CODING, "str"
+        rt = {
+            "stream": datum,
+            "coding": CODING,
+            "dtype": "str",
+        }
     else:
-        return base64.b64encode(datum).decode(CODING), CODING, "base64"
+        rt = {
+            "stream": base64.b64encode(datum).decode(CODING),
+            "coding": CODING,
+            "dtype": "base64",
+        }
+    return rt
 
 
-def stream_to_datum(stream, coding=None, dtype=None):
-    if stream is None and coding is None and dtype is None:
-        return None
-    if stream is None or coding is None or dtype is None:
-        raise ValueError
+def stream_to_datum(stream, coding, dtype):
     if isinstance(stream, str):
         if dtype in ["base64"]:
             return base64.b64decode(stream.encode(coding))

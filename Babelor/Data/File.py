@@ -18,9 +18,9 @@ import os
 import base64
 # Outer Required
 # Inner Required
-from Babelor.Presentation import URL, MSG
-from Babelor.Config import GLOBAL_CFG
-from Babelor.Data import EXCEL
+from Babelor.Presentation.UniformResourceIdentifier import URL
+from Babelor.Presentation.Message import MSG
+from Babelor.Config.Config import GLOBAL_CFG
 # Global Parameters
 
 
@@ -33,12 +33,26 @@ class FILE:
         self.conn = self.__dict__["conn"].check
 
     def read(self, msg: MSG):
-        with open(self.conn.path, "rb") as f:
-            stream = base64.b64encode(f.read())
-            msg.add_datum(datum=stream, path=self.conn.path)
-        return msg
+        new_msg = msg
+        new_msg.nums = 0
+        for i in range(0, msg.nums, 1):
+            dt = msg.read_datum(i)
+            path = os.path.join(self.conn.path, dt["path"])
+            if os.path.exists(path):
+                with open(path, "rb") as file:
+                    stream = base64.b64encode(file.read())
+                    new_msg.add_datum(datum=stream, path=dt["path"])
+            else:
+                new_msg.add_datum(datum=None, path=dt["path"])
+        return new_msg
 
     def write(self, msg: MSG):
+        if not os.path.exists(self.conn.path):
+            os.mkdir(self.conn.path)
         for i in range(0, msg.nums, 1):
-            stream = msg.read_datum(i)
-            f = base64.b64decode(stream["stream"])
+            dt = msg.read_datum(i)
+            stream = base64.b64decode(dt["stream"])
+            path = os.path.join(self.conn.path, dt["path"])
+            if stream is not None:
+                with open(path, "wb") as file:
+                    file.write(stream)

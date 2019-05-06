@@ -14,6 +14,6 @@
 # limitations under the License.
 
 # Inner Required
-from Babelor.Presentation.MSG import MSG
-from Babelor.Presentation.CASE import CASE
-from Babelor.Presentation.URL import URL
+from Babelor.Presentation.Message import MSG
+from Babelor.Presentation.Case import CASE
+from Babelor.Presentation.UniformResourceIdentifier import URL
