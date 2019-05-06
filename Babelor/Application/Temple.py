@@ -115,6 +115,7 @@ def sender(msg: MSG, queue_ctrl: Queue, func: callable = None):
     :return: None
     """
     # init
+    print("sender:", msg)
     origination = allocator(msg.origination)    # Data.read(msg)
     treatment = allocator(msg.treatment)        # MessageQueue
     encryption = allocator(msg.encryption)      # MessageQueue
@@ -123,27 +124,34 @@ def sender(msg: MSG, queue_ctrl: Queue, func: callable = None):
     is_active = queue_ctrl.get()                # 控制信号（初始化）
     if is_active:                               # 控制信号（启动）
         if queue_ctrl.empty():                  # 控制信号（无变更），敏捷响应
-            msg_origination = origination.read(msg)
-            # -----------------------------------------------------
+            # --------- origination -----------------------------------------
+            if isinstance(origination, MQ):
+                msg_origination = origination.pull()
+            else:
+                msg_origination = origination.read(msg)
+            # --------- encryption ------------------------------------------
             if encryption is None:
                 msg_encryption = msg_origination
             else:
                 msg_encryption = encryption.request(msg_origination)
             del msg_origination
-            # ------------------------------------------------------
+            # --------- treatment -------------------------------------------
             if treatment is None:
                 msg_treatment = msg_encryption
             else:
                 msg_treatment = treatment.request(msg_encryption)
             del msg_encryption
-            # ------------------------------------------------------
+            # --------- function --------------------------------------------
             if func is None:
                 msg_function = msg_treatment
             else:
                 msg_function = func(msg_treatment)
             del msg_treatment
-            # ------------------------------------------------------
-            destination.push(msg_function)
+            # --------- destination -----------------------------------------
+            if isinstance(destination, MQ):
+                destination.push(msg_function)
+            else:
+                destination.write(msg_function)
         else:
             is_active = queue_ctrl.get()
     else:
@@ -153,6 +161,7 @@ def sender(msg: MSG, queue_ctrl: Queue, func: callable = None):
 
 def receiver(msg: MSG, queue_ctrl: Queue, func: callable = None):
     # init
+    print("receiver:", msg)
     origination = allocator(msg.origination)    # MessageQueue
     treatment = allocator(msg.treatment)        # MessageQueue
     encryption = allocator(msg.encryption)      # MessageQueue
@@ -161,27 +170,34 @@ def receiver(msg: MSG, queue_ctrl: Queue, func: callable = None):
     is_active = queue_ctrl.get()                # 控制信号（初始化）
     while is_active:                            # 控制信号（启动）
         if queue_ctrl.empty():                  # 控制信号（无变更），敏捷响应
-            msg_origination = origination.pull()
-            # -----------------------------------------------------
+            # --------- origination -----------------------------------------
+            if isinstance(origination, MQ):
+                msg_origination = origination.pull()
+            else:
+                msg_origination = origination.read(msg)
+            # --------- encryption ------------------------------------------
             if encryption is None:
                 msg_encryption = msg_origination
             else:
                 msg_encryption = encryption.request(msg_origination)
             del msg_origination
-            # ------------------------------------------------------
+            # --------- treatment -------------------------------------------
             if treatment is None:
                 msg_treatment = msg_encryption
             else:
                 msg_treatment = treatment.request(msg_encryption)
             del msg_encryption
-            # ------------------------------------------------------
+            # --------- function --------------------------------------------
             if func is None:
                 msg_function = msg_treatment
             else:
                 msg_function = func(msg_treatment)
             del msg_treatment
-            # ------------------------------------------------------
-            destination.write(msg_function)
+            # --------- destination -----------------------------------------
+            if isinstance(destination, MQ):
+                destination.push(msg_function)
+            else:
+                destination.write(msg_function)
         else:
             is_active = queue_ctrl.get()        # 控制信号（变更）
     else:
@@ -203,23 +219,24 @@ def treater(msg: MSG, queue_ctrl: Queue, func: callable = None):
     destination = allocator(msg.destination)    # Data.write()
 
     def treat_msg(msg_orig):
+        # --------- encryption ------------------------------------------
         if encryption is None:
             msg_encryption = msg_orig
         else:
             msg_encryption = encryption.request(msg_orig)
-        # ------------------------------------------------------
+        # --------- treatment -------------------------------------------
         if treatment is None:
             msg_treatment = msg_encryption
         else:
             msg_treatment = treatment.request(msg_encryption)
         del msg_encryption
-        # ------------------------------------------------------
+        # --------- function --------------------------------------------
         if func is None:
             msg_func = msg_treatment
         else:
             msg_func = func(msg_treatment)
         del msg_treatment
-        # ------------------------------------------------------
+        # --------- destination -----------------------------------------
         if destination is None:
             pass
         else:

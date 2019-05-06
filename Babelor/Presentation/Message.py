@@ -143,7 +143,6 @@ class MSG:
             if dt[key] is None:
                 self.__dict__[key] = default
             else:
-                print(type(dt[key]), type(cls), cls)
                 if isinstance(dt[key], cls):
                     self.__dict__[key] = dt[key]
                 else:

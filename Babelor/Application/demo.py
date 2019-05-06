@@ -14,6 +14,7 @@
 # limitations under the License.
 
 # System Required
+import time
 from multiprocessing import Queue, Process
 # Outer Required
 # Inner Required
@@ -111,6 +112,7 @@ def main():
     receiver_msg = msg
     receiver_msg.origination = edge_node_url["inner"]
     receiver_msg.destination = destination_url
+    print("init receiver:", receiver_msg)
     receiver_start = MQ(receiver_url["outer"])
     receiver_start.push(receiver_msg)
     # -————————————------------------------ SENDER ------
@@ -119,7 +121,7 @@ def main():
     sender_msg.destination = edge_node_url["outer"]
     sender_msg.add_datum("", "Babelor-2019-Data-Structure.vsdx")
     sender_msg.add_datum("", "Babelor-2019-Protocol.vsdx")
-    # -————————————------------------------ ADD DATUM ---
+    print("init sender:", sender_msg)
     sender_start = MQ(sender_url["outer"])
     sender_start.push(sender_msg)
 
