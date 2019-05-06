@@ -142,7 +142,7 @@ def first_in_last_out(conn: str, me: str, queue_ctrl: Queue, queue_in: Queue, qu
         del socket, context
 
 
-class MessageQueue:
+class ZMQ:
     def __init__(self, conn: URL):
         if isinstance(conn, str):
             self.conn = URL(conn)                 # 套接字

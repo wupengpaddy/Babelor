@@ -19,9 +19,9 @@ from multiprocessing import Queue, Process
 # Outer Required
 # Inner Required
 from Babelor.Presentation import URL, CASE, MSG
-from Babelor.Config.Config import GLOBAL_CFG
-from Babelor.Session.MQ import MessageQueue
-from Babelor.Data import SQL, FTP, FTPD, TOMAIL, File
+from Babelor.Config import GLOBAL_CFG
+from Babelor.Session import MQ
+from Babelor.Data import SQL, FTP, FTPD, TOMAIL, FILE
 # Global Parameters
 MSG_Q_MAX_DEPTH = GLOBAL_CFG["MSG_Q_MAX_DEPTH"]
 CTRL_Q_MAX_DEPTH = GLOBAL_CFG["CTRL_Q_MAX_DEPTH"]
@@ -30,7 +30,7 @@ BlockingTime = GLOBAL_CFG["MSG_Q_BlockingTime"]
 
 
 def priest(conn: URL, queue_ctrl: Queue, queue_in: Queue):
-    mq = MessageQueue(conn)
+    mq = MQ(conn)
     is_active = queue_ctrl.get()
     while is_active:
         if queue_ctrl.empty():
@@ -96,7 +96,7 @@ def allocator(conn: URL):
         if conn.scheme in ["oracle", "mysql"]:
             return SQL(conn)
         if conn.scheme in ["tcp"]:
-            return MessageQueue(conn)
+            return MQ(conn)
         if conn.scheme in ["ftp"]:
             return FTP(conn)
         if conn.scheme in ["ftpd"]:
@@ -104,7 +104,7 @@ def allocator(conn: URL):
         if conn.scheme in ["tomail"]:
             return TOMAIL(conn)
         if conn.scheme in ["file"]:
-            return File(conn)
+            return FILE(conn)
 
 
 def sender(msg: MSG, queue_ctrl: Queue, func: callable = None):
@@ -223,7 +223,7 @@ def treater(msg: MSG, queue_ctrl: Queue, func: callable = None):
         if destination is None:
             pass
         else:
-            if isinstance(destination, MessageQueue):
+            if isinstance(destination, MQ):
                 destination.push(msg_func)
             else:
                 destination.write(msg_func)
@@ -234,7 +234,7 @@ def treater(msg: MSG, queue_ctrl: Queue, func: callable = None):
     while is_active:                            # 控制信号（启动）
         if queue_ctrl.empty():                  # 控制信号（无变更），敏捷响应
             # ------------------------------------------------------
-            if isinstance(origination, MessageQueue):
+            if isinstance(origination, MQ):
                 origination.reply(treat_msg)
             else:
                 msg_origination = origination.read(msg)

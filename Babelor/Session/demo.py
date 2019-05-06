@@ -18,7 +18,7 @@ import time
 from threading import Thread
 # Outer Required
 # Inner Required
-from Babelor.Session import MessageQueue
+from Babelor.Session import MQ
 from Babelor.Presentation import MSG, URL
 # Global Parameters
 
@@ -26,13 +26,13 @@ from Babelor.Presentation import MSG, URL
 def try_push():
     msg = MSG()
     msg.origination = URL("tcp://127.0.0.1:10001")
-    mq = MessageQueue(URL("tcp://127.0.0.1:10001"))
+    mq = MQ(URL("tcp://127.0.0.1:10001"))
     print("push msg:", msg)
     mq.push(msg)
 
 
 def try_pull():
-    mq = MessageQueue(URL("tcp://*:10001"))
+    mq = MQ(URL("tcp://*:10001"))
     msg = mq.pull()
     print("pull msg:", msg)
 
@@ -46,7 +46,7 @@ def test_push_pull():
 def try_request():
     msg = MSG()
     msg.origination = URL("tcp://127.0.0.1:10001")
-    mq = MessageQueue(URL("tcp://127.0.0.1:10001"))
+    mq = MQ(URL("tcp://127.0.0.1:10001"))
     print("request msg:", msg)
     msg = mq.request(msg)
     print("reply msg:", msg)
@@ -58,7 +58,7 @@ def try_reply_func(msg: MSG):
 
 
 def try_reply():
-    mq = MessageQueue(URL("tcp://*:10001"))
+    mq = MQ(URL("tcp://*:10001"))
     mq .reply(try_reply_func)
 
 
@@ -71,13 +71,13 @@ def test_request_reply():
 def try_publish():
     msg = MSG()
     msg.origination = URL("tcp://127.0.0.1:10001")
-    mq = MessageQueue(URL("tcp://*:10001"))
+    mq = MQ(URL("tcp://*:10001"))
     print("publish msg:", msg)
     mq.publish(msg)
 
 
 def try_subscribe():
-    mq = MessageQueue(URL("tcp://127.0.0.1:10001"))
+    mq = MQ(URL("tcp://127.0.0.1:10001"))
     msg = mq.subscribe()
     print("subscribe msg:", msg)
 

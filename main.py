@@ -18,7 +18,7 @@ import time
 import datetime
 # Outer Required
 import pandas as pd
-from Babelor import MSG, URL, CASE, MessageQueue
+from Babelor import MSG, URL, CASE, MQ
 # Inner Required
 # Global Parameters
 DateFormat = '%Y-%m-%d'
@@ -423,7 +423,7 @@ order by STOD, STOA
     msg.case = CASE()
     msg.case.origination = URL("oracle://username:password@10.169.0.1:1521/oracle")
     msg.case.destination = URL("ftp://username:password@172.21.98.66:21#PASV")
-    mq = MessageQueue(URL("tcp://10.169.0.7:2011"))
+    mq = MQ(URL("tcp://10.169.0.7:2011"))
     mq.push(msg)
     mq.close()
 

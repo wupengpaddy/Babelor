@@ -19,7 +19,7 @@ from multiprocessing import Queue, Process
 # Inner Required
 from Babelor.Application import TEMPLE
 from Babelor.Presentation import MSG, URL, CASE
-from Babelor.Session import MessageQueue
+from Babelor.Session import MQ
 # Global Parameters
 
 
@@ -111,7 +111,7 @@ def main():
     receiver_msg = msg
     receiver_msg.origination = edge_node_url["inner"]
     receiver_msg.destination = destination_url
-    receiver_start = MessageQueue(receiver_url["outer"])
+    receiver_start = MQ(receiver_url["outer"])
     receiver_start.push(receiver_msg)
     # -————————————------------------------ SENDER ------
     sender_msg = msg
@@ -120,7 +120,7 @@ def main():
     sender_msg.add_datum("", "Babelor-2019-Data-Structure.vsdx")
     sender_msg.add_datum("", "Babelor-2019-Protocol.vsdx")
     # -————————————------------------------ ADD DATUM ---
-    sender_start = MessageQueue(sender_url["outer"])
+    sender_start = MQ(sender_url["outer"])
     sender_start.push(sender_msg)
 
 
