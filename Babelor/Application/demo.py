@@ -14,6 +14,8 @@
 # limitations under the License.
 
 # System Required
+import time
+import logging
 from multiprocessing import Process
 # Outer Required
 # Inner Required
@@ -21,6 +23,8 @@ from Babelor.Application import TEMPLE
 from Babelor.Presentation import MSG, URL, CASE
 from Babelor.Session import MQ
 # Global Parameters
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s')
 
 
 def func_treater(msg_in: MSG):
@@ -111,7 +115,8 @@ def main():
     receiver_msg = msg
     receiver_msg.origination = edge_node_url["inner"]
     receiver_msg.destination = destination_url
-    print("init receiver:", receiver_msg)
+    logging.warning("RECEIVER::INIT::{0} send:{1}".format(receiver_url["inner"], receiver_msg))
+    time.sleep(10)
     receiver_init = MQ(receiver_url["outer"])
     receiver_init.push(receiver_msg)
     receiver_init.close()
