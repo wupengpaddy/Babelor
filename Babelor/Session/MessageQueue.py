@@ -47,7 +47,7 @@ def first_out_last_in(conn: str, me: str, queue_ctrl: Queue, queue_in: Queue, qu
         has_response = True
     elif me in ["PUBLISH"]:
         socket = context.socket(zmq.PUB)
-        socket.setsockopt(zmq.SNDHWM, MSG_Q_MAX_DEPTH)
+        # socket.setsockopt(zmq.SNDHWM, MSG_Q_MAX_DEPTH)
         socket.bind(conn)
         has_response = False
     else:   # PUSH
@@ -108,7 +108,7 @@ def first_in_last_out(conn: str, me: str, queue_ctrl: Queue, queue_in: Queue, qu
         has_response = False
     else:   # PULL
         socket = context.socket(zmq.PULL)
-        socket.setsockopt(zmq.SNDHWM, MSG_Q_MAX_DEPTH)
+        # socket.setsockopt(zmq.SNDHWM, MSG_Q_MAX_DEPTH)
         socket.bind(conn)
         has_response = False
     is_active = queue_ctrl.get()                    # 控制信号（初始化）
@@ -160,11 +160,10 @@ class ZMQ:
             else:                                          # 已初始化模式
                 self.queue_ctrl.put(False)                 # 控制信号（停止）
                 time.sleep(BlockingTime)
-                try:
-                    self.process.close()                   # 进程释放（软释放）
-                except ValueError:
-                    self.process.kill()                    # 进程释放（硬释放）
-                self.process = None
+                if isinstance(self.process, Process):      # 进程释放（软释放）
+                    self.process.terminate()
+                else:
+                    self.process = None
                 self.queue_in = Queue(MSG_Q_MAX_DEPTH)     # 进站队列（初始化）
                 self.queue_out = Queue(MSG_Q_MAX_DEPTH)    # 出站队列（初始化）
                 self.queue_ctrl = Queue(CTRL_Q_MAX_DEPTH)  # 控制队列（初始化）

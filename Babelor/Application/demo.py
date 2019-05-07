@@ -96,8 +96,8 @@ def main():
     # -————————————------------------------ PROCESS ------
     temple = {
         "sender": Process(target=sender, args=(sender_url["inner"],)),
-        "treater": Process(target=treater, args=(treater_url["inner"],)),
-        "encrypter": Process(target=encrypter, args=(encrypter_url["inner"],)),
+        # "treater": Process(target=treater, args=(treater_url["inner"],)),
+        # "encrypter": Process(target=encrypter, args=(encrypter_url["inner"],)),
         "receiver": Process(target=receiver, args=(receiver_url["inner"],)),
     }
     for obj in temple.items():
@@ -112,17 +112,18 @@ def main():
     receiver_msg.origination = edge_node_url["inner"]
     receiver_msg.destination = destination_url
     print("init receiver:", receiver_msg)
-    receiver_start = MQ(receiver_url["outer"])
-    receiver_start.push(receiver_msg)
+    receiver_init = MQ(receiver_url["outer"])
+    receiver_init.push(receiver_msg)
+    receiver_init.close()
     # -————————————------------------------ SENDER ------
-    sender_msg = msg
-    sender_msg.origination = origination_url
-    sender_msg.destination = edge_node_url["outer"]
-    sender_msg.add_datum("", "Babelor-2019-Data-Structure.vsdx")
-    sender_msg.add_datum("", "Babelor-2019-Protocol.vsdx")
-    print("init sender:", sender_msg)
-    sender_start = MQ(sender_url["outer"])
-    sender_start.push(sender_msg)
+    # sender_msg = msg
+    # sender_msg.origination = origination_url
+    # sender_msg.destination = edge_node_url["outer"]
+    # sender_msg.add_datum(None, "Babelor-2019-Data-Structure.vsdx")
+    # sender_msg.add_datum(None, "Babelor-2019-Protocol.vsdx")
+    # print("init sender:", sender_msg)
+    # sender_start = MQ(sender_url["outer"])
+    # sender_start.push(sender_msg)
 
 
 if __name__ == '__main__':
