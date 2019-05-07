@@ -1,9 +1,0 @@
-requests>=2.18.4
-beautifulsoup4>=4.6.0
-SQLAlchemy>=1.2.15
-numpy>=1.15.4
-pandas>=0.23.4
-python-dateutil>=2.7.5
-pyzmq>=17.1.2
-pyftpdlib>=1.5.4
-xlrd>=1.2.0
