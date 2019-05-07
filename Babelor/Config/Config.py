@@ -27,9 +27,9 @@ GLOBAL_CFG = {
     # XML 报配置
     "ROOT_TAG": "root",
     # MQ 配置
-    "CTRL_Q_MAX_DEPTH": 8,
+    "CTRL_Q_MAX_DEPTH": 4,
     "MSG_Q_MAX_DEPTH": 32,
-    "MSG_Q_BlockingTime": 1/3,
+    "MSG_Q_BlockingTime": 1/1024,
     # FTP 配置
     "FTP_BANNER": "Welcome to Information Service Exchange Platform.",
     "FTP_PASV_PORTS": {

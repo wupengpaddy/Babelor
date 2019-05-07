@@ -15,12 +15,15 @@
 
 # System Required
 import time
+import logging
 from multiprocessing import Process
 # Outer Required
 # Inner Required
 from Babelor.Session import MQ
 from Babelor.Presentation import MSG, URL
 # Global Parameters
+logging.basicConfig(level=logging.WARNING,
+                    format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s')
 
 
 def try_push(url: str):
@@ -28,7 +31,7 @@ def try_push(url: str):
     msg.origination = URL("tcp://127.0.0.1:10001")
     msg.destination = URL("tcp://127.0.0.1:10001")
     mq = MQ(url)
-    for i in range(0, 100, 1):
+    for i in range(0, 10000, 1):
         # print("push msg:", msg)
         msg.activity = str(i)
         # print("push msg:", i, msg)
@@ -37,25 +40,24 @@ def try_push(url: str):
 
 def try_pull(url: str):
     mq = MQ(url)
-    for i in range(0, 100, 1):
+    for i in range(0, 10000, 1):
         msg = mq.pull()
-        print("pull msg:", i, msg)
+        logging.warning("PULL::{0} seq:{1} recv:{2}".format(url, i, msg.timestamp))
 
 
 def demo_push_pull():
+    logging.warning("DEMO::START")
     process = Process(target=try_pull, args=("tcp://*:15001",))
     process.start()
-    time.sleep(1)
     try_push("tcp://127.0.0.1:15001")
+    logging.warning("DEMO::END")
 
 
 def try_request():
     msg = MSG()
     msg.origination = URL("tcp://127.0.0.1:10001")
     mq = MQ(URL("tcp://127.0.0.1:10001"))
-    print("request msg:", msg)
     msg = mq.request(msg)
-    print("reply msg:", msg)
 
 
 def try_reply_func(msg: MSG):
