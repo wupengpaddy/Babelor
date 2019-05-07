@@ -1,24 +1,13 @@
 # coding=utf-8
-# Copyright 2018 StrTrek Team Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright 2019 StrTrek Shanghai Pudong International Airport Team Authors.
 
 # System Required
 import time
 import datetime
+from multiprocessing import Process
 # Outer Required
 import pandas as pd
-from Babelor import MSG, URL, CASE, MQ
+from Babelor import MSG, URL, CASE, MQ, TEMPLE
 # Inner Required
 # Global Parameters
 DateFormat = '%Y-%m-%d'
@@ -352,7 +341,7 @@ def func_treatment(msg: MSG):
     return msg_out
 
 
-def pvg2flight_quality_analysis(select_date: str):
+def pvg2flight_quality_analysis(select_date: str, msg: MSG):
     # 数据范围
     start_date = datetime.datetime.strptime(select_date, DateFormat) - datetime.timedelta(days=7)
     end_date = datetime.datetime.strptime(select_date, DateFormat) + datetime.timedelta(days=1)
@@ -413,7 +402,6 @@ where cdm.STOD between to_date('{0}', 'yyyy-mm-dd') and to_date('{1}', 'yyyy-mm-
 order by STOD, STOA
 """.format(start_date.strftime(DateFormat), end_date.strftime(DateFormat))
     # 消息生成
-    msg = MSG()
     msg.add_datum(datum=select_date, path="SELECT-DATE")
     msg.add_datum(datum=pvg_afds_sql, path="PVG-AFDS")
     msg.add_datum(datum=pvg_cdm_sql, path="PVG-CDM")
@@ -423,22 +411,39 @@ order by STOD, STOA
     msg.case = CASE()
     msg.case.origination = URL("oracle://username:password@10.169.0.1:1521/oracle")
     msg.case.destination = URL("ftp://username:password@172.21.98.66:21#PASV")
-    mq = MQ(URL("tcp://10.169.0.7:2011"))
-    mq.push(msg)
-    mq.close()
+    return msg
 
 
-def range_worker(year: int):
-    # 取时间范围
-    begin_date = datetime.date(year, 1, 1)
-    end_date = datetime.date(year, 12, 31)
-    if end_date > datetime.datetime.strptime(CurrentDate, DateFormat):
-        end_date = CurrentDate
-    # 时间遍历
-    for i in range((end_date - begin_date).days + 1):
-        select_date = begin_date + datetime.timedelta(days=i)
-        pvg2flight_quality_analysis(select_date.strftime(DateFormat))
+def sender(url):
+    myself = TEMPLE(url)
+    myself.open(role="sender", func=func_treatment)
+
+
+def main():
+    # -————————————------------------------ TEMPLE -------
+    temple_url = URL("tcp://127.0.0.1:10001")
+    edge_node_url = {
+        "inner": URL("tcp://*:10002"),
+        "outer": URL("tcp://10.140.0.8:10002"),
+    }
+    origination_url = URL("oracle://spia_acdm:Wonders@10.28.130.13:1521/orcl")
+    destination_url = URL("ftp://pvghbpz:pVGHbpz2018@10.139.140.10#?model=PASV")
+    # -————————————------------------------ PROCESS ------
+    temple_receiver = Process(target=sender, args=(temple_url, ))
+    temple_receiver.start()
+    # -————————————------------------------ MESSAGE -----
+    case = CASE("{0}#{1}".format(origination_url, destination_url))
+    sender_msg = MSG()
+    sender_msg.case = case
+    sender_msg.origination = origination_url
+    sender_msg.destination = edge_node_url["outer"]
+    sender_msg.activity = "init"
+    sender_msg = pvg2flight_quality_analysis(CurrentDate, sender_msg)
+    # -————————————------------------------ SENDER ------
+    receiver_init = MQ(temple_url)
+    receiver_init.push(sender_msg)
+    receiver_init.close()
 
 
 if __name__ == '__main__':
-    range_worker(year=2018)
+    main()
