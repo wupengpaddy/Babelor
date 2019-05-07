@@ -23,31 +23,30 @@ from Babelor.Presentation import MSG, URL
 # Global Parameters
 
 
-def try_push():
+def try_push(url: str):
     msg = MSG()
-    msg.origination = URL("tcp://*:10001")
+    msg.origination = URL("tcp://127.0.0.1:10001")
     msg.destination = URL("tcp://127.0.0.1:10001")
-    mq = MQ("tcp://127.0.0.1:10001")
+    mq = MQ(url)
     for i in range(0, 100, 1):
         # print("push msg:", msg)
         msg.activity = str(i)
         # print("push msg:", i, msg)
         mq.push(msg)
-        time.sleep(0.001)
 
 
-def try_pull():
-    mq = MQ("tcp://*:10001")
+def try_pull(url: str):
+    mq = MQ(url)
     for i in range(0, 100, 1):
         msg = mq.pull()
-        # print("pull msg:", i, msg)
+        print("pull msg:", i, msg)
 
 
 def demo_push_pull():
-    process = Process(target=try_pull)
+    process = Process(target=try_pull, args=("tcp://*:15001",))
     process.start()
     time.sleep(1)
-    try_push()
+    try_push("tcp://127.0.0.1:15001")
 
 
 def try_request():
@@ -70,7 +69,7 @@ def try_reply():
 
 
 def demo_request_reply():
-    thread = Thread(target=try_reply)
+    thread = Process(target=try_reply)
     thread.start()
     try_request()
 
@@ -90,7 +89,7 @@ def try_subscribe():
 
 
 def demo_publish_subscribe():
-    thread = Thread(target=try_publish)
+    thread = Process(target=try_publish)
     thread.start()
     time.sleep(2)
     try_subscribe()

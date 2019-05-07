@@ -62,7 +62,7 @@ def first_out_last_in(conn: str, me: str, queue_ctrl: Queue, queue_in: Queue, qu
                 time.sleep(BlockingTime)
             else:
                 msg_out = queue_out.get()           # 输出队列（推出）
-            print("ZMQ send:", msg_out)
+            # print("ZMQ send:", msg_out)
             message_out = str(msg_out).encode(CODING)
             # print("ZMQ send:", message_out)
             socket.send(message_out)        # 消息 出
@@ -116,7 +116,7 @@ def first_in_last_out(conn: str, me: str, queue_ctrl: Queue, queue_in: Queue, qu
     while is_active:                                # 控制信号（启动）
         if queue_ctrl.empty():                      # 控制信号（无变更），敏捷响应
             message_in = socket.recv()              # 消息 进
-            # print("ZMQ receive:", message_in)
+            # print("ZMQ recv:", message_in)
             msg_in = MSG(message_in.decode(CODING))
             while queue_in.full():                  # 进 / put / recv
                 time.sleep(BlockingTime)
@@ -232,7 +232,7 @@ class ZMQ:
         if self.initialed not in [me, ]:
             self.__start(me=me, func=first_out_last_in)
         if self.active:
-            print("ZMQ PUSH:", self.queue_out.full(), msg_out)
+            # print("MQ PUSH:", msg_out)
             while self.queue_out.full():
                 time.sleep(BlockingTime)
             else:
@@ -250,7 +250,7 @@ class ZMQ:
                 time.sleep(BlockingTime)
             else:
                 msg_in = self.queue_in.get()                 # 输入数据
-                # print("ZMQ PULL:", msg_in)
+                # print("MQ PULL:", msg_in)
                 return msg_in
         else:
             self.release()
