@@ -14,70 +14,117 @@
 # limitations under the License.
 
 # System Required
+import time
 from multiprocessing import Queue, Process
 # Outer Required
 # Inner Required
 from Babelor.Application import TEMPLE
 from Babelor.Presentation import MSG, URL, CASE
+from Babelor.Session import MQ
 # Global Parameters
 
 
 def func_treater(msg_in: MSG):
-    # -———————————————————————————————————------------------------ INIT ---------
-    data_tuple = {}
+    # -—————————————------------------------ INIT ---------
+    dt = {}
     for i in range(0, msg_in.nums, 1):
         attachment = msg_in.read_datum(i)
-        if attachment["path"] in data_tuple.keys():
-            data_tuple[attachment["path"]] = attachment["stream"]
-    # -———————————————————————————————————------------------------ PROCESS ------
+        if attachment["path"] in dt.keys():
+            dt[attachment["path"]] = attachment["stream"]
+    # -—————————————------------------------ PROCESS ------
     msg_out = msg_in
-    # -———————————————————————————————————------------------------ END ----------
+    # -—————————————------------------------ END ----------
     return msg_out
 
 
 def func_encrypter(msg_in: MSG):
-    # -———————————————————————————————————------------------------ INIT ---------
-    data_tuple = {}
+    # -————————————------------------------ INIT ---------
+    dt = {}
     for i in range(0, msg_in.nums, 1):
         attachment = msg_in.read_datum(i)
-        if attachment["path"] in data_tuple.keys():
-            data_tuple[attachment["path"]] = attachment["stream"]
-    # -———————————————————————————————————------------------------ PROCESS ------
+        if attachment["path"] in dt.keys():
+            dt[attachment["path"]] = attachment["stream"]
+    # -————————————------------------------ PROCESS ------
     msg_out = msg_in
-    # -———————————————————————————————————------------------------ END ----------
+    # -————————————------------------------ END ----------
     return msg_out
 
 
-def sender():
-    myself = TEMPLE(URL("tcp://*:3001"))
+def sender(url):
+    myself = TEMPLE(url)
     myself.open(role="sender")
 
 
-def treater():
-    myself = TEMPLE(URL("tcp://*:3002"))
+def treater(url):
+    myself = TEMPLE(url)
     myself.open(role="treater", func=func_treater)
 
 
-def encrypter():
-    myself = TEMPLE(URL("tcp://*:3003"))
+def encrypter(url):
+    myself = TEMPLE(url)
     myself.open(role="encrypter", func=func_encrypter)
 
 
-def receiver():
-    myself = TEMPLE(URL("tcp://*:3004"))
+def receiver(url):
+    myself = TEMPLE(url)
     myself.open(role="receiver")
 
 
-if __name__ == '__main__':
+def main():
+    # -————————————------------------------ TEMPLE -------
+    sender_url = {
+        "inner": URL("tcp://*:10001"),
+        "outer": URL("tcp://127.0.0.1:10001"),
+    }
+    treater_url = {
+        "inner": URL("tcp://*:10002"),
+        "outer": URL("tcp://127.0.0.1:10002"),
+    }
+    encrypter_url = {
+        "inner": URL("tcp://*:10003"),
+        "outer": URL("tcp://127.0.0.1:10003"),
+    }
+    receiver_url = {
+        "inner": URL("tcp://*:10004"),
+        "outer": URL("tcp://127.0.0.1:10004"),
+    }
+    edge_node_url = {
+        "inner": URL("tcp://*:10005"),
+        "outer": URL("tcp://127.0.0.1:10005"),
+    }
+    origination_url = URL("file://docs")
+    destination_url = URL("file://new_docs")
+    # -————————————------------------------ PROCESS ------
     temple = {
-        "sender": Process(target=sender),
-        "treater": Process(target=treater),
-        "encrypter": Process(target=encrypter),
-        "receiver": Process(target=receiver),
+        "sender": Process(target=sender, args=(sender_url["inner"],)),
+        "treater": Process(target=treater, args=(treater_url["inner"],)),
+        "encrypter": Process(target=encrypter, args=(encrypter_url["inner"],)),
+        "receiver": Process(target=receiver, args=(receiver_url["inner"],)),
     }
     for obj in temple.items():
         key, value = obj
         value.start()
+    # -————————————------------------------ MESSAGE -----
+    case = CASE("{0}#{1}".format(origination_url, destination_url))
+    msg = MSG()
+    msg.case = case
+    # -————————————------------------------ RECEIVER ----
+    receiver_msg = msg
+    receiver_msg.origination = edge_node_url["inner"]
+    receiver_msg.destination = destination_url
+    print("init receiver:", receiver_msg)
+    receiver_start = MQ(receiver_url["outer"])
+    receiver_start.push(receiver_msg)
+    # -————————————------------------------ SENDER ------
+    sender_msg = msg
+    sender_msg.origination = origination_url
+    sender_msg.destination = edge_node_url["outer"]
+    sender_msg.add_datum("", "Babelor-2019-Data-Structure.vsdx")
+    sender_msg.add_datum("", "Babelor-2019-Protocol.vsdx")
+    print("init sender:", sender_msg)
+    sender_start = MQ(sender_url["outer"])
+    sender_start.push(sender_msg)
 
 
-
+if __name__ == '__main__':
+    main()

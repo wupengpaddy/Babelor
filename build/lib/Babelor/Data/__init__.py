@@ -14,7 +14,8 @@
 # limitations under the License.
 
 # Inner Required
-from Babelor.Data.SQL import SQL
-from Babelor.Data.FTPD import FTPD
-from Babelor.Data.FTP import FTP
-from Babelor.Data.TOMAIL import TOMAIL
+from Babelor.Data.Sql import SQL
+from Babelor.Data.Ftpd import FTPD
+from Babelor.Data.Ftp import FTP
+from Babelor.Data.Tomail import TOMAIL
+from Babelor.Data.File import FILE

@@ -39,7 +39,7 @@ class FTP:
         ftp = self.open()
         for i in range(0, msg.nums, 1):
             attachment = msg.read_datum(i)
-            ftp.storbinary('STOR ' + attachment["path"].split("/")[-1], attachment["stream"], BUFFER_SIZE)  # 上传文件
+            ftp.storbinary('STOR ' + attachment["path"].split("/")[-1], attachment["stream"], BUFFER_SIZE)
         ftp.close()
 
     def read(self, msg: MSG):
@@ -48,17 +48,18 @@ class FTP:
         ftp = self.open()
         for i in range(0, msg.nums, 1):
             attachment = msg.read_datum(i)
-            ftp.retrbinary('RETR ' + attachment.split("/")[-1], attachment["stream"], BUFFER_SIZE)  # 下载文件
-            new_msg.add_datum(attachment["stream"], attachment['path'])
+            ftp.retrbinary('RETR ' + attachment["path"].split("/")[-1], attachment["stream"], BUFFER_SIZE)
+            new_msg.add_datum(datum=attachment["stream"], path=attachment['path'])
         ftp.close()
         return new_msg
 
     def open(self):
         ftp = ftplib.FTP()
-        ftp.connect(self.conn.hostname, self.conn.port)     # 连接
-        ftp.login(self.conn.username, self.conn.password)   # 登录
-        if isinstance(self.conn.fragment, URL):             # 被动模式
-            if self.conn.fragment.query not in [""]:
+        ftp.connect(self.conn.hostname, self.conn.port)
+        ftp.login(self.conn.username, self.conn.password)
+        # ----------------------------------------------------- 被动模式 - PASV Model
+        if isinstance(self.conn.fragment, URL):
+            if isinstance(self.conn.fragment.query, dict):
                 if self.conn.fragment.query["model"] in ["PASV"]:
                     ftp.set_pasv(True)
             return ftp

@@ -18,8 +18,8 @@ from datetime import datetime
 from urllib.parse import unquote, quote
 # Outer Required
 # Inner Required
-from Babelor.Config import GLOBAL_CFG
-from Babelor.Presentation import URL
+from Babelor.Presentation.UniformResourceIdentifier import URL
+from Babelor.Config.Config import GLOBAL_CFG
 # Global Parameters
 DatetimeFmt = GLOBAL_CFG["DatetimeFormat"]
 PortFmt = GLOBAL_CFG["PortFormat"]
@@ -33,8 +33,8 @@ def current_datetime() -> str:
 
 class CASE:
     def __init__(self, case=None):
-        self.origination = URL()
-        self.destination = URL()
+        self.origination = None
+        self.destination = None
         self.timestamp = current_datetime()
         if isinstance(case, str):
             self.from_string(case)

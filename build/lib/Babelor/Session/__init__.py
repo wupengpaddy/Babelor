@@ -14,4 +14,4 @@
 # limitations under the License.
 
 # Inner Required
-from Babelor.Session.MQ import MessageQueue
+from Babelor.Session.MessageQueue import ZMQ as MQ
