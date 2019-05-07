@@ -15,7 +15,10 @@
 
 # System Required
 import time
+import logging
 from multiprocessing import Queue, Process
+# Outer Required
+import zmq
 # Inner Required
 from Babelor.Presentation import MSG, URL
 from Babelor.Config import GLOBAL_CFG
@@ -24,12 +27,14 @@ MSG_Q_MAX_DEPTH = GLOBAL_CFG["MSG_Q_MAX_DEPTH"]
 CTRL_Q_MAX_DEPTH = GLOBAL_CFG["CTRL_Q_MAX_DEPTH"]
 CODING = GLOBAL_CFG["CODING"]
 BlockingTime = GLOBAL_CFG["MSG_Q_BlockingTime"]
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s')
 
 
 def first_out_last_in(conn: str, me: str, queue_ctrl: Queue, queue_in: Queue, queue_out: Queue):
     """
     # 先出后进 / 只出
-    # 控制信号（启动）--> 输出队列（推出）--> 控制信号（需反馈）--> 输入队列（推入）
+    # 控制信号 --> 输出队列 --> 输出队列 --> 反馈信号 --> 输入队列
     :param conn: str            # 套接字
     :param me: str              # 传输方式 ( "REQUEST", "PUBLISH", "PUSH")
     :param queue_ctrl: Queue    # 控制队列 ("is_active",):(bool,)
@@ -37,45 +42,61 @@ def first_out_last_in(conn: str, me: str, queue_ctrl: Queue, queue_in: Queue, qu
     :param queue_out: Queue     # 输入队列 ("msg_out",):(MSG,)
     :return: None
     """
-    # Outer Required
-    import zmq
-    # 初始化 initial
-    context = zmq.Context.instance()
+    context = zmq.Context()
+    # ------- REQUEST ----------------------------
     if me in ["REQUEST"]:
         socket = context.socket(zmq.REQ)
         socket.connect(conn)
-        has_response = True
-    elif me in ["PUBLISH"]:
-        socket = context.socket(zmq.PUB)
-        # socket.setsockopt(zmq.SNDHWM, MSG_Q_MAX_DEPTH)
-        socket.bind(conn)
-        has_response = False
-    else:   # PUSH
+        handshake, has_response = 0, True
+        logging.debug("ZMQ FOLI:REQUEST connect:{0}".format(conn))
+    # ------- SUBSCRIBE --------------------------
+    elif me in ["SUBSCRIBE"]:
+        socket = context.socket(zmq.SUB)
+        socket.connect(conn)
+        handshake, has_response = 1, True
+        logging.debug("ZMQ FOLI:SUBSCRIBE connect:{0}".format(conn))
+    # ------- PUSH ------------------------------
+    elif me in ["PUSH"]:
         socket = context.socket(zmq.PUSH)
         socket.connect(conn)
-        has_response = False
-    is_active = queue_ctrl.get()                    # 控制信号（初始化）
-    # 消息队列 to message queue
-    while is_active:                                # 控制信号（启动）
-        if queue_ctrl.empty():                      # 控制信号（无变更），敏捷响应
-            while queue_out.empty():                # 出 / get / send
-                time.sleep(BlockingTime)
+        handshake, has_response = 0, False
+        logging.debug("ZMQ FOLI:PUSH connect:{0}".format(conn))
+    # ------- DEFAULT: PUSH ---------------------
+    else:
+        socket = context.socket(zmq.PUSH)
+        socket.connect(conn)
+        handshake, has_response = 0, False
+        logging.debug("ZMQ FOLI::{0} connect:{1}".format(me, conn))
+    # ------------------------------------- QUEUE
+    is_active = queue_ctrl.get()
+    while is_active:
+        if queue_ctrl.empty():
+            # SEND --------------------------------
+            if handshake == 1:
+                socket.setsockopt(zmq.SUBSCRIBE, '')
+                logging.info("ZMQ FOLI::{0}::{1} send:{2}".format(me, conn, "zmq.SUBSCRIBE"))
             else:
-                msg_out = queue_out.get()           # 输出队列（推出）
-            # print("ZMQ send:", msg_out)
-            message_out = str(msg_out).encode(CODING)
-            # print("ZMQ send:", message_out)
-            socket.send(message_out)        # 消息 出
-            if has_response:                    # 控制信号（需反馈）
-                while queue_in.full():          # 进 / put / recv
+                while queue_out.empty():
                     time.sleep(BlockingTime)
                 else:
-                    message_in = socket.recv()  # 消息 进
+                    msg_out = queue_out.get()
+                logging.debug("ZMQ FOLI::{0}::{1} QUEUE OUT:{2}".format(me, conn, msg_out))
+                message_out = str(msg_out).encode(CODING)
+                socket.send(message_out)
+                logging.info("ZMQ FOLI::{0}::{1} send:{2}".format(me, conn, message_out))
+            # RECV --------------------------------
+            if has_response:
+                while queue_in.full():
+                    time.sleep(BlockingTime)
+                else:
+                    message_in = socket.recv()
+                    logging.info("ZMQ FOLI:{0}:{1} receive:{2}".format(me, conn, message_in))
                     msg_in = MSG(message_in.decode(CODING))
-                    queue_in.put(msg_in)        # 输入队列（推入）
-        else:                                       # 控制信号（变更）
+                    queue_in.put(msg_in)
+                    logging.debug("ZMQ FOLI::{0}::{1} QUEUE IN:{2}".format(me, conn, msg_in))
+        else:
             is_active = queue_ctrl.get()
-    else:                                           # 队列关闭
+    else:
         queue_ctrl.close()
         queue_out.close()
         queue_in.close()
@@ -92,46 +113,54 @@ def first_in_last_out(conn: str, me: str, queue_ctrl: Queue, queue_in: Queue, qu
     :param queue_out: Queue     # 输入队列 (MSG,)
     :return: None
     """
-    # Outer Required
-    import zmq
-    # 初始化 initial
-    context = zmq.Context.instance()
+    context = zmq.Context()
+    # ------- REPLY ----------------------------
     if me in ["REPLY"]:
         socket = context.socket(zmq.REP)
         socket.bind(conn)
         has_response = True
-    elif me in ["SUBSCRIBE"]:
-        socket = context.socket(zmq.SUB)
-        socket.connect(conn)
-        # socket.setsockopt(zmq.SUBSCRIBE, '')        # 初次握手订阅
-        socket.setsockopt_string(zmq.SUBSCRIBE, '')
-        has_response = False
-    else:   # PULL
-        socket = context.socket(zmq.PULL)
-        # socket.setsockopt(zmq.SNDHWM, MSG_Q_MAX_DEPTH)
+        logging.debug("ZMQ FILO:REPLY bind:{1}".format(me, conn))
+    # ------- REPLY ----------------------------
+    elif me in ["PUBLISH"]:
+        socket = context.socket(zmq.PUB)
         socket.bind(conn)
         has_response = False
-    is_active = queue_ctrl.get()                    # 控制信号（初始化）
-    # 消息队列 from message queue
-    while is_active:                                # 控制信号（启动）
-        if queue_ctrl.empty():                      # 控制信号（无变更），敏捷响应
-            message_in = socket.recv()              # 消息 进
-            # print("ZMQ recv:", message_in)
+        logging.debug("ZMQ FILO:PUBLISH bind:{1}".format(me, conn))
+    # ------- PULL -----------------------------
+    elif me in ["PULL"]:
+        socket = context.socket(zmq.PULL)
+        socket.bind(conn)
+        has_response = False
+        logging.debug("ZMQ FILO:PULL bind:{1}".format(me, conn))
+    # ------- DEFAULT: PULL -----------------------------
+    else:
+        socket = context.socket(zmq.PULL)
+        socket.bind(conn)
+        has_response = False
+        logging.debug("ZMQ FILO::{0} bind:{1}".format(me, conn))
+    # ------------------------------------- QUEUE
+    is_active = queue_ctrl.get()
+    while is_active:
+        if queue_ctrl.empty():
+            # RECV --------------------------------
+            message_in = socket.recv()
+            logging.info("ZMQ FILO:{0}:{1} receive:{2}".format(me, conn, message_in))
             msg_in = MSG(message_in.decode(CODING))
-            while queue_in.full():                  # 进 / put / recv
+            while queue_in.full():
                 time.sleep(BlockingTime)
             else:
-                queue_in.put(msg_in)                # 输入队列（推入）
-            if has_response:                        # 控制信号（需反馈）
-                while queue_out.empty():            # 出 / get / send
+                queue_in.put(msg_in)
+            # SEND --------------------------------
+            if has_response:
+                while queue_out.empty():
                     time.sleep(BlockingTime)
                 else:
-                    msg_out = queue_out.get()       # 输出队列（推出）
+                    msg_out = queue_out.get()
                     message_out = str(msg_out).encode(CODING)
-                    socket.send(message_out)        # 消息 出
-        else:                                       # 控制信号（变更）
+                    socket.send(message_out)
+        else:
             is_active = queue_ctrl.get()
-    else:                                           # 队列关闭
+    else:
         queue_ctrl.close()
         queue_out.close()
         queue_in.close()
@@ -140,16 +169,16 @@ def first_in_last_out(conn: str, me: str, queue_ctrl: Queue, queue_in: Queue, qu
 class ZMQ:
     def __init__(self, conn: (URL, str)):
         if isinstance(conn, str):
-            self.conn = URL(conn)                 # 套接字
+            self.conn = URL(conn)
         else:
             self.conn = conn
-        if self.conn.scheme not in ["tcp", "pgm", "inproc"]:       # 协议（校验）
+        # Check
+        if self.conn.scheme not in ["tcp", "pgm", "inproc"]:
             raise ValueError("Invalid scheme{0}.".format(self.conn.scheme))
-        self.conn = self.conn.check   # 默认端口（校验）
-        self.queue_in = Queue(MSG_Q_MAX_DEPTH)     # 进站队列（初始化）
-        self.queue_out = Queue(MSG_Q_MAX_DEPTH)    # 出站队列（初始化）
-        self.queue_ctrl = Queue(CTRL_Q_MAX_DEPTH)  # 控制队列（初始化）
-        self.active = False                        # 激活状态（初始 不激活）
+        self.queue_in = Queue(MSG_Q_MAX_DEPTH)     # QUEUE IN
+        self.queue_out = Queue(MSG_Q_MAX_DEPTH)    # QUEUE OUT
+        self.queue_ctrl = Queue(CTRL_Q_MAX_DEPTH)  # QUEUE CTRL
+        self.active = False                        # 激活状态
         self.initialed = None                      # 已初始化模式
         self.process = None                        # 队列控制进程
 
