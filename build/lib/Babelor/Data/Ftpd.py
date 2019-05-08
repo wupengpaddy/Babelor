@@ -14,11 +14,12 @@
 # limitations under the License.
 
 # System Required
-import ftplib
-import logging
 # Outer Required
+from pyftpdlib.authorizers import DummyAuthorizer
+from pyftpdlib.handlers import FTPHandler
+from pyftpdlib.servers import FTPServer
 # Inner Required
-from Babelor.Presentation import URL, MSG
+from Babelor.Presentation import URL
 from Babelor.Config import GLOBAL_CFG
 # Global Parameters
 BANNER = GLOBAL_CFG["FTP_BANNER"]
@@ -28,7 +29,7 @@ MAX_CONS_PER_IP = GLOBAL_CFG["FTP_MAX_CONS_PER_IP"]
 BUFFER_SIZE = GLOBAL_CFG['FTP_BUFFER_SIZE']
 
 
-class FTP:
+class FTPD:
     def __init__(self, conn: URL):
         if isinstance(conn, str):
             self.conn = URL(conn)
@@ -36,33 +37,33 @@ class FTP:
             self.conn = conn
         self.conn = self.__dict__["conn"].check
 
-    def write(self, msg: MSG):
-        logging.info("FTP::{0} write:{1}".format(self.conn, msg))
-        ftp = self.open()
-        for i in range(0, msg.nums, 1):
-            attachment = msg.read_datum(i)
-            ftp.storbinary('STOR ' + attachment["path"].split("/")[-1], attachment["stream"], BUFFER_SIZE)
-        ftp.close()
-
-    def read(self, msg: MSG):
-        new_msg = msg
-        new_msg.nums = 0
-        ftp = self.open()
-        for i in range(0, msg.nums, 1):
-            attachment = msg.read_datum(i)
-            ftp.retrbinary('RETR ' + attachment["path"].split("/")[-1], attachment["stream"], BUFFER_SIZE)
-            new_msg.add_datum(datum=attachment["stream"], path=attachment['path'])
-        ftp.close()
-        logging.info("FTP::{0} read:{1}".format(self.conn, new_msg))
-        return new_msg
-
-    def open(self):
-        ftp = ftplib.FTP()
-        ftp.connect(self.conn.hostname, self.conn.port)
-        ftp.login(self.conn.username, self.conn.password)
+    def ftp_server(self):
+        authorizer = DummyAuthorizer()
+        authorizer.add_user(self.conn.username, self.conn.password, self.conn.path, perm='elradfmwM')
+        handler = FTPDHandler
+        handler.authorizer = authorizer
+        handler.banner = BANNER
+        if "*" in self.conn.hostname:
+            address = ('', int(self.conn.port))
+        else:
+            handler.masquerade_address = self.conn.hostname
+            address = (self.conn.hostname, int(self.conn.port))
         # ----------------------------------------------------- 被动模式 - PASV Model
         if isinstance(self.conn.fragment, URL):
             if isinstance(self.conn.fragment.query, dict):
                 if self.conn.fragment.query["model"] in ["PASV"]:
-                    ftp.set_pasv(True)
-            return ftp
+                    handler.passive_ports = range(PASV_PORT["START"], PASV_PORT["END"])
+        server = FTPServer(address, handler)
+        server.max_cons = MAX_CONS
+        server.max_cons_per_ip = MAX_CONS_PER_IP
+        server.serve_forever()
+
+
+class FTPDHandler(FTPHandler):
+    def on_file_received(self, file):
+        # do something when a file has been received
+        pass
+
+    def on_file_sent(self, file):
+        # do something when a file has been received
+        pass

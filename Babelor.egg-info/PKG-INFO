@@ -1,0 +1,59 @@
+Metadata-Version: 1.2
+Name: Babelor
+Version: 0.1.1.post3.dev2
+Summary: 
+Babelor - a tiny integration information service bus library for Python
+=======================================================================
+
+**Babelor** is a Python package providing fast, flexible, and expressive
+integration information service bus structures designed to make working
+with serializable message transportation and service invocation both easy
+and intuitive. It aims to be the fundamental high-level building block for
+doing practical, **real world** data analysis in Python. Additionally, 
+it has the broader goal of becoming **the most powerful and flexible 
+open source integration information message transportation / service
+invocation tool available in any language**.
+
+Home-page: http://www.strtrek.com/
+Author: StrTrek Team Authors
+Author-email: geyuanji@strtrek.com
+Maintainer: StrTrek Team Authors
+Maintainer-email: geyuanji@strtrek.com
+License: 
+Copyright 2019 StrTrek Team Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Description: UNKNOWN
+Keywords: Service Bus
+Platform: UNKNOWN
+Classifier: Development Status :: 2 - Pre-Alpha
+Classifier: License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Financial and Insurance Industry
+Classifier: Intended Audience :: Information Technology
+Classifier: Intended Audience :: Science/Research
+Classifier: Intended Audience :: Manufacturing
+Classifier: Intended Audience :: Healthcare Industry
+Classifier: Topic :: Software Development :: Libraries :: Application Frameworks
+Classifier: Topic :: Scientific/Engineering :: Information Analysis
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: System :: Distributed Computing
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX

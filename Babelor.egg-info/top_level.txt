@@ -1,0 +1,7 @@
+Babelor
+Babelor/Application
+Babelor/Config
+Babelor/Data
+Babelor/Presentation
+Babelor/Session
+Babelor/Tools
