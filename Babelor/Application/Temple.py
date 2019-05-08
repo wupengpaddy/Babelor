@@ -22,7 +22,7 @@ from multiprocessing import Process, Pipe, Queue
 from Babelor.Presentation import URL
 from Babelor.Config import GLOBAL_CFG
 from Babelor.Session import MQ
-from Babelor.Data import SQL, FTP, FTPD, TOMAIL, FILE
+from Babelor.Data import SQL, FTP, FTPD, TOMAIL, FILE, EXCEL
 # Global Parameters
 MSG_Q_MAX_DEPTH = GLOBAL_CFG["MSG_Q_MAX_DEPTH"]
 CTRL_Q_MAX_DEPTH = GLOBAL_CFG["CTRL_Q_MAX_DEPTH"]
@@ -114,6 +114,8 @@ def allocator(conn: URL):
             return TOMAIL(conn)
         if conn.scheme in ["file"]:
             return FILE(conn)
+        if conn.scheme in ["excel"]:
+            return EXCEL(conn)
 
 
 def sender(pipe_in: Pipe, queue_ctrl: Queue, func: callable = None):

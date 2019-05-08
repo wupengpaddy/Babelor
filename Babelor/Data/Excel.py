@@ -15,6 +15,8 @@
 
 # System Required
 import os
+import base64
+import logging
 # Outer Required
 import pandas as pd
 import xlrd
@@ -25,6 +27,7 @@ from Babelor.Presentation import URL, MSG
 
 class EXCEL:
     def __init__(self, conn: URL):
+        # "excel:///<path>"
         if isinstance(conn, str):
             self.conn = URL(conn)
         else:
@@ -32,11 +35,40 @@ class EXCEL:
         self.conn = self.__dict__["conn"].check
 
     def read(self, msg: MSG):
-        msg_new = msg
-        return msg_new
+        logging.debug("EXCEL::{0}::READ msg:{1}".format(self.conn, msg))
+        msg_out = MSG()
+        msg_out.origination = msg.origination
+        msg_out.encryption = msg.encryption
+        msg_out.treatment = msg.treatment
+        msg_out.destination = msg.destination
+        msg_out.case = msg.case
+        msg_out.activity = msg.activity
+        logging.debug("EXCEL::{0}::READ msg_out:{1}".format(self.conn, msg_out))
+        # -------------------------------------------------
+        for i in range(0, msg.nums, 1):
+            dt = msg.read_datum(i)
+            path = os.path.join(self.conn.path, dt["path"])
+            if os.path.exists(path):
+                df = pd.read_excel(path)
+                msg_out.add_datum(datum=df.to_msgpack(), path=dt["path"])
+                logging.info("EXCEL {0} is read:{1}".format(path, os.path.exists(path)))
+            else:
+                msg_out.add_datum(datum=None, path=dt["path"])
+        logging.info("EXCEL::{0}::READ return:{1}".format(self.conn, msg_out))
+        return msg_out
 
     def write(self, msg: MSG):
-        pass
+        logging.info("EXCEL::{0}::WRITE msg:{1}".format(self.conn, msg))
+        if not os.path.exists(self.conn.path):
+            os.mkdir(self.conn.path)
+        for i in range(0, msg.nums, 1):
+            dt = msg.read_datum(i)
+            if dt["stream"] is not None:
+                stream = base64.b64decode(dt["stream"])
+                path = os.path.join(self.conn.path, dt["path"])
+                with open(path, "wb") as file:
+                    file.write(stream)
+                logging.info("EXCEL {0} is write:{1}.".format(path, os.path.exists(path)))
 
 
 def sheets_merge(read_path, write_path):
