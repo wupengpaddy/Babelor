@@ -18,18 +18,22 @@ import os
 import base64
 import logging
 # Outer Required
+import pandas as pd
 # Inner Required
 from Babelor.Presentation import URL, MSG
 # Global Parameters
 
 
 class FILE:
-    def __init__(self, conn: URL):
+    def __init__(self, conn: (URL, str)):
         if isinstance(conn, str):
             self.conn = URL(conn)
         else:
             self.conn = conn
-        self.conn = self.__dict__["conn"].check
+        if os.path.splitext(self.conn.path)[-1] in [""]:
+            self.url_is_dir = True
+        else:
+            self.url_is_dir = False
 
     def read(self, msg: MSG):
         logging.debug("FILE::{0}::READ msg:{1}".format(self.conn, msg))
@@ -44,21 +48,34 @@ class FILE:
         # -------------------------------------------------
         for i in range(0, msg.nums, 1):
             dt = msg.read_datum(i)
-            path = os.path.join(self.conn.path, dt["path"])
-            if os.path.exists(path):
-                with open(path, "rb") as file:
-                    stream = base64.b64encode(file.read())
-                    msg_out.add_datum(datum=stream, path=dt["path"])
-                logging.info("FILE {0} is read:{1}".format(path, os.path.exists(path)))
+            if self.url_is_dir:
+                path = os.path.join(self.conn.path, dt["path"])
+            else:
+                path = self.conn.path
+            suffix = os.path.splitext(path)
+            # -------------------------------
+            if os.path.isfile(path):
+                if suffix in ["xls", "xlsx"]:
+                    if self.url_is_dir:
+                        stream = pd.read_excel(path)
+                    else:
+                        stream = pd.read_excel(path, sheet_name=dt["path"])
+                else:
+                    with open(path, "rb") as file:
+                        stream = file.read()
+                msg_out.add_datum(datum=stream, path=dt["path"])
+                logging.info("FILE::{0}::READ successfully.".format(path))
             else:
                 msg_out.add_datum(datum=None, path=dt["path"])
+                logging.warning("FILE::{0}::READ failed.".format(path))
         logging.info("FILE::{0}::READ return:{1}".format(self.conn, msg_out))
         return msg_out
 
     def write(self, msg: MSG):
         logging.info("FILE::{0}::WRITE msg:{1}".format(self.conn, msg))
-        if not os.path.exists(self.conn.path):
-            os.mkdir(self.conn.path)
+        if self.url_is_dir:
+            if not os.path.exists(self.conn.path):
+                os.mkdir(self.conn.path)
         for i in range(0, msg.nums, 1):
             dt = msg.read_datum(i)
             if dt["stream"] is not None:
@@ -67,3 +84,11 @@ class FILE:
                 with open(path, "wb") as file:
                     file.write(stream)
                 logging.info("FILE {0} is write:{1}.".format(path, os.path.exists(path)))
+
+
+def path_check(path: str):
+    if os.path.splitext(path)[-1] in [""]:
+        if not os.path.isdir(path):
+            parent_path = os.path.split(path)[0]
+            if not os.path.isdir(parent_path):
+                path_check(parent_path)

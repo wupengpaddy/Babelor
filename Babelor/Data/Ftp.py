@@ -45,16 +45,24 @@ class FTP:
         ftp.close()
 
     def read(self, msg: MSG):
-        new_msg = msg
-        new_msg.nums = 0
+        logging.debug("SQL::{0}::READ msg:{1}".format(self.conn, msg))
+        msg_out = MSG()
+        msg_out.origination = msg.origination
+        msg_out.encryption = msg.encryption
+        msg_out.treatment = msg.treatment
+        msg_out.destination = msg.destination
+        msg_out.case = msg.case
+        msg_out.activity = msg.activity
+        logging.debug("SQL::{0}::READ msg_out:{1}".format(self.conn, msg_out))
+        # ----------------------------
         ftp = self.open()
         for i in range(0, msg.nums, 1):
             attachment = msg.read_datum(i)
             ftp.retrbinary('RETR ' + attachment["path"].split("/")[-1], attachment["stream"], BUFFER_SIZE)
-            new_msg.add_datum(datum=attachment["stream"], path=attachment['path'])
+            msg_out.add_datum(datum=attachment["stream"], path=attachment['path'])
         ftp.close()
-        logging.info("FTP::{0} read:{1}".format(self.conn, new_msg))
-        return new_msg
+        logging.info("FTP::{0} read:{1}".format(self.conn, msg_out))
+        return msg_out
 
     def open(self):
         ftp = ftplib.FTP()

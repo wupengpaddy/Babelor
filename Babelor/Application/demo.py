@@ -97,7 +97,9 @@ def sender_init():
     # -————————————------------------------ SENDER ------
     sender_msg.origination = origination_url
     sender_msg.destination = edge_node_url["outer"]
-    sender_msg.add_datum(None, "Babelor-2019-Protocol.png")
+    sender_msg.add_datum(None, "20190505.xlsx")
+    sender_msg.add_datum(None, "20190506.xlsx")
+    sender_msg.add_datum(None, "20190507.xlsx")
     send_init = MQ(sender_url["outer"])
     send_init.push(sender_msg)
 
@@ -141,9 +143,15 @@ edge_node_url = {
     "inner": URL("tcp://*:20005"),
     "outer": URL("tcp://127.0.0.1:20005"),
 }
-origination_url = URL("file:///C:/Users/geyua/PycharmProjects/Babelor/docs/imgs/protocol/")
-destination_url = URL("file:///C:/Users/geyua/PycharmProjects/Babelor/docs/imgs/protocol_new/")
+origination_url = URL("excel:///C:/Users/geyua/PycharmProjects/Babelor/data/dir1/20190505.xlsx")
+destination_url = URL("excel:///C:/Users/geyua/PycharmProjects/Babelor/data/dir2/")
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+    if os.path.isdir(origination_url.path):
+        is_file = False
+    else:
+        is_file = True
+    url_suffix = os.path.splitext(destination_url.path)[-1]
+    path_suffix = os.path.splitext(destination_url.path)[-1]

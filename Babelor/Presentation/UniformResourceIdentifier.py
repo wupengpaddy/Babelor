@@ -18,7 +18,7 @@ from urllib.parse import urlparse, unquote, urlunparse, quote, parse_qs, urlenco
 import re
 # Outer Required
 # Inner Required
-from Babelor.Config.Config import GLOBAL_CFG
+from Babelor.Config import GLOBAL_CFG
 # Global Parameters
 DatetimeFmt = GLOBAL_CFG["DatetimeFormat"]
 PortFmt = GLOBAL_CFG["PortFormat"]

@@ -15,7 +15,6 @@
 
 # System Required
 import os
-import base64
 import logging
 # Outer Required
 import pandas as pd
@@ -32,7 +31,6 @@ class EXCEL:
             self.conn = URL(conn)
         else:
             self.conn = conn
-        self.conn = self.__dict__["conn"].check
 
     def read(self, msg: MSG):
         logging.debug("EXCEL::{0}::READ msg:{1}".format(self.conn, msg))
@@ -48,27 +46,32 @@ class EXCEL:
         for i in range(0, msg.nums, 1):
             dt = msg.read_datum(i)
             path = os.path.join(self.conn.path, dt["path"])
-            if os.path.exists(path):
+            if os.path.isfile(path):
                 df = pd.read_excel(path)
-                msg_out.add_datum(datum=df.to_msgpack(), path=dt["path"])
-                logging.info("EXCEL {0} is read:{1}".format(path, os.path.exists(path)))
+                msg_out.add_datum(datum=df, path=dt["path"])
+                logging.debug("EXCEL::{0} load successfully.".format(path))
             else:
                 msg_out.add_datum(datum=None, path=dt["path"])
+                logging.warning("EXCEL::{0} load failed.".format(path))
         logging.info("EXCEL::{0}::READ return:{1}".format(self.conn, msg_out))
         return msg_out
 
     def write(self, msg: MSG):
-        logging.info("EXCEL::{0}::WRITE msg:{1}".format(self.conn, msg))
+        logging.debug("EXCEL::{0}::WRITE msg:{1}".format(self.conn, msg))
         if not os.path.exists(self.conn.path):
             os.mkdir(self.conn.path)
         for i in range(0, msg.nums, 1):
             dt = msg.read_datum(i)
-            if dt["stream"] is not None:
-                stream = base64.b64decode(dt["stream"])
-                path = os.path.join(self.conn.path, dt["path"])
-                with open(path, "wb") as file:
-                    file.write(stream)
-                logging.info("EXCEL {0} is write:{1}.".format(path, os.path.exists(path)))
+            df = dt["stream"]
+            path = os.path.join(self.conn.path, dt["path"])
+            if not os.path.exists(path):
+                if isinstance(df, pd.DataFrame):
+                    df.to_excel(path, index=False)
+                    logging.info("EXCEL::{0} write successfully.".format(path))
+                else:
+                    logging.warning("EXCEL {0} is write failed.".format(path))
+            else:
+                logging.warning("EXCEL {0} is write failed.".format(path))
 
 
 def sheets_merge(read_path, write_path):
@@ -88,6 +91,3 @@ def sheets_merge(read_path, write_path):
     writer = writer.reset_index(drop=True)                  # idx clean up
     writer.to_excel(write_path)
 
-
-if __name__ == '__main__':
-    sheets_merge("excel.xlsx", "excel_out.xlsx")
