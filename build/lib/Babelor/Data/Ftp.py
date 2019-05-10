@@ -14,9 +14,11 @@
 # limitations under the License.
 
 # System Required
+import os
 import ftplib
 import logging
 # Outer Required
+import pandas as pd
 # Inner Required
 from Babelor.Presentation import URL, MSG
 from Babelor.Config import GLOBAL_CFG
@@ -34,27 +36,81 @@ class FTP:
             self.conn = URL(conn)
         else:
             self.conn = conn
-        self.conn = self.__dict__["conn"].check
-
-    def write(self, msg: MSG):
-        logging.info("FTP::{0} write:{1}".format(self.conn, msg))
-        ftp = self.open()
-        for i in range(0, msg.nums, 1):
-            attachment = msg.read_datum(i)
-            ftp.storbinary('STOR ' + attachment["path"].split("/")[-1], attachment["stream"], BUFFER_SIZE)
-        ftp.close()
+        if os.path.splitext(self.conn.path)[-1] in [""]:
+            self.url_is_dir = True
+        else:
+            self.url_is_dir = False
 
     def read(self, msg: MSG):
-        new_msg = msg
-        new_msg.nums = 0
+        logging.debug("FTP::{0}::READ msg:{1}".format(self.conn, msg))
+        msg_out = MSG()
+        msg_out.origination = msg.origination
+        msg_out.encryption = msg.encryption
+        msg_out.treatment = msg.treatment
+        msg_out.destination = msg.destination
+        msg_out.case = msg.case
+        msg_out.activity = msg.activity
+        logging.debug("FTP::{0}::READ msg_out:{1}".format(self.conn, msg_out))
+        # -------------------------------------------------
         ftp = self.open()
+        # -------------------------------------------------
         for i in range(0, msg.nums, 1):
-            attachment = msg.read_datum(i)
-            ftp.retrbinary('RETR ' + attachment["path"].split("/")[-1], attachment["stream"], BUFFER_SIZE)
-            new_msg.add_datum(datum=attachment["stream"], path=attachment['path'])
+            dt = msg.read_datum(i)
+            if self.url_is_dir:
+                path = os.path.join(self.conn.path, dt["path"])
+            else:
+                path = self.conn.path
+            suffix = os.path.splitext(path)[-1]
+            # ----------------------------
+            stream = bytes()
+            ftp.retrbinary('RETR ' + path, stream, BUFFER_SIZE)
+            logging.info("FTP::{0}::READ successfully.".format(path))
+            # -------------------------------
+            if suffix in ["xls", "xlsx"]:
+                temp_path = "temp/temp" + suffix
+                with open(temp_path, "wb") as temp_file:
+                    temp_file.write(stream)
+                if self.url_is_dir:
+                    stream = pd.read_excel(temp_path)
+                else:
+                    stream = pd.read_excel(temp_path, sheet_name=dt["path"])
+                os.remove(temp_path)
+                del temp_path
+                logging.info("FTP::EXCEL::READ successfully.".format(path))
+            msg_out.add_datum(datum=stream, path=dt["path"])
+        # -------------------------------------------------
+        logging.info("FTP::{0}::READ return:{1}".format(self.conn, msg_out))
+        return msg_out
+
+    def write(self, msg: MSG):
+        logging.info("FTP::{0}::WRITE msg:{1}".format(self.conn, msg))
+        # -------------------------------------------------
+        ftp = self.open()
+        # -------------------------------------------------
+        for i in range(0, msg.nums, 1):
+            dt = msg.read_datum(i)
+            if self.url_is_dir:
+                path = os.path.join(self.conn.path, dt["path"])
+            else:
+                path = self.conn.path
+            suffix = os.path.splitext(path)[-1]
+            # ----------------------------
+            if suffix in ["xls", "xlsx"]:
+                temp_path = "temp/temp" + suffix
+                if isinstance(dt["stream"], pd.DataFrame):
+                    dt["stream"].to_excel(temp_path, index=False)
+                    with open(temp_path, "rb") as temp_file:
+                        stream = temp_file.read()
+                    logging.info("FILE::EXCEL::{0} write successfully.".format(path))
+                else:
+                    stream = None
+                    logging.warning("FILE::EXCEL::{0} write failed.".format(path))
+            else:
+                stream = dt["stream"]
+            if stream is not None:
+                ftp.storbinary('STOR ' + path, stream, BUFFER_SIZE)
+                logging.info("FTP::{0}::WRITE successfully.".format(self.conn))
         ftp.close()
-        logging.info("FTP::{0} read:{1}".format(self.conn, new_msg))
-        return new_msg
 
     def open(self):
         ftp = ftplib.FTP()

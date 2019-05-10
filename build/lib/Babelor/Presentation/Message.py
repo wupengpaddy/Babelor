@@ -17,6 +17,7 @@
 from datetime import datetime
 import base64
 # Outer Required
+import pandas as pd
 # Inner Required
 from Babelor.Tools import dict2json, json2dict, dict2xml, xml2dict
 from Babelor.Config import GLOBAL_CFG
@@ -252,14 +253,14 @@ class MSG:
             self.nums = self.__dict__["nums"] - 1
 
 
-def datum_to_stream(datum=None):
+def datum_to_stream(datum: (str, pd.DataFrame, bytes) = None):
     """
-    :param datum:
+    :param datum: []
     :return: rt:
     {
         "stream": [None, str],
-        "coding": [None, str],
-        "dtype": [None, "str", "base64"]
+        "coding": [None, "ascii"],
+        "dtype": [None, "str", "base64", "pandas.core.frame.DataFrame"]
     }
     """
     if datum is None:
@@ -271,23 +272,36 @@ def datum_to_stream(datum=None):
     elif isinstance(datum, str):
         rt = {
             "stream": datum,
-            "coding": CODING,
+            "coding": None,
             "dtype": "str",
+        }
+    elif isinstance(datum, pd.DataFrame):
+        rt = {
+            "stream": base64.b64encode(datum.to_msgpack()).decode("ascii"),
+            "coding": "ascii",
+            "dtype": "pandas.core.frame.DataFrame",
         }
     else:
         rt = {
-            "stream": base64.b64encode(datum).decode(CODING),
-            "coding": CODING,
+            "stream": base64.b64encode(datum).decode("ascii"),
+            "coding": "ascii",
             "dtype": "base64",
         }
     return rt
 
 
-def stream_to_datum(stream, coding, dtype):
-    if isinstance(stream, str):
-        if dtype in ["base64"]:
-            return base64.b64decode(stream.encode(coding))
-        elif dtype in ["str"]:
-            return stream
-        else:
-            raise NotImplementedError("Not support type:{0}".format(dtype))
+def stream_to_datum(stream: str = None, coding: str = None, dtype: str = None):
+    """
+    :param stream:[None, str]
+    :param coding:[None, str]   ("ascii", None)
+    :param dtype:[None, str]    ("base64", "str", "pandas.core.frame.DataFrame", None)
+    :return: [None, str, bytes, pd.DataFrame]
+    """
+    if dtype in ["base64"]:
+        return base64.b64decode(stream.encode(coding))
+    elif dtype in ["str"]:
+        return stream
+    elif dtype in ["pandas.core.frame.DataFrame"]:
+        return pd.read_msgpack(base64.b64decode(stream.encode(coding)))
+    else:
+        return None

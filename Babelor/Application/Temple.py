@@ -114,8 +114,6 @@ def allocator(conn: URL):
             return TOMAIL(conn)
         if conn.scheme in ["file"]:
             return FILE(conn)
-        if conn.scheme in ["excel"]:
-            return EXCEL(conn)
 
 
 def sender(pipe_in: Pipe, queue_ctrl: Queue, func: callable = None):

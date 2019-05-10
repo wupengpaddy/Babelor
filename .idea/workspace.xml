@@ -2,16 +2,24 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="be54182a-218b-4e8e-9234-62a7d88d12fc" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/Babelor.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Babelor.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dist/Babelor-0.1.1.post3.dev4-py3-none-any.whl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Babelor/Application/demo.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Application/demo.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Babelor/Data/Excel.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Data/Excel.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Babelor.egg-info/PKG-INFO" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor.egg-info/PKG-INFO" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Babelor.egg-info/SOURCES.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor.egg-info/SOURCES.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Babelor/Application/Temple.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Application/Temple.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Babelor/Data/Excel.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Babelor/Data/File.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Data/File.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Babelor/Data/Ftp.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Data/Ftp.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Babelor/Data/Sql.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Data/Sql.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Babelor/Presentation/Message.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Presentation/Message.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Babelor/Presentation/UniformResourceIdentifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Presentation/UniformResourceIdentifier.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Babelor/Presentation/demo.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Presentation/demo.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/lib/Babelor/Application/Temple.py" beforeDir="false" afterPath="$PROJECT_DIR$/build/lib/Babelor/Application/Temple.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/lib/Babelor/Application/demo.py" beforeDir="false" afterPath="$PROJECT_DIR$/build/lib/Babelor/Application/demo.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/lib/Babelor/Data/File.py" beforeDir="false" afterPath="$PROJECT_DIR$/build/lib/Babelor/Data/File.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/lib/Babelor/Data/Ftp.py" beforeDir="false" afterPath="$PROJECT_DIR$/build/lib/Babelor/Data/Ftp.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/lib/Babelor/Data/Sql.py" beforeDir="false" afterPath="$PROJECT_DIR$/build/lib/Babelor/Data/Sql.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/lib/Babelor/Data/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/build/lib/Babelor/Data/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/lib/Babelor/Presentation/Message.py" beforeDir="false" afterPath="$PROJECT_DIR$/build/lib/Babelor/Presentation/Message.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/lib/Babelor/Presentation/UniformResourceIdentifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/build/lib/Babelor/Presentation/UniformResourceIdentifier.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/lib/Babelor/Presentation/demo.py" beforeDir="false" afterPath="$PROJECT_DIR$/build/lib/Babelor/Presentation/demo.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -33,49 +41,13 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Babelor/Data/Sql.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="131">
-              <caret line="39" column="29" lean-forward="true" selection-start-line="39" selection-start-column="29" selection-end-line="39" selection-end-column="29" />
-              <folding>
-                <element signature="e#619#628#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Babelor/Data/Ftp.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="399">
-              <caret line="54" column="39" lean-forward="true" selection-start-line="54" selection-start-column="39" selection-end-line="54" selection-end-column="39" />
-              <folding>
-                <element signature="e#619#632#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Babelor/Application/demo.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="435">
-              <caret line="156" column="60" selection-start-line="156" selection-start-column="60" selection-end-line="156" selection-end-column="60" />
-              <folding>
-                <element signature="e#619#628#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Babelor/Data/File.py">
+        <entry file="file://$PROJECT_DIR$/setup.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="340">
-              <caret line="88" selection-start-line="88" selection-end-line="93" selection-end-column="39" />
+            <state relative-caret-position="95">
+              <caret line="110" lean-forward="true" selection-start-line="110" selection-end-line="110" />
               <folding>
-                <element signature="e#619#628#0" expanded="true" />
+                <element signature="e#33#46#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -146,17 +118,17 @@
         <option value="$PROJECT_DIR$/Babelor/Data/Tomail.py" />
         <option value="$PROJECT_DIR$/Babelor/Session/MessageQueue.py" />
         <option value="$PROJECT_DIR$/Babelor/__init__.py" />
-        <option value="$PROJECT_DIR$/setup.py" />
         <option value="$PROJECT_DIR$/Babelor/Data/__init__.py" />
-        <option value="$PROJECT_DIR$/Babelor/Application/Temple.py" />
         <option value="$PROJECT_DIR$/Babelor/Presentation/demo.py" />
-        <option value="$PROJECT_DIR$/Babelor/Data/Excel.py" />
         <option value="$PROJECT_DIR$/Babelor/Data/Sql.py" />
         <option value="$PROJECT_DIR$/Babelor/Presentation/Message.py" />
         <option value="$PROJECT_DIR$/Babelor/Presentation/UniformResourceIdentifier.py" />
-        <option value="$PROJECT_DIR$/Babelor/Data/Ftp.py" />
         <option value="$PROJECT_DIR$/Babelor/Application/demo.py" />
+        <option value="$PROJECT_DIR$/Babelor/Application/Temple.py" />
+        <option value="$PROJECT_DIR$/Babelor/Data/Excel.py" />
         <option value="$PROJECT_DIR$/Babelor/Data/File.py" />
+        <option value="$PROJECT_DIR$/Babelor/Data/Ftp.py" />
+        <option value="$PROJECT_DIR$/setup.py" />
       </list>
     </option>
   </component>
@@ -188,24 +160,24 @@
               <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
               <item name="Babelor" type="462c0819:PsiDirectoryNode" />
               <item name="Babelor" type="462c0819:PsiDirectoryNode" />
+              <item name="Application" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
+              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
               <item name="Data" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
               <item name="Babelor" type="462c0819:PsiDirectoryNode" />
               <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-              <item name="Presentation" type="462c0819:PsiDirectoryNode" />
+              <item name="Session" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
               <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-              <item name="data" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Babelor" type="462c0819:PsiDirectoryNode" />
-              <item name="data" type="462c0819:PsiDirectoryNode" />
-              <item name="dir1" type="462c0819:PsiDirectoryNode" />
+              <item name="dist" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Babelor" type="b2602c69:ProjectViewProjectNode" />
@@ -419,18 +391,18 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="559950000" />
+    <option name="totallyTimeSpent" value="566177000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="-7" width="1453" height="933" extended-state="6" />
+    <frame x="-6" y="-6" width="2263" height="1473" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.30851826" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.30430838" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3275218" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49977323" visible="true" weight="0.32503113" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49977323" visible="true" weight="0.32503113" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -467,13 +439,6 @@
     <SUITE FILE_PATH="coverage/Babelor$pytest_in_demo_py.coverage" NAME="pytest in demo.py Coverage Results" MODIFIED="1557150855244" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Babelor/Session" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/COPYING.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1124">
-          <caret line="192" column="42" lean-forward="true" selection-start-line="192" selection-start-column="42" selection-end-line="192" selection-end-column="42" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Babelor/Application/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="285">
@@ -650,23 +615,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Babelor/Application/Temple.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="266">
-          <caret line="23" column="30" selection-start-line="23" selection-start-column="30" selection-end-line="23" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/setup.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="19">
-          <caret line="25" column="28" selection-start-line="25" selection-start-column="28" selection-end-line="25" selection-end-column="28" />
-          <folding>
-            <element signature="e#33#46#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Babelor/Presentation/demo.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="245">
@@ -684,13 +632,6 @@
           <folding>
             <element signature="e#619#701#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Babelor/Presentation/Message.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="76">
-          <caret line="19" column="19" lean-forward="true" selection-start-line="19" selection-start-column="19" selection-end-line="19" selection-end-column="19" />
         </state>
       </provider>
     </entry>
@@ -721,36 +662,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Babelor/Data/Excel.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="42" column="39" lean-forward="true" selection-start-line="42" selection-start-column="39" selection-end-line="42" selection-end-column="39" />
-          <folding>
-            <element signature="e#619#628#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Babelor/Data/Sql.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="131">
-          <caret line="39" column="29" lean-forward="true" selection-start-line="39" selection-start-column="29" selection-end-line="39" selection-end-column="29" />
-          <folding>
-            <element signature="e#619#628#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Babelor/Data/Ftp.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="399">
-          <caret line="54" column="39" lean-forward="true" selection-start-line="54" selection-start-column="39" selection-end-line="54" selection-end-column="39" />
-          <folding>
-            <element signature="e#619#632#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Babelor/Application/demo.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="435">
@@ -761,12 +672,79 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Babelor/Data/File.py">
+    <entry file="file://$PROJECT_DIR$/Babelor/Data/Excel.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="88" selection-start-line="88" selection-end-line="93" selection-end-column="39" />
+        <state relative-caret-position="1520">
+          <caret line="80" selection-start-line="80" selection-end-line="80" />
           <folding>
             <element signature="e#619#628#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/typing.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="159">
+          <caret line="2329" lean-forward="true" selection-start-line="2329" selection-end-line="2329" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Babelor/Application/Temple.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="513">
+          <caret line="116" selection-start-line="116" selection-end-line="116" />
+          <folding>
+            <element signature="e#619#630#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Babelor/Data/Sql.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="738">
+          <caret line="67" selection-start-line="67" selection-end-line="67" />
+          <folding>
+            <element signature="e#619#628#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Babelor/Data/Ftp.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-402">
+          <caret line="64" column="28" lean-forward="true" selection-start-line="64" selection-start-column="28" selection-end-line="64" selection-end-column="28" />
+          <folding>
+            <element signature="e#619#625#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Babelor/Data/File.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="301">
+          <caret line="92" column="87" lean-forward="true" selection-start-line="92" selection-start-column="87" selection-end-line="92" selection-end-column="87" />
+          <folding>
+            <element signature="e#619#628#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Babelor/Presentation/Message.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-4563">
+          <caret line="26" column="42" selection-start-line="26" selection-start-column="42" selection-end-line="26" selection-end-column="42" />
+          <folding>
+            <element signature="e#619#648#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/setup.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="95">
+          <caret line="110" lean-forward="true" selection-start-line="110" selection-end-line="110" />
+          <folding>
+            <element signature="e#33#46#0" expanded="true" />
           </folding>
         </state>
       </provider>

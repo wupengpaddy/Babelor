@@ -14,7 +14,10 @@
 # limitations under the License.
 
 # System Required
+import os
+import base64
 # Outer Required
+import pandas as pd
 # Inner Required
 from Babelor.Presentation import URL, MSG, CASE
 # Global Parameters
@@ -111,10 +114,21 @@ def demo_msg_mysql2ftp():
         f.write(new_bytes_f)
 
 
+def demo_excel():
+    path = "C:/Users/geyua/PycharmProjects/Babelor/data/dir1/20190505.xlsx"
+    df = pd.read_excel(path)
+    print(df)
+    msg = MSG()
+    msg.add_datum(datum=df, path=path)
+    new_df = msg.read_datum(1)["stream"]
+    print(new_df)
+
+
 if __name__ == '__main__':
-    demo_tomail_url()
-    demo_ftp_url()
-    demo_mysql_url()
-    demo_oracle_url()
-    demo_tcp_url()
+    # demo_tomail_url()
+    # demo_ftp_url()
+    # demo_mysql_url()
+    # demo_oracle_url()
+    # demo_tcp_url()
     # demo_msg_mysql2ftp()
+    demo_excel()

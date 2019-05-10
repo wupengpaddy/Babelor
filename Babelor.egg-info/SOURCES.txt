@@ -12,7 +12,6 @@ Babelor/Application/__init__.py
 Babelor/Application/demo.py
 Babelor/Config/Config.py
 Babelor/Config/__init__.py
-Babelor/Data/Excel.py
 Babelor/Data/File.py
 Babelor/Data/Ftp.py
 Babelor/Data/Ftpd.py
@@ -35,7 +34,6 @@ Babelor/Application/__init__.py
 Babelor/Application/demo.py
 Babelor/Config/Config.py
 Babelor/Config/__init__.py
-Babelor/Data/Excel.py
 Babelor/Data/File.py
 Babelor/Data/Ftp.py
 Babelor/Data/Ftpd.py

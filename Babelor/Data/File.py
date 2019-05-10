@@ -15,9 +15,9 @@
 
 # System Required
 import os
-import base64
 import logging
 # Outer Required
+import xlrd
 import pandas as pd
 # Inner Required
 from Babelor.Presentation import URL, MSG
@@ -78,17 +78,38 @@ class FILE:
                 os.mkdir(self.conn.path)
         for i in range(0, msg.nums, 1):
             dt = msg.read_datum(i)
-            if dt["stream"] is not None:
-                stream = base64.b64decode(dt["stream"])
+            df = dt["stream"]
+            if self.url_is_dir:
                 path = os.path.join(self.conn.path, dt["path"])
-                with open(path, "wb") as file:
-                    file.write(stream)
-                logging.info("FILE {0} is write:{1}.".format(path, os.path.exists(path)))
+            else:
+                path = self.conn.path
+            if os.path.exists(path):
+                logging.warning("FILE::{0} write failed.".format(path))
+            else:
+                if isinstance(df, pd.DataFrame):
+                    df.to_excel(path, index=False)
+                    logging.info("FILE::EXCEL::{0} write successfully.".format(path))
+                elif df is None:
+                    logging.warning("FILE::NONE::{0} write successfully.".format(path))
+                else:
+                    with open(path, "wb") as file:
+                        file.write(df)
+                    logging.info("FILE::{0} write successfully.".format(path))
 
 
-def path_check(path: str):
-    if os.path.splitext(path)[-1] in [""]:
-        if not os.path.isdir(path):
-            parent_path = os.path.split(path)[0]
-            if not os.path.isdir(parent_path):
-                path_check(parent_path)
+def sheets_merge(read_path, write_path):
+    """
+    :param read_path: 读取路径
+    :param write_path: 写入路径
+    :return: None
+    """
+    book = xlrd.open_workbook(read_path)
+    writer = None
+    for sheet in book.sheets():
+        reader = pd.read_excel(read_path, sheet_name=sheet.name)
+        if writer is None:
+            writer = reader
+        else:
+            writer = writer.append(reader.fillna(""))       # NaN clean up
+    writer = writer.reset_index(drop=True)                  # idx clean up
+    writer.to_excel(write_path)
