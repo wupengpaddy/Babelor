@@ -214,7 +214,7 @@ class URL:
             # "http://<username>:<password>@<hostname>:80"
             default_port = 80
         if self.scheme in ["file"]:
-            # "file://<username>:<password>@<hostname>/<path>"
+            # "file://<username>:<password>@/<path>"
             # "file:///<path>"
             default_port = None
         if self.scheme in ["tcp"]:
@@ -254,3 +254,12 @@ class URL:
         if scheme in ["file"]:
             self.__init__("file://username:password@hostname/path")
         return self
+
+
+def url_null_keep(item: object, item_type: classmethod = str) -> object:
+    if item is None:
+        return None
+    elif isinstance(item, item_type):
+        return item
+    else:
+        return item_type(item)

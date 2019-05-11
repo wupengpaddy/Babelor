@@ -20,14 +20,10 @@ from multiprocessing import Process, Pipe, Queue
 # Outer Required
 # Inner Required
 from Babelor.Presentation import URL
-from Babelor.Config import GLOBAL_CFG
 from Babelor.Session import MQ
 from Babelor.Data import SQL, FTP, FTPD, TOMAIL, FILE
 # Global Parameters
-MSG_Q_MAX_DEPTH = GLOBAL_CFG["MSG_Q_MAX_DEPTH"]
-CTRL_Q_MAX_DEPTH = GLOBAL_CFG["CTRL_Q_MAX_DEPTH"]
-CODING = GLOBAL_CFG["CODING"]
-BlockingTime = GLOBAL_CFG["MSG_Q_BlockingTime"]
+from Babelor.Config import CONFIG
 
 
 def priest(conn: URL, queue_ctrl: Queue, pipe_in: Pipe):
@@ -50,8 +46,8 @@ class TEMPLE:
         # "tcp://*:<port>"
         self.me = conn
         self.priest_pipe_in = Pipe()
-        self.priest_queue_ctrl = Queue(CTRL_Q_MAX_DEPTH)
-        self.believer_queue_ctrl = Queue(CTRL_Q_MAX_DEPTH)
+        self.priest_queue_ctrl = Queue(CONFIG.MQ_MAX_DEPTH)
+        self.believer_queue_ctrl = Queue(CONFIG.MQ_MAX_DEPTH)
         self.priest = None
         self.believer = None
 
@@ -80,7 +76,7 @@ class TEMPLE:
         is_active = False
         if isinstance(self.believer, Process):
             self.believer_queue_ctrl.put(is_active)
-            time.sleep(BlockingTime)
+            time.sleep(CONFIG.MQ_BLOCK_TIME)
             self.believer.terminate()
         while not self.believer_queue_ctrl.empty():
             self.believer_queue_ctrl.get()
@@ -91,7 +87,7 @@ class TEMPLE:
         is_active = False
         if isinstance(self.priest, Process):
             self.priest_queue_ctrl.put(is_active)
-            time.sleep(BlockingTime)
+            time.sleep(CONFIG.MQ_BLOCK_TIME)
             self.priest.terminate()
         while not self.priest_queue_ctrl.empty():
             self.priest_queue_ctrl.get()

@@ -28,6 +28,7 @@
       <w>levelname</w>
       <w>lgpl</w>
       <w>msgpack</w>
+      <w>ndarray</w>
       <w>openpyxl</w>
       <w>orcl</w>
       <w>patd</w>

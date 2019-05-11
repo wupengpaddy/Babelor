@@ -18,6 +18,7 @@ import os
 import base64
 # Outer Required
 import pandas as pd
+import numpy as np
 # Inner Required
 from Babelor.Presentation import URL, MSG, CASE
 # Global Parameters
@@ -131,4 +132,14 @@ if __name__ == '__main__':
     # demo_oracle_url()
     # demo_tcp_url()
     # demo_msg_mysql2ftp()
-    demo_excel()
+    # demo_excel()
+    a = np.array([[1, 2, 3], [4, 5, 6]], dtype=np.dtype("int8"))
+    dt = a.dtype
+    sp = a.shape
+    print("dtype:{0} shape:{1} array:{2}".format(dt, sp, a))
+    print(type(str(dt)), str(dt))
+    b64 = base64.b64encode(a).decode("ascii")
+    print(type(b64), b64)
+    a1 = np.frombuffer(base64.decodebytes(b64.encode("ascii")), dtype=np.dtype("int8"))
+    a1 = np.reshape(a1, sp)
+    print(type(a1), a1.dtype, a1)
