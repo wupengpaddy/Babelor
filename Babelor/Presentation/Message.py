@@ -20,18 +20,14 @@ import base64
 import pandas as pd
 # Inner Required
 from Babelor.Tools import dict2json, json2dict, dict2xml, xml2dict
-from Babelor.Config import GLOBAL_CFG
 from Babelor.Presentation.UniformResourceIdentifier import URL
 from Babelor.Presentation.Case import CASE
 # Global Parameters
-DatetimeFmt = GLOBAL_CFG["DatetimeFormat"]
-PortFmt = GLOBAL_CFG["PortFormat"]
-CODING = GLOBAL_CFG["CODING"]
-MSG_TYPE = GLOBAL_CFG["MSG_TYPE"]
+from Babelor.Config import CONFIG
 
 
 def current_datetime() -> str:
-    return datetime.now().strftime(DatetimeFmt)
+    return datetime.now().strftime(CONFIG.Datetime_FMT)
 
 
 def null_keep(item: object, item_type: classmethod = str) -> object:
@@ -58,9 +54,9 @@ class MSG:
         self.stream = None                      # 数据流        -   Data Stream
         self.path = None                        # 路径          -   Path
         if isinstance(msg, str):
-            if MSG_TYPE in ["json"]:
+            if CONFIG.MSG_TPE in ["json"]:
                 self.from_json(msg)
-            elif MSG_TYPE in ["xml"]:
+            elif CONFIG.MSG_TPE in ["xml"]:
                 self.from_xml(msg)
             else:
                 raise NotImplementedError("仅支持 xml 和 json 类消息")
@@ -129,9 +125,9 @@ class MSG:
         }
 
     def to_string(self):
-        if MSG_TYPE is "json":
+        if CONFIG.MSG_TPE in ["json"]:
             return self.to_json()
-        elif MSG_TYPE is "xml":
+        elif CONFIG.MSG_TPE in ["xml"]:
             return self.to_xml()
         else:
             raise NotImplementedError("Support xml and json pattern only.")

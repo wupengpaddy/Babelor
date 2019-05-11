@@ -14,4 +14,4 @@
 # limitations under the License.
 
 # Inner Required
-from Babelor.Config.Config import GLOBAL_CFG
+from Babelor.Config.Config import CONFIG

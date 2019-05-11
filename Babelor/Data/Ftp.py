@@ -21,13 +21,8 @@ import logging
 import pandas as pd
 # Inner Required
 from Babelor.Presentation import URL, MSG
-from Babelor.Config import GLOBAL_CFG
 # Global Parameters
-BANNER = GLOBAL_CFG["FTP_BANNER"]
-PASV_PORT = GLOBAL_CFG["FTP_PASV_PORTS"]
-MAX_CONS = GLOBAL_CFG["FTP_MAX_CONS"]
-MAX_CONS_PER_IP = GLOBAL_CFG["FTP_MAX_CONS_PER_IP"]
-BUFFER_SIZE = GLOBAL_CFG['FTP_BUFFER_SIZE']
+from Babelor.Config import CONFIG
 
 
 class FTP:
@@ -63,7 +58,7 @@ class FTP:
             suffix = os.path.splitext(path)[-1]
             # ----------------------------
             stream = bytes()
-            ftp.retrbinary('RETR ' + path, stream, BUFFER_SIZE)
+            ftp.retrbinary('RETR ' + path, stream, CONFIG.FTP_BUFFER)
             logging.info("FTP::{0}::READ successfully.".format(path))
             # -------------------------------
             if suffix in ["xls", "xlsx"]:
@@ -108,7 +103,7 @@ class FTP:
             else:
                 stream = dt["stream"]
             if stream is not None:
-                ftp.storbinary('STOR ' + path, stream, BUFFER_SIZE)
+                ftp.storbinary('STOR ' + path, stream, CONFIG.FTP_BUFFER)
                 logging.info("FTP::{0}::WRITE successfully.".format(self.conn))
         ftp.close()
 

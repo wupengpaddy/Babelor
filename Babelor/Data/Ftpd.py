@@ -20,13 +20,8 @@ from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.servers import FTPServer
 # Inner Required
 from Babelor.Presentation import URL
-from Babelor.Config import GLOBAL_CFG
 # Global Parameters
-BANNER = GLOBAL_CFG["FTP_BANNER"]
-PASV_PORT = GLOBAL_CFG["FTP_PASV_PORTS"]
-MAX_CONS = GLOBAL_CFG["FTP_MAX_CONS"]
-MAX_CONS_PER_IP = GLOBAL_CFG["FTP_MAX_CONS_PER_IP"]
-BUFFER_SIZE = GLOBAL_CFG['FTP_BUFFER_SIZE']
+from Babelor.Config import CONFIG
 
 
 class FTPD:
@@ -42,7 +37,7 @@ class FTPD:
         authorizer.add_user(self.conn.username, self.conn.password, self.conn.path, perm='elradfmwM')
         handler = FTPDHandler
         handler.authorizer = authorizer
-        handler.banner = BANNER
+        handler.banner = CONFIG.FTP_BANNER
         if "*" in self.conn.hostname:
             address = ('', int(self.conn.port))
         else:
@@ -52,10 +47,10 @@ class FTPD:
         if isinstance(self.conn.fragment, URL):
             if isinstance(self.conn.fragment.query, dict):
                 if self.conn.fragment.query["model"] in ["PASV"]:
-                    handler.passive_ports = range(PASV_PORT["START"], PASV_PORT["END"])
+                    handler.passive_ports = CONFIG.FTP_PASV_PORTS
         server = FTPServer(address, handler)
-        server.max_cons = MAX_CONS
-        server.max_cons_per_ip = MAX_CONS_PER_IP
+        server.max_cons = CONFIG.FTP_MAX_CONS
+        server.max_cons_per_ip = CONFIG.FTP_MAX_CONS_PER_IP
         server.serve_forever()
 
 

@@ -21,9 +21,10 @@ import pandas as pd
 from sqlalchemy import create_engine
 # Inner Required
 from Babelor.Presentation import URL, MSG
-from Babelor.Config import GLOBAL_CFG
+
 # Global Parameters
-os.environ['NLS_LANG'] = GLOBAL_CFG["NLS_LANG"]     # 切换中文字符
+from Babelor.Config import CONFIG
+os.environ['NLS_LANG'] = CONFIG.Default_LANG     # 切换中文字符
 
 
 class SQL:

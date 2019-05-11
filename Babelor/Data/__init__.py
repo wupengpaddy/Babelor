@@ -19,4 +19,3 @@ from Babelor.Data.Ftpd import FTPD
 from Babelor.Data.Ftp import FTP
 from Babelor.Data.Tomail import TOMAIL
 from Babelor.Data.File import FILE
-from Babelor.Data.Excel import EXCEL

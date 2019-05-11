@@ -143,15 +143,9 @@ edge_node_url = {
     "inner": URL("tcp://*:20005"),
     "outer": URL("tcp://127.0.0.1:20005"),
 }
-origination_url = URL("excel:///C:/Users/geyua/PycharmProjects/Babelor/data/dir1/20190505.xlsx")
-destination_url = URL("excel:///C:/Users/geyua/PycharmProjects/Babelor/data/dir2/")
+origination_url = URL("file:///C:/Users/geyua/PycharmProjects/Babelor/data/dir1/20190505.xlsx")
+destination_url = URL("file:///C:/Users/geyua/PycharmProjects/Babelor/data/dir2/")
 
 
 if __name__ == '__main__':
-    # main()
-    if os.path.isdir(origination_url.path):
-        is_file = False
-    else:
-        is_file = True
-    url_suffix = os.path.splitext(destination_url.path)[-1]
-    path_suffix = os.path.splitext(destination_url.path)[-1]
+    main()

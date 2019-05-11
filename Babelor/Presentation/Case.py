@@ -19,16 +19,12 @@ from urllib.parse import unquote, quote
 # Outer Required
 # Inner Required
 from Babelor.Presentation.UniformResourceIdentifier import URL
-from Babelor.Config.Config import GLOBAL_CFG
 # Global Parameters
-DatetimeFmt = GLOBAL_CFG["DatetimeFormat"]
-PortFmt = GLOBAL_CFG["PortFormat"]
-CODING = GLOBAL_CFG["CODING"]
-MSG_TYPE = GLOBAL_CFG["MSG_TYPE"]
+from Babelor.Config import CONFIG
 
 
 def current_datetime() -> str:
-    return datetime.now().strftime(DatetimeFmt)
+    return datetime.now().strftime(CONFIG.Datetime_FMT)
 
 
 class CASE:

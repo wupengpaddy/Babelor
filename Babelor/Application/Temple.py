@@ -22,7 +22,7 @@ from multiprocessing import Process, Pipe, Queue
 from Babelor.Presentation import URL
 from Babelor.Config import GLOBAL_CFG
 from Babelor.Session import MQ
-from Babelor.Data import SQL, FTP, FTPD, TOMAIL, FILE, EXCEL
+from Babelor.Data import SQL, FTP, FTPD, TOMAIL, FILE
 # Global Parameters
 MSG_Q_MAX_DEPTH = GLOBAL_CFG["MSG_Q_MAX_DEPTH"]
 CTRL_Q_MAX_DEPTH = GLOBAL_CFG["CTRL_Q_MAX_DEPTH"]

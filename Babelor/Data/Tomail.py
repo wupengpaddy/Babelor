@@ -12,7 +12,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# 外部依赖
+
+# System Required
 import logging
 import smtplib
 from email.header import Header
@@ -21,11 +22,11 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email.headerregistry import Address
 from email import encoders
-# 内部依赖
+# Outer Required
+# Inner Required
 from Babelor.Presentation import URL, MSG
-from Babelor.Config import GLOBAL_CFG
-# 全局参数
-CODING = GLOBAL_CFG["CODING"]
+# Global Parameters
+from Babelor.Config import CONFIG
 
 
 class TOMAIL:
@@ -52,8 +53,8 @@ class TOMAIL:
         sender_postfix = self.conn.fragment.fragment.hostname   # 寄件人 postfix
         receiver_postfix = self.conn.hostname                   # 收件人 postfix
         # Structure MIME
-        self.me = str(Address(Header(sender_name, CODING).encode(), sender_user, sender_postfix))
-        self.to = str(Address(Header(receiver_name, CODING).encode(), receiver_user, receiver_postfix))
+        self.me = str(Address(Header(sender_name, CONFIG.Coding).encode(), sender_user, sender_postfix))
+        self.to = str(Address(Header(receiver_name, CONFIG.Coding).encode(), receiver_user, receiver_postfix))
         self.subject = msg.read_datum(0)
         self.content = msg.read_datum(1)
         self.mime['from'] = self.me                                     # 寄件人

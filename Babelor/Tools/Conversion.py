@@ -13,13 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# System Required
 import json
 from xml.etree import ElementTree
-from Babelor.Config.Config import GLOBAL_CFG
-
-ROOT_TAG = GLOBAL_CFG["ROOT_TAG"]
-CODING = GLOBAL_CFG["CODING"]
-IS_STR_VALUE = GLOBAL_CFG["IS_STR_VALUE"]
+# Outer Required
+# Inner Required
+# Global Parameters
+from Babelor.Config import CONFIG
 
 
 def dict2json(dt: dict) -> str:
@@ -66,8 +66,8 @@ def xml2dict(xml: str) -> dict:
     return etree2dict(ElementTree.fromstring(xml.strip()))
 
 
-def dict2etree(dt: dict, tag=ROOT_TAG, parent=None) -> ElementTree.Element:
-    if tag == ROOT_TAG:
+def dict2etree(dt: dict, tag=CONFIG.XML_ROOT_TAG, parent=None) -> ElementTree.Element:
+    if tag in [CONFIG.XML_ROOT_TAG]:
         root = ElementTree.Element(tag)
     else:
         root = ElementTree.SubElement(parent, tag)
@@ -88,11 +88,11 @@ def dict2etree(dt: dict, tag=ROOT_TAG, parent=None) -> ElementTree.Element:
 
 
 def json2xml(js: str) -> str:
-    return ElementTree.tostring(dict2etree(json2dict(js)), encoding=CODING).decode(CODING)
+    return ElementTree.tostring(dict2etree(json2dict(js)), encoding=CONFIG.Coding).decode(CONFIG.Coding)
 
 
 def dict2xml(dt: dict) -> str:
-    return ElementTree.tostring(dict2etree(dt), encoding=CODING).decode(CODING)
+    return ElementTree.tostring(dict2etree(dt), encoding=CONFIG.Coding).decode(CONFIG.Coding)
 
 
 def extract_multi_values_from_keys(dt, *args):
@@ -145,7 +145,7 @@ def extract_value_from_key(dt, *args):
 
 def extract_from_key(*args, **kwargs):
     rt = extract_value_from_key(*args, **kwargs)
-    if IS_STR_VALUE:
+    if CONFIG.XML_IS_STR_VALUE:
         if isinstance(rt, list):
             if len(rt) == 0:
                 return "None"

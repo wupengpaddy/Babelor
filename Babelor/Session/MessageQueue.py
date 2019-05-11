@@ -21,14 +21,8 @@ from multiprocessing import Queue, Process, Pipe
 import zmq
 # Inner Required
 from Babelor.Presentation import MSG, URL
-from Babelor.Config import GLOBAL_CFG
 # Global Parameters
-MSG_Q_MAX_DEPTH = GLOBAL_CFG["MSG_Q_MAX_DEPTH"]
-CTRL_Q_MAX_DEPTH = GLOBAL_CFG["CTRL_Q_MAX_DEPTH"]
-CODING = GLOBAL_CFG["CODING"]
-BlockingTime = GLOBAL_CFG["MSG_Q_BlockingTime"]
-# logging.basicConfig(level=logging.WARNING,
-#                     format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s')
+from Babelor.Config import CONFIG
 
 
 def first_out_last_in(conn: str, me: str, queue_ctrl: Queue, pipe_in: Pipe, pipe_out: Pipe):
@@ -76,7 +70,7 @@ def first_out_last_in(conn: str, me: str, queue_ctrl: Queue, pipe_in: Pipe, pipe
                 try:
                     msg_out = pipe_out.recv()
                     logging.debug("ZMQ::FOLI::{0}::{1}::PIPE OUT recv:{2}".format(me, conn, msg_out))
-                    message_out = str(msg_out).encode(CODING)
+                    message_out = str(msg_out).encode(CONFIG.Coding)
                     socket.send(message_out)
                     logging.debug("ZMQ::FOLI::{0}::{1} send:{2}".format(me, conn, message_out))
                 except EOFError:
@@ -85,7 +79,7 @@ def first_out_last_in(conn: str, me: str, queue_ctrl: Queue, pipe_in: Pipe, pipe
             if has_response:
                 message_in = socket.recv()
                 logging.debug("ZMQ::FOLI::{0}::{1} recv:{2}".format(me, conn, message_in))
-                msg_in = MSG(message_in.decode(CODING))
+                msg_in = MSG(message_in.decode(CONFIG.Coding))
                 pipe_in.send(msg_in)
                 logging.debug("ZMQ::FOLI::{0}::{1}::PIPE IN send:{2}".format(me, conn, msg_in))
         else:
@@ -134,7 +128,7 @@ def first_in_last_out(conn: str, me: str, queue_ctrl: Queue, pipe_in: Pipe, pipe
             # RECV --------------------------------
             message_in = socket.recv()
             logging.debug("ZMQ::FILO::{0}::{1} recv:{2}".format(me, conn, message_in))
-            msg_in = MSG(message_in.decode(CODING))
+            msg_in = MSG(message_in.decode(CONFIG.Coding))
             pipe_in.send(msg_in)
             logging.debug("ZMQ::FILO::{0}::{1}::PIPE IN send:{2}".format(me, conn, msg_in))
             # SEND --------------------------------
@@ -142,7 +136,7 @@ def first_in_last_out(conn: str, me: str, queue_ctrl: Queue, pipe_in: Pipe, pipe
                 try:
                     msg_out = pipe_out.recv()
                     logging.debug("ZMQ::FILO::{0}::{1}::PIPE OUT recv:{2}".format(me, conn, msg_out))
-                    message_out = str(msg_out).encode(CODING)
+                    message_out = str(msg_out).encode(CONFIG.Coding)
                     socket.send(message_out)
                     logging.debug("ZMQ::FILO::{0}::{1} send:{2}".format(me, conn, message_out))
                 except EOFError:
@@ -162,17 +156,17 @@ class ZMQ:
         # Check
         if self.conn.scheme not in ["tcp", "pgm", "inproc"]:
             raise ValueError("Invalid scheme{0}.".format(self.conn.scheme))
-        self.pipe_in = Pipe()                       # PIPE IN
-        self.pipe_out = Pipe()                      # PIPE OUT
-        self.queue_ctrl = Queue(CTRL_Q_MAX_DEPTH)   # QUEUE CTRL
-        self.active = False                         # 激活状态
-        self.initialed = None                       # 初始化模式
-        self.process = None                         # 队列进程
+        self.pipe_in = Pipe()                           # PIPE IN
+        self.pipe_out = Pipe()                          # PIPE OUT
+        self.queue_ctrl = Queue(CONFIG.MQ_MAX_DEPTH)    # QUEUE CTRL
+        self.active = False                             # 激活状态
+        self.initialed = None                           # 初始化模式
+        self.process = None                             # 队列进程
 
     def release(self):
         if isinstance(self.process, Process):
             self.queue_ctrl.put(False)
-            time.sleep(BlockingTime)
+            time.sleep(CONFIG.MQ_BLOCK_TIME)
             self.process.terminate()
         while not self.queue_ctrl.empty():
             self.queue_ctrl.get()
@@ -186,7 +180,7 @@ class ZMQ:
         self.release()
         is_active = True
         while self.queue_ctrl.full():
-            time.sleep(BlockingTime)
+            time.sleep(CONFIG.MQ_BLOCK_TIME)
         else:
             self.queue_ctrl.put(is_active)
         if me in ["REPLY", "SUBSCRIBE", "PULL"]:

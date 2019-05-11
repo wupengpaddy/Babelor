@@ -18,10 +18,8 @@ from urllib.parse import urlparse, unquote, urlunparse, quote, parse_qs, urlenco
 import re
 # Outer Required
 # Inner Required
-from Babelor.Config import GLOBAL_CFG
 # Global Parameters
-DatetimeFmt = GLOBAL_CFG["DatetimeFormat"]
-PortFmt = GLOBAL_CFG["PortFormat"]
+from Babelor.Config import CONFIG
 
 
 class URL:
@@ -223,7 +221,7 @@ class URL:
             # "tcp://<hostname>:<port>"
             default_port = 10001
         # ----------------------------------------------------------------------
-        if re.match(PortFmt, str(self.port)) is None:
+        if re.match(CONFIG.Port_FMT, str(self.port)) is None:
             if default_port is not None:
                 check_url.port = default_port
             else:
