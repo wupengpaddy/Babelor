@@ -14,15 +14,14 @@
 # limitations under the License.
 
 # System Required
-from datetime import datetime
-import base64
 import logging
 # Outer Required
-import pandas as pd
 # Inner Required
 from Babelor.Tools import dict2json, json2dict, dict2xml, xml2dict
 from Babelor.Presentation.UniformResourceIdentifier import URL, url_null_keep
-from Babelor.Presentation.Case import CASE, current_datetime
+from Babelor.Presentation.Case import CASE, current_datetime, case_null_keep
+from Babelor.Presentation.Datum import DATUM, datum_null_keep
+from Babelor.Presentation.Arguments import ARGS, args_null_keep
 # Global Parameters
 from Babelor.Config import CONFIG
 
@@ -36,15 +35,17 @@ class MSG:
         self.destination = None                 # 目标节点      Target Node
         self.case = None                        # 实例          Instance
         self.activity = None                    # 步骤          Step in Instance
+        self.dt_count = 0                       # 数据数量      Data count
         self.data = None                        # 数据          Data
+        self.args_count = 0                     # 参数数量      Arguments count
         self.arguments = None                   # 参数          Arguments
         if isinstance(msg, str):
             if CONFIG.MSG_TPE in ["json"]:
                 self.from_json(msg)
             elif CONFIG.MSG_TPE in ["xml"]:
                 self.from_xml(msg)
-            elif CONFIG.MSG_TPE in ["msgpack"]:
-                self.from_msgpack(msg)
+            # elif CONFIG.MSG_TPE in ["msgpack"]:
+            #     self.from_msgpack(msg)
             else:
                 logging.warning("Defined serialization patterns:{0} are not supported.".format(CONFIG.MSG_TPE))
                 raise NotImplementedError("Serialization support xml, json and msgpack only.")
@@ -56,59 +57,48 @@ class MSG:
 
     def __setattr__(self, key, value):
         self.__dict__[key] = value
-        keys = ["coding", "dtype", "path", "stream"]
-        is_keys_init = len([False for k in keys if k not in list(self.__dict__.keys())]) == 0
-        if key in ["nums"]:
-            if value == 0 and is_keys_init:
-                for k in keys:
-                    self.__dict__[k] = None
-        if key in keys and is_keys_init:
-            if isinstance(value, list) and self.__dict__["nums"] == 1:
-                self.__dict__[key] = value[0]
-            # print([False for k in keys if self.__dict__[k] is None])
         if key not in ["timestamp"]:
-            self.__dict__["timestamp"] = current_datetime()
+            if "timestamp" in self.__dict__.keys():
+                self.__dict__["timestamp"] = current_datetime()
 
     def update(self):
-        self.timestamp = current_datetime()
+        self.__dict__["timestamp"] = current_datetime()
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         return {
             "head": {
                 "timestamp": self.timestamp,        # 时间戳        Time Stamp
                 "origination": self.origination,    # 来源节点      Source Node
-                "destination": self.destination,    # 目标节点      Target Node
-                "treatment": self.treatment,        # 计算节点      Computing Node
                 "encryption": self.encryption,      # 加/解密节点   Encrypted Node
+                "treatment": self.treatment,        # 计算节点      Computing Node
+                "destination": self.destination,    # 目标节点      Target Node
                 "case": self.case,                  # 实例          Instance
                 "activity": self.activity,          # 步骤          Step in Instance
             },
             "body": {
-                "nums": self.nums,                  # 参数个数      -   Number of Arguments
-                "coding": self.coding,              # 文字编码      -   Character Coding
-                "dtype": self.dtype,                # 数据编码      -   Data Encoding
-                "path": self.path,                  # 路径          -   Path
-                "stream": self.stream,              # 数据流        -   Data Stream
+                "dt_count": self.dt_count,          # 数据数量      Data count
+                "data": self.data,                  # 数据          Data
+                "args_count": self.args_count,      # 参数数量      Arguments count
+                "arguments": self.arguments,        # 参数          Arguments
             },
         }
 
-    def to_serialize(self):
+    def to_serialize(self) -> dict:
         return {
             "head": {
-                "timestamp": url_null_keep(self.timestamp),
-                "origination": url_null_keep(self.origination),
-                "destination": url_null_keep(self.destination),
-                "treatment": url_null_keep(self.treatment),
-                "encryption": url_null_keep(self.encryption),
-                "case": url_null_keep(self.case),
-                "activity": url_null_keep(self.activity),
+                "timestamp": self.timestamp,                        # 时间戳        Time Stamp
+                "origination": url_null_keep(self.origination),     # 来源节点      Source Node
+                "encryption": url_null_keep(self.encryption),       # 加/解密节点   Encrypted Node
+                "treatment": url_null_keep(self.treatment),         # 计算节点      Computing Node
+                "destination": url_null_keep(self.destination),     # 目标节点      Target Node
+                "case": case_null_keep(self.case),                  # 实例          Instance
+                "activity": self.activity,                          # 步骤          Step in Instance
             },
             "body": {
-                "nums": self.nums,
-                "coding": self.coding,
-                "dtype": self.dtype,
-                "path": self.path,
-                "stream": self.stream,
+                "dt_count": self.dt_count,                          # 数据数量      Data count
+                "data": datum_null_keep(self.data),                 # 数据          Data
+                "args_count": self.args_count,                      # 参数数量      Arguments count
+                "arguments": args_null_keep(self.arguments),        # 参数          Arguments
             },
         }
 
@@ -117,18 +107,18 @@ class MSG:
             return self.to_json()
         elif CONFIG.MSG_TPE in ["xml"]:
             return self.to_xml()
-        elif CONFIG.MSG_TPE in ["msgpack"]:
-            return self.to_msgpack()
+        # elif CONFIG.MSG_TPE in ["msgpack"]:
+        #     return self.to_msgpack()
         else:
             raise NotImplementedError("Serialization support xml, json and msgpack only.")
 
-    def to_json(self):
+    def to_json(self) -> str:
         return dict2json(self.to_serialize())
 
-    def to_xml(self):
+    def to_xml(self) -> str:
         return dict2xml(self.to_serialize())
 
-    def _from_key_url(self, key: str, dt: dict, cls: classmethod, default: object = None):
+    def _from_dict_key(self, key: str, dt: dict, cls: classmethod, default: object = None):
         if key in dt.keys():
             if dt[key] is None:
                 self.__dict__[key] = default
@@ -140,49 +130,35 @@ class MSG:
         else:
             self.__dict__[key] = default
 
-    def from_dict(self, msg: dict):
-        # set value from msg head
-        if "head" in msg.keys():
-            # set timestamp from msg head ------------------------------------
-            self._from_key_url("timestamp", msg["head"], str, current_datetime())
-            # set origination from msg head ----------------------------------
-            self._from_key_url("origination", msg["head"], URL, None)
-            # set destination from msg head ----------------------------------
-            self._from_key_url("destination", msg["head"], URL, None)
-            # set treatment from msg head ------------------------------------
-            self._from_key_url("treatment", msg["head"], URL, None)
-            # set encryption from msg head -----------------------------------
-            self._from_key_url("encryption", msg["head"], URL, None)
-            # set case from msg head -----------------------------------------
-            self._from_key_url("case", msg["head"], CASE, None)
-            # set activity from msg head -------------------------------------
-            self._from_key_url("activity", msg["head"], str)
+    def from_dict(self, dt: dict):
+        # set value from msg head --------------------------------------------
+        if "head" in dt.keys():
+            self._from_dict_key("timestamp", dt["head"], str, current_datetime())
+            self._from_dict_key("origination", dt["head"], URL, None)
+            self._from_dict_key("encryption", dt["head"], URL, None)
+            self._from_dict_key("treatment", dt["head"], URL, None)
+            self._from_dict_key("destination", dt["head"], URL, None)
+            self._from_dict_key("case", dt["head"], CASE, None)
+            self._from_dict_key("activity", dt["head"], str)
         else:
             self.__dict__["timestamp"] = current_datetime()
             self.__dict__["origination"] = None
-            self.__dict__["destination"] = None
-            self.__dict__["treatment"] = None
             self.__dict__["encryption"] = None
+            self.__dict__["treatment"] = None
+            self.__dict__["destination"] = None
             self.__dict__["case"] = None
             self.__dict__["activity"] = None
-        # set value from msg body
-        if "body" in msg.keys():
-            # set nums from msg body -----------------------------------------
-            self._from_key_url("nums", msg["body"], int, None)
-            # set coding from msg body ---------------------------------------
-            self._from_key_url("coding", msg["body"], list, None)
-            # set path from msg body -----------------------------------------
-            self._from_key_url("path", msg["body"], list, None)
-            # set dtype from msg body ----------------------------------------
-            self._from_key_url("dtype", msg["body"], list, None)
-            # set stream from msg body ---------------------------------------
-            self._from_key_url("stream", msg["body"], list, None)
+        # set value from msg body --------------------------------------------
+        if "body" in dt.keys():
+            self._from_dict_key("dt_count", dt["body"], int, 0)
+            self._from_dict_key("data", dt["body"], DATUM, None)
+            self._from_dict_key("args_count", dt["body"], int, 0)
+            self._from_dict_key("arguments", dt["body"], ARGS, None)
         else:
-            self.__dict__["nums"] = 0
-            self.__dict__["coding"] = None
-            self.__dict__["path"] = None
-            self.__dict__["dtype"] = None
-            self.__dict__["stream"] = None
+            self.__dict__["dt_count"] = 0
+            self.__dict__["data"] = None
+            self.__dict__["args_count"] = 0
+            self.__dict__["arguments"] = None
 
     def from_json(self, msg: str):
         self.from_dict(json2dict(msg))
@@ -190,104 +166,54 @@ class MSG:
     def from_xml(self, msg: str):
         self.from_dict(xml2dict(msg))
 
-    def swap(self):
-        origination = self.origination
-        self.origination = self.destination
-        self.destination = origination
-        return self
-
-    def forward(self, destination: URL):
-        self.origination = self.destination
-        self.destination = destination
-        return self
-
     def add_datum(self, datum, path=None):
-        dt = datum_to_stream(datum)
-        path = url_null_keep(path)
-        if self.__dict__["nums"] == 0:
-            self.__dict__["stream"] = [dt["stream"], ]
-            self.__dict__["coding"] = [dt["coding"], ]
-            self.__dict__["path"] = [path, ]
-            self.__dict__["dtype"] = [dt["dtype"], ]
+        if self.dt_count == 0:
+            self.data = DATUM()
+        self.data.add(datum=datum, path=path)
+        self.dt_count += 1
+
+    def read_datum(self, idx: int):
+        if (idx < self.dt_count) and (self.dt_count > 0):
+            return self.data.read(idx=idx)
         else:
-            self.__dict__["stream"] = self.__dict__["stream"] + [dt["stream"], ]
-            self.__dict__["coding"] = self.__dict__["coding"] + [dt["coding"], ]
-            self.__dict__["path"] = self.__dict__["path"] + [path, ]
-            self.__dict__["dtype"] = self.__dict__["dtype"] + [dt["dtype"], ]
-        self.__dict__["nums"] = self.__dict__["nums"] + 1
+            return None
 
-    def read_datum(self, num: int):
-        if self.__dict__["nums"] == 0:
-            return {"stream": None, "path": None}
+    def remove_datum(self, idx: int):
+        if self.dt_count > 0:
+            self.data.remove(idx=idx)
+            if self.data.count == 1:
+                self.data = None
+            self.dt_count -= 1
+
+    def clean_datum(self):
+        if self.dt_count > 0:
+            self.data.clean()
+            self.dt_count = 0
+            self.data = None
+
+    def add_args(self, argument, path=None):
+        if self.args_count == 0:
+            self.arguments = ARGS()
+        self.arguments.add(arguments=argument, path=path)
+
+    def read_args(self, idx: int):
+        if self.args_count == 0:
+            return None
         else:
-            return {
-                "stream": stream_to_datum(self.__dict__["stream"][num - 1], self.__dict__["coding"][num - 1],
-                                          self.__dict__["dtype"][num - 1]),
-                "path": self.__dict__["path"][num - 1],
-            }
+            if idx > self.args_count:
+                return None
+            else:
+                return self.arguments.read(idx=idx)
 
-    def del_datum(self, num: int):
-        if self.__dict__["nums"] == 0:
-            pass
-        elif self.__dict__["nums"] == 1:
-            self.nums = 0
-        else:
-            del self.__dict__["stream"][num]
-            del self.__dict__["coding"][num]
-            del self.__dict__["path"][num]
-            del self.__dict__["dtype"][num]
-            self.nums = self.__dict__["nums"] - 1
+    def remove_args(self, idx: int):
+        if self.args_count > 0:
+            self.arguments.remove(idx=idx)
+            if self.arguments.count == 1:
+                self.arguments = None
+            self.args_count = self.__dict__["dt_count"] - 1
 
-
-def datum_to_stream(datum: (str, pd.DataFrame, bytes) = None):
-    """
-    :param datum: []
-    :return: rt:
-    {
-        "stream": [None, str],
-        "coding": [None, "ascii"],
-        "dtype": [None, "str", "base64", "pandas.core.frame.DataFrame"]
-    }
-    """
-    if datum is None:
-        rt = {
-            "stream": None,
-            "coding": None,
-            "dtype": None,
-        }
-    elif isinstance(datum, str):
-        rt = {
-            "stream": datum,
-            "coding": None,
-            "dtype": "str",
-        }
-    elif isinstance(datum, pd.DataFrame):
-        rt = {
-            "stream": base64.b64encode(datum.to_msgpack()).decode("ascii"),
-            "coding": "ascii",
-            "dtype": "pandas.core.frame.DataFrame",
-        }
-    else:
-        rt = {
-            "stream": base64.b64encode(datum).decode("ascii"),
-            "coding": "ascii",
-            "dtype": "base64",
-        }
-    return rt
-
-
-def stream_to_datum(stream: str = None, coding: str = None, dtype: str = None):
-    """
-    :param stream:[None, str]
-    :param coding:[None, str]   ("ascii", None)
-    :param dtype:[None, str]    ("base64", "str", "pandas.core.frame.DataFrame", None)
-    :return: [None, str, bytes, pd.DataFrame]
-    """
-    if dtype in ["base64"]:
-        return base64.b64decode(stream.encode(coding))
-    elif dtype in ["str"]:
-        return stream
-    elif dtype in ["pandas.core.frame.DataFrame"]:
-        return pd.read_msgpack(base64.b64decode(stream.encode(coding)))
-    else:
-        return None
+    def clean_args(self):
+        if self.args_count > 0:
+            self.arguments.clean()
+            self.args_count = 0
+            self.arguments = None

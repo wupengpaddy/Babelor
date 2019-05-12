@@ -55,3 +55,12 @@ class CASE:
             self.timestamp = current_datetime()
         else:
             raise ValueError("地址格式错误")
+
+
+def case_null_keep(item: object, item_type: classmethod = str) -> object:
+    if item is None:
+        return None
+    elif isinstance(item, item_type):
+        return item
+    else:
+        return item_type(item)
