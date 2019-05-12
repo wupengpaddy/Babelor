@@ -19,8 +19,9 @@ import logging
 # Outer Required
 import xlrd
 import pandas as pd
+import numpy as np
 # Inner Required
-from Babelor.Presentation import URL, MSG, DATUM
+from Babelor.Presentation import URL, MSG
 # Global Parameters
 
 
@@ -37,64 +38,85 @@ class FILE:
 
     def read(self, msg: MSG):
         logging.debug("FILE::{0}::READ msg:{1}".format(self.conn, msg))
-        msg_out = MSG()
-        msg_out.origination = msg.origination
-        msg_out.encryption = msg.encryption
-        msg_out.treatment = msg.treatment
-        msg_out.destination = msg.destination
-        msg_out.case = msg.case
-        msg_out.activity = msg.activity
-        logging.debug("FILE::{0}::READ msg_out:{1}".format(self.conn, msg_out))
         # -------------------------------------------------
-        for i in range(0, msg.nums, 1):
-            dt = msg.read_datum(i)
+        for i in range(0, msg.args_count, 1):
+            arguments = msg.read_args(i)
             if self.url_is_dir:
-                path = os.path.join(self.conn.path, dt["path"])
+                path = os.path.join(self.conn.path, arguments["path"])
             else:
                 path = self.conn.path
-            suffix = os.path.splitext(path)
+            suffix = os.path.splitext(path)[-1]
             # -------------------------------
             if os.path.isfile(path):
-                if suffix in ["xls", "xlsx"]:
+                if suffix in [".xls", ".xlsx"]:
                     if self.url_is_dir:
-                        stream = pd.read_excel(path)
+                        datum = pd.read_excel(path)
                     else:
-                        stream = pd.read_excel(path, sheet_name=dt["path"])
+                        datum = pd.read_excel(path, sheet_name=arguments["path"])
+                elif suffix in [".npy"]:
+                    datum = np.load(path)
                 else:
                     with open(path, "rb") as file:
-                        stream = file.read()
-                msg_out.add_datum(datum=stream, path=dt["path"])
+                        datum = file.read()
+                msg.add_datum(datum, arguments["path"])
                 logging.info("FILE::{0}::READ successfully.".format(path))
             else:
-                msg_out.add_datum(datum=None, path=dt["path"])
                 logging.warning("FILE::{0}::READ failed.".format(path))
-        logging.info("FILE::{0}::READ return:{1}".format(self.conn, msg_out))
-        return msg_out
+            # -------------------------------
+            msg.remove_args(i)
+        logging.info("FILE::{0}::READ return:{1}".format(self.conn, msg))
+        return msg
 
     def write(self, msg: MSG):
-        logging.info("FILE::{0}::WRITE msg:{1}".format(self.conn, msg))
+        logging.debug("FILE::{0}::WRITE msg:{1}".format(self.conn, msg))
         if self.url_is_dir:
             if not os.path.exists(self.conn.path):
                 os.mkdir(self.conn.path)
-        for i in range(0, msg.nums, 1):
+        for i in range(0, msg.dt_count, 1):
             dt = msg.read_datum(i)
-            df = dt["stream"]
             if self.url_is_dir:
                 path = os.path.join(self.conn.path, dt["path"])
             else:
                 path = self.conn.path
+            suffix = os.path.splitext(path)[-1]
+            # -------------------------------
             if os.path.exists(path):
-                logging.warning("FILE::{0} write failed.".format(path))
+                logging.warning("FILE::{0}::WRITE failed.".format(path))
+            elif os.path.isfile(os.path.split(path)[0]):
+                logging.warning("FILE::{0}::WRITE failed.".format(path))
             else:
-                if isinstance(df, pd.DataFrame):
-                    df.to_excel(path, index=False)
-                    logging.info("FILE::EXCEL::{0} write successfully.".format(path))
-                elif df is None:
-                    logging.warning("FILE::NONE::{0} write successfully.".format(path))
+                if not os.path.isdir(os.path.split(path)[0]):
+                    mkdir(os.path.split(path)[0])
+                # -------------------------------
+                if suffix in [".xls", ".xlsx"]:
+                    if isinstance(dt["stream"], pd.DataFrame):
+                        dt["stream"].to_excel(path, index=False)
+                        logging.info("FILE::EXCEL::{0}::WRITE successfully.".format(path))
+                    else:
+                        logging.warning("FILE::EXCEL::{0}::WRITE failed.".format(path))
+                elif suffix in [".npy"]:
+                    if isinstance(dt["stream"], np.ndarray):
+                        np.save(path, dt["stream"])
+                        logging.info("FILE::NUMPY::{0}::WRITE successfully.".format(path))
+                    else:
+                        logging.warning("FILE::NUMPY::{0}::WRITE failed.".format(path))
+                elif suffix in [""]:
+                    logging.warning("FILE::{0}::WRITE None.".format(path))
                 else:
                     with open(path, "wb") as file:
-                        file.write(df)
-                    logging.info("FILE::{0} write successfully.".format(path))
+                        file.write(dt["stream"])
+                    logging.info("FILE::{0}::WRITE successfully.".format(path))
+
+
+def mkdir(path: str):
+    if not os.path.exists(os.path.split(path)[0]):
+        mkdir(os.path.split(path)[0])
+        mkdir(path)
+    else:
+        if os.path.isfile(path):
+            os.remove(path)
+        if not os.path.exists(path):
+            os.mkdir(path)
 
 
 def sheets_merge(read_path, write_path):

@@ -40,29 +40,24 @@ class SQL:
 
     def read(self, msg: MSG):
         logging.debug("SQL::{0}::READ msg:{1}".format(self.conn, msg))
-        msg_out = MSG()
-        msg_out.origination = msg.origination
-        msg_out.encryption = msg.encryption
-        msg_out.treatment = msg.treatment
-        msg_out.destination = msg.destination
-        msg_out.case = msg.case
-        msg_out.activity = msg.activity
-        logging.debug("SQL::{0}::READ msg_out:{1}".format(self.conn, msg_out))
         # ----------------------------------
-        for i in range(0, msg.nums, 1):
-            rt = msg.read_datum(i)
-            df = pd.read_sql(sql=rt["stream"], con=self.engine)
+        for i in range(0, msg.args_count, 1):
+            argument = msg.read_args(i)
+            df = pd.read_sql(sql=argument["stream"], con=self.engine)
             df = df.rename(str.upper, axis='columns')
-            msg_out.add_datum(datum=df, path=rt["path"])
-        logging.info("SQL::{0}::READ return:{1}".format(self.conn, msg_out))
-        return msg_out
+            msg.add_datum(datum=df, path=argument["path"])
+            msg.remove_args(i)
+        logging.info("SQL::{0}::READ return:{1}".format(self.conn, msg))
+        return msg
 
     def write(self, msg: MSG):
-        logging.info("SQL::{0} write:{1}".format(self.conn, msg))
-        for i in range(0, msg.nums, 1):
+        logging.debug("SQL::{0} write:{1}".format(self.conn, msg))
+        for i in range(0, msg.dt_count, 1):
             rt = msg.read_datum(i)
             df = rt["stream"]
+            path = os.path.splitext(rt["path"])[0]
             if isinstance(df, pd.DataFrame):
-                df.to_sql(rt["path"], con=self.engine, if_exists='replace', index=False, index_label=False)
+                df.to_sql(path, con=self.engine, if_exists='replace', index=False, index_label=False)
+                logging.info("SQL::{0}::WRITE successfully.".format(self.conn))
             else:
                 logging.warning("SQL::{0}::WRITE failed.".format(self.conn))

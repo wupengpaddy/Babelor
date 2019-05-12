@@ -19,8 +19,10 @@ import ftplib
 import logging
 # Outer Required
 import pandas as pd
+import numpy as np
 # Inner Required
 from Babelor.Presentation import URL, MSG
+from Babelor.Data.File import mkdir
 # Global Parameters
 from Babelor.Config import CONFIG
 
@@ -38,73 +40,87 @@ class FTP:
 
     def read(self, msg: MSG):
         logging.debug("FTP::{0}::READ msg:{1}".format(self.conn, msg))
-        msg_out = MSG()
-        msg_out.origination = msg.origination
-        msg_out.encryption = msg.encryption
-        msg_out.treatment = msg.treatment
-        msg_out.destination = msg.destination
-        msg_out.case = msg.case
-        msg_out.activity = msg.activity
-        logging.debug("FTP::{0}::READ msg_out:{1}".format(self.conn, msg_out))
-        # -------------------------------------------------
         ftp = self.open()
         # -------------------------------------------------
-        for i in range(0, msg.nums, 1):
-            dt = msg.read_datum(i)
+        for i in range(0, msg.args_count, 1):
+            argument = msg.read_args(i)
             if self.url_is_dir:
-                path = os.path.join(self.conn.path, dt["path"])
+                path = os.path.join(self.conn.path, argument["path"])
             else:
                 path = self.conn.path
             suffix = os.path.splitext(path)[-1]
             # ----------------------------
             stream = bytes()
             ftp.retrbinary('RETR ' + path, stream, CONFIG.FTP_BUFFER)
-            logging.info("FTP::{0}::READ successfully.".format(path))
+            temp_path = "temp/temp" + suffix
+            mkdir(os.path.split(temp_path)[0])
             # -------------------------------
-            if suffix in ["xls", "xlsx"]:
-                temp_path = "temp/temp" + suffix
+            if suffix in [".xls", ".xlsx"]:
                 with open(temp_path, "wb") as temp_file:
                     temp_file.write(stream)
                 if self.url_is_dir:
                     stream = pd.read_excel(temp_path)
                 else:
-                    stream = pd.read_excel(temp_path, sheet_name=dt["path"])
-                os.remove(temp_path)
-                del temp_path
+                    stream = pd.read_excel(temp_path, sheet_name=argument["path"])
                 logging.info("FTP::EXCEL::READ successfully.".format(path))
-            msg_out.add_datum(datum=stream, path=dt["path"])
+            elif suffix in [".npy"]:
+                with open(temp_path, "wb") as temp_file:
+                    temp_file.write(stream)
+                stream = np.load(temp_path)
+                logging.info("FTP::NUMPY::READ successfully.".format(path))
+            else:
+                logging.info("FTP::{0}::READ successfully.".format(path))
+            os.remove(temp_path)
+            os.removedirs(os.path.split(temp_path)[0])
+            del temp_path
+            # -------------------------------
+            msg.add_datum(datum=stream, path=argument["path"])
+            # -------------------------------
+            msg.remove_args(i)
         # -------------------------------------------------
-        logging.info("FTP::{0}::READ return:{1}".format(self.conn, msg_out))
-        return msg_out
+        logging.info("FTP::{0}::READ return:{1}".format(self.conn, msg))
+        return msg
 
     def write(self, msg: MSG):
-        logging.info("FTP::{0}::WRITE msg:{1}".format(self.conn, msg))
-        # -------------------------------------------------
+        logging.debug("FTP::{0}::WRITE msg:{1}".format(self.conn, msg))
         ftp = self.open()
         # -------------------------------------------------
-        for i in range(0, msg.nums, 1):
+        for i in range(0, msg.dt_count, 1):
             dt = msg.read_datum(i)
             if self.url_is_dir:
                 path = os.path.join(self.conn.path, dt["path"])
             else:
                 path = self.conn.path
             suffix = os.path.splitext(path)[-1]
+            temp_path = "temp/temp" + suffix
+            mkdir(os.path.split(temp_path)[0])
             # ----------------------------
-            if suffix in ["xls", "xlsx"]:
-                temp_path = "temp/temp" + suffix
+            if suffix in [".xls", ".xlsx"]:
                 if isinstance(dt["stream"], pd.DataFrame):
                     dt["stream"].to_excel(temp_path, index=False)
                     with open(temp_path, "rb") as temp_file:
                         stream = temp_file.read()
-                    logging.info("FILE::EXCEL::{0} write successfully.".format(path))
+                    logging_info = "::EXCEL"
                 else:
                     stream = None
-                    logging.warning("FILE::EXCEL::{0} write failed.".format(path))
+                    logging_info = "::EXCEL"
+            elif suffix in [".npy"]:
+                if isinstance(dt["stream"], np.ndarray):
+                    np.save(temp_path, dt["stream"])
+                    with open(temp_path, "rb") as temp_file:
+                        stream = temp_file.read()
+                    logging_info = "::NUMPY"
+                else:
+                    stream = None
+                    logging_info = "::NUMPY"
             else:
-                stream = dt["stream"]
-            if stream is not None:
+                logging_info = ""
+            # ----------------------------
+            if stream is None:
+                logging.warning("FTP{0}::{1}::WRITE successfully.".format(logging_info, self.conn))
+            else:
                 ftp.storbinary('STOR ' + path, stream, CONFIG.FTP_BUFFER)
-                logging.info("FTP::{0}::WRITE successfully.".format(self.conn))
+                logging.info("FTP{0}::{1}::WRITE successfully.".format(logging_info, self.conn))
         ftp.close()
 
     def open(self):
@@ -116,4 +132,4 @@ class FTP:
             if isinstance(self.conn.fragment.query, dict):
                 if self.conn.fragment.query["model"] in ["PASV"]:
                     ftp.set_pasv(True)
-            return ftp
+        return ftp
