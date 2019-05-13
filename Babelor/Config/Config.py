@@ -36,3 +36,4 @@ class CONFIG:
     FTP_MAX_CONS_PER_IP = 5
     IS_DATA_WRITE_END = True
     IS_DATA_READ_START = True
+    IS_SQL_DATA_STRING = True
