@@ -191,10 +191,12 @@ def stream_to_datum(stream: str = None, coding: str = None, dtype: str = None):
     elif dtype in ["str"]:
         return base64.b64decode(stream.encode("ascii")).decode(coding)
     elif dtype in ["pandas.core.frame.DataFrame"]:
-        if CONFIG.IS_SQL_DATA_STRING:
-            return pd.read_msgpack(base64.b64decode(stream.encode("ascii")), dtype=str)
-        else:
-            return pd.read_msgpack(base64.b64decode(stream.encode("ascii")))
+        df = pd.read_msgpack(base64.b64decode(stream.encode("ascii")))
+        if isinstance(df, pd.DataFrame):
+            if CONFIG.IS_SQL_DATA_STRING:
+                for col in df.columns.tolist():
+                    df = df[col].astype(str)
+        return df
     elif dtype in ["numpy.ndarray"]:
         dt_coding = json2dict(coding)
         rt = np.frombuffer(base64.decodebytes(stream.encode("ascii")), dtype=np.dtype(dt_coding["dtype"]))
