@@ -17,4 +17,5 @@
 from Babelor.Tools.Conversion import json2dict, json2xml,\
     dict2json, dict2xml, dict2etree,\
     etree2dict, \
-    xml2dict, xml2json
+    xml2dict, xml2json, \
+    msgpack2dict, dict2msgpack

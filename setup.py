@@ -51,6 +51,7 @@ INSTALL_REQUIRED = [
     "xlrd>=1.2.0",              # python excel file read connector      EXCEL 读连接器 (XLS)
     "xlwt>=1.3.0",              # python excel file write connector     EXCEL 写连接器 (XLS)
     "openpyxl>=2.5.3",          # python excel file connector           EXCEL 连接器 (XLSX)
+    "msgpack-python>=0.5.6",    # python msgpack serialization          msgpack 序列化库
 ]
 
 # 库分类

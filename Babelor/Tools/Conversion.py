@@ -17,6 +17,7 @@
 import json
 from xml.etree import ElementTree
 # Outer Required
+import msgpack
 # Inner Required
 # Global Parameters
 from Babelor.Config import CONFIG
@@ -160,3 +161,11 @@ def extract_from_key(*args, **kwargs):
             if len(rt) == 1:
                 return rt[0]
         return rt
+
+
+def dict2msgpack(dt: dict) -> str:
+    return msgpack.packb(dt)
+
+
+def msgpack2dict(msg_pack: str) -> dict:
+    return msgpack.unpackb(msg_pack)
