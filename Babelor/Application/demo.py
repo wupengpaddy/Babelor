@@ -14,8 +14,6 @@
 # limitations under the License.
 
 # System Required
-import os
-import time
 import logging
 from multiprocessing import Process
 # Outer Required
@@ -30,28 +28,41 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(levelname)s: %(message)s')
 
 
-def func_treater(msg_in: MSG):
+def func_sender(msg: MSG):
     # -—————————————------------------------ INIT ---------
-    dt = {}
-    for i in range(0, msg_in.nums, 1):
-        attachment = msg_in.read_datum(i)
-        if attachment["path"] in dt.keys():
-            dt[attachment["path"]] = attachment["stream"]
+    arguments = {}
+    for i in range(0, msg.dt_count, 1):
+        argument = msg.read_datum(i)
+        if argument["path"] in arguments.keys():
+            arguments[argument["path"]] = argument["stream"]
     # -—————————————------------------------ PROCESS ------
-    msg_out = msg_in
+    msg_out = msg
     # -—————————————------------------------ END ----------
     return msg_out
 
 
-def func_encrypter(msg_in: MSG):
+def func_treater(msg: MSG):
+    # -—————————————------------------------ INIT ---------
+    data = {}
+    for i in range(0, msg.dt_count, 1):
+        datum = msg.read_datum(i)
+        if datum["path"] in data.keys():
+            data[datum["path"]] = datum["stream"]
+    # -—————————————------------------------ PROCESS ------
+    msg_out = msg
+    # -—————————————------------------------ END ----------
+    return msg_out
+
+
+def func_encrypter(msg: MSG):
     # -————————————------------------------ INIT ---------
-    dt = {}
-    for i in range(0, msg_in.nums, 1):
-        attachment = msg_in.read_datum(i)
-        if attachment["path"] in dt.keys():
-            dt[attachment["path"]] = attachment["stream"]
+    data = {}
+    for i in range(0, msg.dt_count, 1):
+        datum = msg.read_datum(i)
+        if datum["path"] in data.keys():
+            data[datum["path"]] = datum["stream"]
     # -————————————------------------------ PROCESS ------
-    msg_out = msg_in
+    msg_out = msg
     # -————————————------------------------ END ----------
     return msg_out
 
@@ -143,9 +154,10 @@ edge_node_url = {
     "inner": URL("tcp://*:20005"),
     "outer": URL("tcp://127.0.0.1:20005"),
 }
-origination_url = URL("file:///C:/Users/geyua/PycharmProjects/Babelor/data/dir1/20190505.xlsx")
+origination_url = URL("file:///C:/Users/geyua/PycharmProjects/Babelor/data/dir1/")
 destination_url = URL("file:///C:/Users/geyua/PycharmProjects/Babelor/data/dir2/")
 
 
 if __name__ == '__main__':
     main()
+

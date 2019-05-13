@@ -42,6 +42,7 @@ class FTP:
         logging.debug("FTP::{0}::READ msg:{1}".format(self.conn, msg))
         ftp = self.open()
         # -------------------------------------------------
+        rm_idx = []
         for i in range(0, msg.args_count, 1):
             argument = msg.read_args(i)
             if self.url_is_dir:
@@ -75,9 +76,11 @@ class FTP:
             del temp_path
             # -------------------------------
             msg.add_datum(datum=stream, path=argument["path"])
-            # -------------------------------
-            msg.remove_args(i)
+            rm_idx = [i] + rm_idx
         # -------------------------------------------------
+        if CONFIG.IS_DATA_READ_START:
+            for i in rm_idx:
+                msg.remove_args(i)
         logging.info("FTP::{0}::READ return:{1}".format(self.conn, msg))
         return msg
 
@@ -85,12 +88,14 @@ class FTP:
         logging.debug("FTP::{0}::WRITE msg:{1}".format(self.conn, msg))
         ftp = self.open()
         # -------------------------------------------------
+        rm_idx = []
         for i in range(0, msg.dt_count, 1):
             dt = msg.read_datum(i)
             if self.url_is_dir:
                 path = os.path.join(self.conn.path, dt["path"])
             else:
                 path = self.conn.path
+            # ----------------------------
             suffix = os.path.splitext(path)[-1]
             temp_path = "temp/temp" + suffix
             mkdir(os.path.split(temp_path)[0])
@@ -114,13 +119,16 @@ class FTP:
                     stream = None
                     logging_info = "::NUMPY"
             else:
+                stream = dt["stream"]
                 logging_info = ""
             # ----------------------------
-            if stream is None:
-                logging.warning("FTP{0}::{1}::WRITE successfully.".format(logging_info, self.conn))
-            else:
-                ftp.storbinary('STOR ' + path, stream, CONFIG.FTP_BUFFER)
-                logging.info("FTP{0}::{1}::WRITE successfully.".format(logging_info, self.conn))
+            ftp.storbinary('STOR ' + path, stream, CONFIG.FTP_BUFFER)
+            rm_idx = [i] + rm_idx
+            logging.info("FTP{0}::{1}::WRITE successfully.".format(logging_info, self.conn))
+        # -------------------------------------------------
+        if CONFIG.IS_DATA_WRITE_END:
+            for i in rm_idx:
+                msg.remove_datum(i)
         ftp.close()
 
     def open(self):

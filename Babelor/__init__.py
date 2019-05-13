@@ -18,15 +18,16 @@ from Babelor.Presentation import MSG, URL, CASE
 from Babelor.Application import TEMPLE
 from Babelor.Session import MQ
 
-# Let users know if they're missing any of our hard dependencies
-hard_dependencies = ("pandas", "sqlalchemy", "zmq", "xlrd", "pyftpdlib", "openpyxl")
+# Let users know if they're missing any of hard dependencies
+hard_dependencies = ("pandas", "numpy", "sqlalchemy", "zmq", "xlrd", "pyftpdlib", "openpyxl")
 missing_dependencies = []
 for dependency in hard_dependencies:
     try:
         __import__(dependency)
     except ImportError as e:
         missing_dependencies.append(dependency)
+
 if missing_dependencies:
     raise ImportError(
         "Missing required dependencies {0}".format(missing_dependencies))
-del hard_dependencies, missing_dependencies, dependency
+del hard_dependencies, missing_dependencies

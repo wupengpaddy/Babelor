@@ -17,12 +17,12 @@
 import os
 import logging
 # Outer Required
-import xlrd
 import pandas as pd
 import numpy as np
 # Inner Required
 from Babelor.Presentation import URL, MSG
 # Global Parameters
+from Babelor.Config import CONFIG
 
 
 class FILE:
@@ -39,6 +39,7 @@ class FILE:
     def read(self, msg: MSG):
         logging.debug("FILE::{0}::READ msg:{1}".format(self.conn, msg))
         # -------------------------------------------------
+        rm_idx = []
         for i in range(0, msg.args_count, 1):
             arguments = msg.read_args(i)
             if self.url_is_dir:
@@ -62,8 +63,11 @@ class FILE:
                 logging.info("FILE::{0}::READ successfully.".format(path))
             else:
                 logging.warning("FILE::{0}::READ failed.".format(path))
+            rm_idx = [i] + rm_idx
             # -------------------------------
-            msg.remove_args(i)
+        if CONFIG.IS_DATA_READ_START:
+            for i in rm_idx:
+                msg.remove_args(i)
         logging.info("FILE::{0}::READ return:{1}".format(self.conn, msg))
         return msg
 
@@ -72,6 +76,8 @@ class FILE:
         if self.url_is_dir:
             if not os.path.exists(self.conn.path):
                 os.mkdir(self.conn.path)
+        # -------------------------------
+        rm_idx = []
         for i in range(0, msg.dt_count, 1):
             dt = msg.read_datum(i)
             if self.url_is_dir:
@@ -106,6 +112,11 @@ class FILE:
                     with open(path, "wb") as file:
                         file.write(dt["stream"])
                     logging.info("FILE::{0}::WRITE successfully.".format(path))
+            rm_idx = [i] + rm_idx
+        # -------------------------------
+        if CONFIG.IS_DATA_WRITE_END:
+            for i in rm_idx:
+                msg.remove_datum(i)
 
 
 def mkdir(path: str):
@@ -125,6 +136,7 @@ def sheets_merge(read_path, write_path):
     :param write_path: 写入路径
     :return: None
     """
+    import xlrd
     book = xlrd.open_workbook(read_path)
     writer = None
     for sheet in book.sheets():

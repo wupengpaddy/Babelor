@@ -41,17 +41,24 @@ class SQL:
     def read(self, msg: MSG):
         logging.debug("SQL::{0}::READ msg:{1}".format(self.conn, msg))
         # ----------------------------------
+        rm_idx = []
         for i in range(0, msg.args_count, 1):
             argument = msg.read_args(i)
             df = pd.read_sql(sql=argument["stream"], con=self.engine)
             df = df.rename(str.upper, axis='columns')
             msg.add_datum(datum=df, path=argument["path"])
-            msg.remove_args(i)
+            rm_idx = [i] + rm_idx
+        # ----------------------------------
+        if CONFIG.IS_DATA_READ_START:
+            for i in rm_idx:
+                msg.remove_args(i)
         logging.info("SQL::{0}::READ return:{1}".format(self.conn, msg))
         return msg
 
     def write(self, msg: MSG):
         logging.debug("SQL::{0} write:{1}".format(self.conn, msg))
+        # ----------------------------------
+        rm_idx = []
         for i in range(0, msg.dt_count, 1):
             rt = msg.read_datum(i)
             df = rt["stream"]
@@ -61,3 +68,8 @@ class SQL:
                 logging.info("SQL::{0}::WRITE successfully.".format(self.conn))
             else:
                 logging.warning("SQL::{0}::WRITE failed.".format(self.conn))
+            rm_idx = [i] + rm_idx
+        # ----------------------------------
+        if CONFIG.IS_DATA_WRITE_END:
+            for i in rm_idx:
+                msg.remove_datum(i)
