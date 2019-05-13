@@ -166,24 +166,24 @@ class MSG:
     def from_xml(self, msg: str):
         self.from_dict(xml2dict(msg))
 
-    def add_datum(self, datum, path=None):
+    def add_datum(self, datum: object, path=None):
         if self.dt_count == 0:
             self.data = DATUM()
         self.data.add(datum=datum, path=path)
         self.dt_count += 1
 
     def read_datum(self, idx: int):
-        if (idx < self.dt_count) and (self.dt_count > 0):
+        if (self.dt_count > 0) and (idx < self.dt_count):
             return self.data.read(idx=idx)
         else:
             return None
 
     def remove_datum(self, idx: int):
-        if self.dt_count > 0:
+        if (idx < self.dt_count) and (self.dt_count > 0):
             self.data.remove(idx=idx)
-            if self.data.count == 1:
-                self.data = None
             self.dt_count -= 1
+        if (self.data is not None) and (self.dt_count == 0):
+            self.data = None
 
     def clean_datum(self):
         if self.dt_count > 0:
@@ -191,26 +191,24 @@ class MSG:
             self.dt_count = 0
             self.data = None
 
-    def add_args(self, argument, path=None):
+    def add_args(self, argument: object, path=None):
         if self.args_count == 0:
             self.arguments = ARGS()
         self.arguments.add(arguments=argument, path=path)
+        self.args_count += 1
 
     def read_args(self, idx: int):
-        if self.args_count == 0:
-            return None
+        if (self.dt_count > 0) and (idx < self.dt_count):
+            return self.arguments.read(idx)
         else:
-            if idx > self.args_count:
-                return None
-            else:
-                return self.arguments.read(idx=idx)
+            return None
 
     def remove_args(self, idx: int):
-        if self.args_count > 0:
+        if (idx < self.args_count) and (self.args_count > 0):
             self.arguments.remove(idx=idx)
-            if self.arguments.count == 1:
-                self.arguments = None
-            self.args_count = self.__dict__["dt_count"] - 1
+            self.args_count -= 1
+        if (self.arguments is not None) and (self.args_count == 0):
+            self.arguments = None
 
     def clean_args(self):
         if self.args_count > 0:

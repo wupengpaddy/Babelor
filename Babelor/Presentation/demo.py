@@ -137,6 +137,20 @@ def demo_numpy():
     print(new_msg.read_datum(0)["stream"])
 
 
+def demo_args():
+    arg1 = "111111111111111111111111111111"
+    arg2 = "222222222222222222222222222222"
+    msg = MSG()
+    msg.add_args(arg1, "arg1")
+    msg.add_args(arg2, "arg2")
+    msg.add_datum(arg1, "arg1")
+    msg.add_datum(arg2, "arg2")
+    print(msg)
+    msg.remove_args(1)
+    msg.remove_args(0)
+    print(msg)
+
+
 if __name__ == '__main__':
     # demo_tomail_url()
     # demo_ftp_url()
@@ -145,4 +159,5 @@ if __name__ == '__main__':
     # demo_tcp_url()
     # demo_msg_mysql2ftp()
     # demo_excel()
-    demo_numpy()
+    # demo_numpy()
+    demo_args()
