@@ -52,6 +52,7 @@
       <w>vsdx</w>
       <w>xlrd</w>
       <w>xlsx</w>
+      <w>xlwt</w>
       <w>xmlfile</w>
       <w>zspd</w>
     </words>

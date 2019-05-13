@@ -23,7 +23,7 @@ NAME = "Babelor"
 # N[.N]         阶段主版本号和副版本号(可选)
 # .postN        发行后的更新版本号(可选)
 # .devN         开发期间的发行版本号(可选)
-VERSION = "0.1.2.post1.dev2"
+VERSION = "0.1.2.post1.dev3"
 
 # 库包含路径
 # Inner Required
@@ -48,7 +48,9 @@ INSTALL_REQUIRED = [
     "python-dateutil>=2.7.5",   # python data util                      解释器：通用数据结构
     "pyzmq>=17.1.2",            # python binding for 0mq                消息中间件
     "pyftpdlib>=1.5.4",         # python async ftp server               FTPD 服务器
-    "xlrd>=1.2.0",              # python excel file connector           EXCEL 连接器
+    "xlrd>=1.2.0",              # python excel file read connector      EXCEL 读连接器 (XLS)
+    "xlwt>=1.3.0",              # python excel file write connector     EXCEL 写连接器 (XLS)
+    "openpyxl>=2.5.3",          # python excel file connector           EXCEL 连接器 (XLSX)
 ]
 
 # 库分类

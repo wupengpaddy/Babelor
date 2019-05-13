@@ -146,4 +146,3 @@ if __name__ == '__main__':
     # demo_msg_mysql2ftp()
     demo_excel()
     # demo_numpy()
-
