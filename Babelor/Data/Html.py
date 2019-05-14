@@ -60,16 +60,6 @@ def user_html2json(text: str):
     return js
 
 
-uri = 'http://newoa.shairport.com/shairport/dep162/swgl_162.nsf/myview'
-query = {
-    'openform': "",
-    'view':     'vwdocforfenlei',
-    'count':    20,
-    'target':   'blank',
-    'start':    1,
-}
-
-
 def get_html2dataframe(path: str):
 
     url_rec_doc = "&".join([
@@ -123,7 +113,6 @@ def get_html2dataframe(path: str):
     title = []
     for cell in rows[0]:
         title.append(TAG_RE.sub("", cell.get_text()))
-    print(title[2:])
     data = {
         "起草日期": [],
         "公文类型": [],

@@ -37,3 +37,5 @@ class CONFIG:
     IS_DATA_WRITE_END = True
     IS_DATA_READ_START = True
     IS_SQL_DATA_STRING = True
+    MAIL_SUBJECT = "Message From Babelor Information Service Exchange Platform"
+    MAIL_CONTENT = "Welcome to Babelor Information Service Exchange Platform."

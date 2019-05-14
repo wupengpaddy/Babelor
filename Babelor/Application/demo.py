@@ -33,7 +33,7 @@ def func_sender(msg: MSG):
     arguments = {}
     for i in range(0, msg.dt_count, 1):
         argument = msg.read_datum(i)
-        if argument["path"] in arguments.keys():
+        if argument["path"] not in arguments.keys():
             arguments[argument["path"]] = argument["stream"]
     # -—————————————------------------------ PROCESS ------
     msg_out = msg
@@ -46,7 +46,7 @@ def func_treater(msg: MSG):
     data = {}
     for i in range(0, msg.dt_count, 1):
         datum = msg.read_datum(i)
-        if datum["path"] in data.keys():
+        if datum["path"] not in data.keys():
             data[datum["path"]] = datum["stream"]
     # -—————————————------------------------ PROCESS ------
     msg_out = msg
@@ -59,7 +59,7 @@ def func_encrypter(msg: MSG):
     data = {}
     for i in range(0, msg.dt_count, 1):
         datum = msg.read_datum(i)
-        if datum["path"] in data.keys():
+        if datum["path"] not in data.keys():
             data[datum["path"]] = datum["stream"]
     # -————————————------------------------ PROCESS ------
     msg_out = msg

@@ -46,26 +46,44 @@ class TOMAIL:
         self.content = None
 
     def _create_mime(self, msg: MSG):
+        # Connection
         sender_user = self.conn.fragment.username               # 寄件人用户名
         receiver_user = self.conn.username                      # 收件人用户名
         sender_name = self.conn.fragment.fragment.path          # 寄件人名
         receiver_name = self.conn.path                          # 收件人名
         sender_postfix = self.conn.fragment.fragment.hostname   # 寄件人 postfix
         receiver_postfix = self.conn.hostname                   # 收件人 postfix
+        # from msg
+        data = {}
+        for i in range(0, msg.dt_count, 1):
+            datum = msg.read_datum(i)
+            if datum["path"] not in data.keys():
+                data[datum["path"]] = datum["stream"]
+        if "subject" in data.keys():
+            subject = data["subject"]
+        else:
+            subject = CONFIG.MAIL_SUBJECT
+        if "content" in data.keys():
+            content = data["content"]
+        else:
+            content = CONFIG.MAIL_CONTENT
+        attachments = []
+        for k in data.keys():
+            if k not in ["subject", "content"]:
+                attachments.append({"stream": data[k], "path": k, })
         # Structure MIME
         self.me = str(Address(Header(sender_name, CONFIG.Coding).encode(), sender_user, sender_postfix))
         self.to = str(Address(Header(receiver_name, CONFIG.Coding).encode(), receiver_user, receiver_postfix))
-        self.subject = msg.read_datum(0)
-        self.content = msg.read_datum(1)
+        self.subject = subject
+        self.content = content
         self.mime['from'] = self.me                                     # 寄件人
         self.mime['to'] = self.to                                       # 收件人
         self.mime['subject'] = Header(self.subject, 'UTF-8').encode()   # 标题
         self.mime["Accept-Language"] = "zh-CN"                          # 语言
         self.mime["Accept-Charset"] = "ISO-8859-1,utf-8"                # 字符集
         self.mime.attach(MIMEText(self.content, 'plain', "utf-8"))      # 正文
-        if msg.nums > 2:
-            for i in range(2, msg.nums, 1):                             # 附件
-                attachment = msg.read_datum(i)
+        if len(attachments) > 0:                                        # 附件
+            for attachment in attachments:
                 part = MIMEBase('application', 'octet-stream')
                 part.set_payload(attachment["stream"])
                 encoders.encode_base64(part)
@@ -74,15 +92,16 @@ class TOMAIL:
                 self.mime.attach(part)
 
     def _send(self):
-        hostname = self.conn.fragment.hostname
-        port = self.conn.fragment.port
-        username = self.conn.fragment.username
-        password = self.conn.fragment.password
+        hostname = self.conn.fragment.hostname                  # 邮件服务主机
+        port = self.conn.fragment.port                          # 邮件服务端口
+        username = self.conn.fragment.username                  # 邮件服务用户
+        password = self.conn.fragment.password                  # 邮件服务密码
+        # smtp
         with smtplib.SMTP_SSL(host=hostname, port=port) as sess:
             sess.login(user=username, password=password)
             sess.sendmail(self.me, self.to, self.mime.as_string())
 
     def write(self, msg: MSG):
-        logging.info("TOMAIL::{0} write:{1}".format(self.conn, msg))
         self._create_mime(msg)
         self._send()
+        logging.info("TOMAIL::{0}::WRITE msg:{1}".format(self.conn, msg))
