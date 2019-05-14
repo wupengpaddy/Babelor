@@ -39,3 +39,5 @@ class CONFIG:
     IS_SQL_DATA_STRING = True
     MAIL_SUBJECT = "Message From Babelor Information Service Exchange Platform"
     MAIL_CONTENT = "Welcome to Babelor Information Service Exchange Platform."
+    TASK_BLOCK_TIME = 60
+    TASK_MAX_RUN_TIMES = 365

@@ -17,6 +17,7 @@
 from Babelor.Presentation import MSG, URL, CASE
 from Babelor.Application import TEMPLE
 from Babelor.Session import MQ
+from Babelor.Tools import TASKS
 
 # Let users know if they're missing any of hard dependencies
 hard_dependencies = ("pandas", "numpy", "sqlalchemy", "zmq", "xlrd", "pyftpdlib", "openpyxl", "xlwt")
