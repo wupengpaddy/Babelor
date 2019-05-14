@@ -17,7 +17,7 @@
 import logging
 # Outer Required
 # Inner Required
-from Babelor.Tools import dict2json, json2dict, dict2xml, xml2dict, dict2msgpack, msgpack2dict
+from Babelor.Tools import dict2json, json2dict, dict2xml, xml2dict  # , dict2msgpack, msgpack2dict
 from Babelor.Presentation.UniformResourceIdentifier import URL, url_null_keep
 from Babelor.Presentation.Case import CASE, current_datetime, case_null_keep
 from Babelor.Presentation.Datum import DATUM, datum_null_keep
@@ -44,8 +44,8 @@ class MSG:
                 self.from_json(msg)
             elif CONFIG.MSG_TPE in ["xml"]:
                 self.from_xml(msg)
-            elif CONFIG.MSG_TPE in ["msgpack"]:
-                self.from_msgpack(msg)
+            # elif CONFIG.MSG_TPE in ["msgpack"]:
+            #     self.from_msgpack(msg)
             else:
                 logging.warning("Defined serialization patterns:{0} are not supported.".format(CONFIG.MSG_TPE))
                 raise NotImplementedError("Serialization support xml, json and msgpack only.")
@@ -107,8 +107,8 @@ class MSG:
             return self.to_json()
         elif CONFIG.MSG_TPE in ["xml"]:
             return self.to_xml()
-        elif CONFIG.MSG_TPE in ["msgpack"]:
-            return self.to_msgpack()
+        # elif CONFIG.MSG_TPE in ["msgpack"]:
+        #     return self.to_msgpack()
         else:
             raise NotImplementedError("Serialization support xml, json and msgpack only.")
 
@@ -118,8 +118,8 @@ class MSG:
     def to_xml(self) -> str:
         return dict2xml(self.to_serialize())
 
-    def to_msgpack(self) -> str:
-        return dict2msgpack(self.to_serialize())
+    # def to_msgpack(self) -> str:
+    #     return dict2msgpack(self.to_serialize())
 
     def _from_dict_key(self, key: str, dt: dict, cls: classmethod, default: object = None):
         if key in dt.keys():
@@ -169,8 +169,8 @@ class MSG:
     def from_xml(self, msg: str):
         self.from_dict(xml2dict(msg))
 
-    def from_msgpack(self, msg: str):
-        self.from_dict(msgpack2dict(msg))
+    # def from_msgpack(self, msg: str):
+    #     self.from_dict(msgpack2dict(msg))
 
     def add_datum(self, datum: object, path=None):
         if self.dt_count == 0:

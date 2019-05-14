@@ -19,7 +19,7 @@ from Babelor.Application import TEMPLE
 from Babelor.Session import MQ
 
 # Let users know if they're missing any of hard dependencies
-hard_dependencies = ("pandas", "numpy", "sqlalchemy", "zmq", "xlrd", "pyftpdlib", "openpyxl")
+hard_dependencies = ("pandas", "numpy", "sqlalchemy", "zmq", "xlrd", "pyftpdlib", "openpyxl", "xlwt")
 missing_dependencies = []
 for dependency in hard_dependencies:
     try:

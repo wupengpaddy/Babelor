@@ -22,7 +22,7 @@ import pandas as pd
 import numpy as np
 # Inner Required
 from Babelor.Presentation.UniformResourceIdentifier import URL, url_null_keep
-from Babelor.Tools import dict2json, json2dict, dict2xml, xml2dict, msgpack2dict, dict2msgpack
+from Babelor.Tools import dict2json, json2dict, dict2xml, xml2dict  # , msgpack2dict, dict2msgpack
 # Global Parameters
 from Babelor.Config import CONFIG
 
@@ -41,8 +41,8 @@ class DATUM:
                 self.from_json(datum)
             elif CONFIG.MSG_TPE in ["xml"]:
                 self.from_xml(datum)
-            elif CONFIG.MSG_TPE in ["msgpack"]:
-                self.from_msgpack(datum)
+            # elif CONFIG.MSG_TPE in ["msgpack"]:
+            #     self.from_msgpack(datum)
             else:
                 logging.warning("Defined serialization patterns:{0} are not supported.".format(CONFIG.MSG_TPE))
                 raise NotImplementedError("Serialization support xml, json and msgpack only.")
@@ -101,8 +101,8 @@ class DATUM:
             return self.to_json()
         elif CONFIG.MSG_TPE in ["xml"]:
             return self.to_xml()
-        elif CONFIG.MSG_TPE in ["msgpack"]:
-            return self.to_msgpack()
+        # elif CONFIG.MSG_TPE in ["msgpack"]:
+        #     return self.to_msgpack()
         else:
             logging.warning("Defined serialization patterns:{0} are not supported.".format(CONFIG.MSG_TPE))
             raise NotImplementedError("Serialization support xml, json and msgpack only.")
@@ -113,8 +113,8 @@ class DATUM:
     def to_xml(self):
         return dict2xml(self.to_serialize())
 
-    def to_msgpack(self):
-        return dict2msgpack(self.to_serialize())
+    # def to_msgpack(self):
+    #     return dict2msgpack(self.to_serialize())
 
     def from_json(self, msg: str):
         self.from_dict(json2dict(msg))
@@ -122,8 +122,8 @@ class DATUM:
     def from_xml(self, msg: str):
         self.from_dict(xml2dict(msg))
 
-    def from_msgpack(self, msg: str):
-        self.from_dict(msgpack2dict(msg))
+    # def from_msgpack(self, msg: str):
+    #     self.from_dict(msgpack2dict(msg))
 
     def from_dict(self, dt: dict):
         self.stream = dt["stream"]
