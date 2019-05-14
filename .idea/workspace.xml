@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="be54182a-218b-4e8e-9234-62a7d88d12fc" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/Babelor/Presentation/Datum.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Presentation/Datum.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Babelor/Presentation/Message.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Presentation/Message.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Babelor/Tools/Conversion.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Tools/Conversion.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Babelor/Tools/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/Tools/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Babelor/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/Babelor/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -28,11 +24,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/setup.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="664">
-              <caret line="179" column="24" lean-forward="true" selection-start-line="179" selection-start-column="24" selection-end-line="179" selection-end-column="24" />
+            <state relative-caret-position="190">
+              <caret line="25" column="28" lean-forward="true" selection-start-line="25" selection-start-column="28" selection-end-line="25" selection-end-column="28" />
               <folding>
                 <element signature="e#33#46#0" expanded="true" />
               </folding>
@@ -41,60 +37,12 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Babelor/Tools/Conversion.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="626">
-              <caret line="165" column="36" lean-forward="true" selection-start-line="165" selection-start-column="36" selection-end-line="165" selection-end-column="36" />
-              <folding>
-                <element signature="e#619#630#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Babelor/Data/Ftpd.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="360">
-              <caret line="32" column="47" lean-forward="true" selection-start-line="32" selection-start-column="47" selection-end-line="32" selection-end-column="47" />
-              <folding>
-                <element signature="e#636#685#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Babelor/Data/Html.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="399">
-              <caret line="78" column="44" lean-forward="true" selection-start-line="78" selection-start-column="44" selection-end-line="78" selection-end-column="44" />
-              <folding>
-                <element signature="e#601#610#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Babelor/__init__.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="532">
-              <caret line="28" lean-forward="true" selection-start-line="28" selection-end-line="28" />
+            <state relative-caret-position="399">
+              <caret line="21" column="96" lean-forward="true" selection-start-line="21" selection-start-column="96" selection-end-line="21" selection-end-column="96" />
               <folding>
                 <element signature="e#618#665#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Babelor/Presentation/Datum.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="361">
-              <caret line="103" column="45" lean-forward="true" selection-start-line="103" selection-start-column="45" selection-end-line="103" selection-end-column="45" />
-              <folding>
-                <element signature="e#643#656#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -170,16 +118,16 @@
         <option value="$PROJECT_DIR$/Babelor/Config/Config.py" />
         <option value="$PROJECT_DIR$/Babelor/Data/Tomail.py" />
         <option value="$PROJECT_DIR$/Babelor/Data/Html.py" />
-        <option value="$PROJECT_DIR$/setup.py" />
         <option value="$PROJECT_DIR$/Babelor/Tools/__init__.py" />
         <option value="$PROJECT_DIR$/Babelor/Tools/Conversion.py" />
         <option value="$PROJECT_DIR$/Babelor/Presentation/Message.py" />
         <option value="$PROJECT_DIR$/Babelor/Presentation/Datum.py" />
         <option value="$PROJECT_DIR$/Babelor/__init__.py" />
+        <option value="$PROJECT_DIR$/setup.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="x" value="22" />
     <option name="y" value="18" />
     <option name="width" value="2696" />
@@ -485,13 +433,12 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="617353000" />
+    <option name="totallyTimeSpent" value="617790000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-6" y="-6" width="2263" height="1473" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.30430838" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.30430838" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -505,7 +452,7 @@
       <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.5010737" side_tool="true" weight="0.32503113" />
-      <window_info anchor="bottom" id="Terminal" order="11" visible="true" weight="0.32637855" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="11" visible="true" weight="0.32637855" />
       <window_info anchor="bottom" id="Python Console" order="12" weight="0.3275218" />
       <window_info anchor="bottom" id="Thumbnails" order="13" weight="0.32935917" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -748,52 +695,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Babelor/Data/Ftpd.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="32" column="47" lean-forward="true" selection-start-line="32" selection-start-column="47" selection-end-line="32" selection-end-column="47" />
-          <folding>
-            <element signature="e#636#685#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Babelor/Data/Tomail.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2033">
           <caret line="107" lean-forward="true" selection-start-line="107" selection-end-line="107" />
           <folding>
             <element signature="e#619#633#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Babelor/Data/Html.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="399">
-          <caret line="78" column="44" lean-forward="true" selection-start-line="78" selection-start-column="44" selection-end-line="78" selection-end-column="44" />
-          <folding>
-            <element signature="e#601#610#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/setup.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="664">
-          <caret line="179" column="24" lean-forward="true" selection-start-line="179" selection-start-column="24" selection-end-line="179" selection-end-column="24" />
-          <folding>
-            <element signature="e#33#46#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Babelor/Tools/Conversion.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="626">
-          <caret line="165" column="36" lean-forward="true" selection-start-line="165" selection-start-column="36" selection-end-line="165" selection-end-column="36" />
-          <folding>
-            <element signature="e#619#630#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -837,10 +744,50 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Babelor/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="532">
-          <caret line="28" lean-forward="true" selection-start-line="28" selection-end-line="28" />
+        <state relative-caret-position="399">
+          <caret line="21" column="96" lean-forward="true" selection-start-line="21" selection-start-column="96" selection-end-line="21" selection-end-column="96" />
           <folding>
             <element signature="e#618#665#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Babelor/Tools/Conversion.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="626">
+          <caret line="165" column="36" lean-forward="true" selection-start-line="165" selection-start-column="36" selection-end-line="165" selection-end-column="36" />
+          <folding>
+            <element signature="e#619#630#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Babelor/Data/Ftpd.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="32" column="47" lean-forward="true" selection-start-line="32" selection-start-column="47" selection-end-line="32" selection-end-column="47" />
+          <folding>
+            <element signature="e#636#685#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Babelor/Data/Html.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="399">
+          <caret line="78" column="44" lean-forward="true" selection-start-line="78" selection-start-column="44" selection-end-line="78" selection-end-column="44" />
+          <folding>
+            <element signature="e#601#610#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/setup.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="190">
+          <caret line="25" column="28" lean-forward="true" selection-start-line="25" selection-start-column="28" selection-end-line="25" selection-end-column="28" />
+          <folding>
+            <element signature="e#33#46#0" expanded="true" />
           </folding>
         </state>
       </provider>
