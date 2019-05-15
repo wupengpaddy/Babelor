@@ -23,7 +23,7 @@ NAME = "Babelor"
 # N[.N]         阶段主版本号和副版本号(可选)
 # .postN        发行后的更新版本号(可选)
 # .devN         开发期间的发行版本号(可选)
-VERSION = "0.1.2.post1.dev5"
+VERSION = "0.1.2.post2"
 
 # 库包含路径
 # Inner Required
