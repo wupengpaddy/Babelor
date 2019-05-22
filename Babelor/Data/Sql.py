@@ -21,7 +21,6 @@ import pandas as pd
 from sqlalchemy import create_engine
 # Inner Required
 from Babelor.Presentation import URL, MSG
-
 # Global Parameters
 from Babelor.Config import CONFIG
 os.environ['NLS_LANG'] = CONFIG.Default_LANG     # 切换中文字符
@@ -39,7 +38,7 @@ class SQL:
         self.engine = create_engine(self.conn.to_string())
 
     def read(self, msg: MSG):
-        logging.debug("SQL::{0}::READ msg:{1}".format(self.conn, msg))
+        # logging.debug("SQL::{0}::READ msg:{1}".format(self.conn, msg))
         # ----------------------------------
         rm_idx = []
         for i in range(0, msg.args_count, 1):
@@ -52,11 +51,11 @@ class SQL:
         if CONFIG.IS_DATA_READ_START:
             for i in rm_idx:
                 msg.remove_args(i)
-        logging.info("SQL::{0}::READ return:{1}".format(self.conn, msg))
+        logging.info("SQL::{0}::READ successfully.".format(self.conn))
         return msg
 
     def write(self, msg: MSG):
-        logging.debug("SQL::{0} write:{1}".format(self.conn, msg))
+        # logging.debug("SQL::{0} write:{1}".format(self.conn, msg))
         # ----------------------------------
         rm_idx = []
         for i in range(0, msg.dt_count, 1):

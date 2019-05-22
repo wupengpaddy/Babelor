@@ -20,7 +20,18 @@ from Babelor.Session import MQ
 from Babelor.Tools import TASKS
 
 # Let users know if they're missing any of hard dependencies
-hard_dependencies = ("pandas", "numpy", "sqlalchemy", "zmq", "xlrd", "pyftpdlib", "openpyxl", "xlwt")
+hard_dependencies = (
+    "pandas",           # python data analysis and statical     解释器：关系和标签类数据分析和统计
+    "numpy",            # python array computing                解释器：数组分析
+    "sqlalchemy",       # python database connector             SQL 连接器
+    "zmq",              # python binding for 0mq                消息中间件
+    "xlrd",             # python excel file read connector      EXCEL 读连接器 (XLS)
+    "xlwt",             # python excel file write connector     EXCEL 写连接器 (XLS)
+    "pyftpdlib",        # python async ftp server               FTPD 服务器
+    "openpyxl",         # python excel file connector           EXCEL 连接器 (XLSX)
+    "BeautifulSoup",    # python html4 descriptor               HTML 解释器
+    "requests",         # python http connector                 HTTP 连接器
+)
 missing_dependencies = []
 for dependency in hard_dependencies:
     try:

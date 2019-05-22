@@ -65,7 +65,7 @@ def first_out_last_in(conn: str, me: str, queue_ctrl: Queue, pipe_in: Pipe, pipe
             # SEND --------------------------------
             if handshake == 1:
                 socket.setsockopt(zmq.SUBSCRIBE, '')
-                logging.info("ZMQ::FOLI::{0}::{1} send:{2}".format(me, conn, "zmq.SUBSCRIBE"))
+                logging.debug("ZMQ::FOLI::{0}::{1} send:{2}".format(me, conn, "zmq.SUBSCRIBE"))
             else:
                 try:
                     msg_out = pipe_out.recv()

@@ -39,7 +39,7 @@ class FTP:
             self.url_is_dir = False
 
     def read(self, msg: MSG):
-        logging.debug("FTP::{0}::READ msg:{1}".format(self.conn, msg))
+        # logging.debug("FTP::{0}::READ msg:{1}".format(self.conn, msg))
         ftp = self.open()
         # -------------------------------------------------
         rm_idx = []
@@ -63,12 +63,12 @@ class FTP:
                     stream = pd.read_excel(temp_path)
                 else:
                     stream = pd.read_excel(temp_path, sheet_name=argument["path"])
-                logging.info("FTP::EXCEL::READ successfully.".format(path))
+                logging.info("FTP::EXCEL::{0}::READ successfully.".format(path))
             elif suffix in [".npy"]:
                 with open(temp_path, "wb") as temp_file:
                     temp_file.write(stream)
                 stream = np.load(temp_path)
-                logging.info("FTP::NUMPY::READ successfully.".format(path))
+                logging.info("FTP::NUMPY::{0}::READ successfully.".format(path))
             else:
                 logging.info("FTP::{0}::READ successfully.".format(path))
             os.remove(temp_path)
@@ -81,11 +81,11 @@ class FTP:
         if CONFIG.IS_DATA_READ_START:
             for i in rm_idx:
                 msg.remove_args(i)
-        logging.info("FTP::{0}::READ return:{1}".format(self.conn, msg))
+        logging.info("FTP::{0}::READ successfully.".format(self.conn))
         return msg
 
     def write(self, msg: MSG):
-        logging.debug("FTP::{0}::WRITE msg:{1}".format(self.conn, msg))
+        # logging.debug("FTP::{0}::WRITE msg:{1}".format(self.conn, msg))
         ftp = self.open()
         # -------------------------------------------------
         rm_idx = []

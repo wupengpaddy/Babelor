@@ -37,7 +37,7 @@ class FILE:
             self.url_is_dir = False
 
     def read(self, msg: MSG):
-        logging.debug("FILE::{0}::READ msg:{1}".format(self.conn, msg))
+        # logging.debug("FILE::{0}::READ msg:{1}".format(self.conn, msg))
         # -------------------------------------------------
         rm_idx = []
         for i in range(0, msg.args_count, 1):
@@ -68,11 +68,11 @@ class FILE:
         if CONFIG.IS_DATA_READ_START:
             for i in rm_idx:
                 msg.remove_args(i)
-        logging.info("FILE::{0}::READ return:{1}".format(self.conn, msg))
+        logging.info("FILE::{0}::READ successfully.".format(self.conn))
         return msg
 
     def write(self, msg: MSG):
-        logging.debug("FILE::{0}::WRITE msg:{1}".format(self.conn, msg))
+        # logging.debug("FILE::{0}::WRITE msg:{1}".format(self.conn, msg))
         if self.url_is_dir:
             if not os.path.exists(self.conn.path):
                 os.mkdir(self.conn.path)

@@ -23,7 +23,7 @@ NAME = "Babelor"
 # N[.N]         阶段主版本号和副版本号(可选)
 # .postN        发行后的更新版本号(可选)
 # .devN         开发期间的发行版本号(可选)
-VERSION = "0.1.2.post2"
+VERSION = "0.1.3"
 
 # 库包含路径
 # Inner Required
@@ -51,7 +51,6 @@ INSTALL_REQUIRED = [
     "xlrd>=1.2.0",              # python excel file read connector      EXCEL 读连接器 (XLS)
     "xlwt>=1.3.0",              # python excel file write connector     EXCEL 写连接器 (XLS)
     "openpyxl>=2.5.3",          # python excel file connector           EXCEL 连接器 (XLSX)
-    "msgpack-python>=0.5.6",    # python msgpack serialization          msgpack 序列化库
 ]
 
 # 库分类
@@ -176,7 +175,7 @@ if __name__ == '__main__':
         packages=PACKAGES,                      # 项目库
         include_package_data=True,              # 库包含数据
         zip_safe=True,                          # 压缩安全
-        # install_requires=INSTALL_REQUIRED,      # 安装外部依赖库
+        install_requires=INSTALL_REQUIRED,      # 安装外部依赖库
     )   # 封库    Packaged
 
 
