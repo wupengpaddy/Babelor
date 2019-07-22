@@ -119,15 +119,20 @@ class FILE:
                 msg.remove_datum(i)
 
 
-def mkdir(path: str):
-    if not os.path.exists(os.path.split(path)[0]):
-        mkdir(os.path.split(path)[0])
-        mkdir(path)
+def mkdir(file_path: str):
+    dir_path = os.path.split(file_path)[0]
+    if os.path.exists(file_path):
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+        else:
+            os.rmdir(file_path)
+    if os.path.exists(dir_path):
+        if os.path.isfile(dir_path):
+            os.remove(dir_path)
+        else:
+            pass
     else:
-        if os.path.isfile(path):
-            os.remove(path)
-        if not os.path.exists(path):
-            os.mkdir(path)
+        os.mkdir(dir_path)
 
 
 def sheets_merge(read_path, write_path):
