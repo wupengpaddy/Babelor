@@ -29,7 +29,7 @@ hard_dependencies = (
     "xlwt",             # python excel file write connector     EXCEL 写连接器 (XLS)
     "pyftpdlib",        # python async ftp server               FTPD 服务器
     "openpyxl",         # python excel file connector           EXCEL 连接器 (XLSX)
-    "BeautifulSoup",    # python html4 descriptor               HTML 解释器
+    # "BeautifulSoup",    # python html4 descriptor               HTML 解释器
     "requests",         # python http connector                 HTTP 连接器
 )
 missing_dependencies = []

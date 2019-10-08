@@ -26,6 +26,8 @@ from Babelor.Data.File import mkdir
 # Global Parameters
 from Babelor.Config import CONFIG
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s')
+
 
 class FTP:
     def __init__(self, conn: URL):

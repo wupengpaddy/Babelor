@@ -23,7 +23,7 @@ NAME = "Babelor"
 # N[.N]         阶段主版本号和副版本号(可选)
 # .postN        发行后的更新版本号(可选)
 # .devN         开发期间的发行版本号(可选)
-VERSION = "0.1.4"
+VERSION = "0.1.4.post.dev1"
 
 # 库包含路径
 # Inner Required
@@ -41,7 +41,7 @@ PACKAGES = [
 # Outer Required
 INSTALL_REQUIRED = [
     "requests>=2.18.4",         # python http connector                 HTTP 连接器
-    "beautifulsoup4>=4.6.0",    # python html4 descriptor               HTML 解释器
+    # "beautifulsoup4>=4.6.0",    # python html4 descriptor               HTML 解释器
     "SQLAlchemy>=1.2.15",       # python database connector             SQL 连接器
     "numpy>=1.15.4",            # python array computing                解释器：数组分析
     "pandas>=0.23.4",           # python data analysis and statical     解释器：关系和标签类数据分析和统计
